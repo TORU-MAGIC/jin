@@ -7,32 +7,10 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  background: #06080d;
+  background: linear-gradient(160deg, #0d0d1a 0%, #16213e 60%, #0f3460 100%);
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Segoe UI', sans-serif;
   color: #e2e8f0;
-  overflow-x: hidden;
-}
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background:
-    linear-gradient(180deg, rgba(4,7,13,.32), rgba(4,7,13,.82) 58%, rgba(4,7,13,.96)),
-    radial-gradient(circle at 52% 24%, rgba(234,179,8,.16), transparent 28%),
-    url("assets/village-night-bg.png") center / cover no-repeat;
-  transform: scale(1.02);
-}
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, rgba(0,0,0,.38), transparent 22%, transparent 78%, rgba(0,0,0,.45)),
-    radial-gradient(circle at 50% 12%, transparent 0 22%, rgba(0,0,0,.38) 78%);
 }
 #app {
   max-width: 480px;
@@ -40,7 +18,6 @@ body::after {
   padding: 1rem 1rem 3rem;
   min-height: 100vh;
   animation: fadeIn 0.25s ease;
-  position: relative;
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -65,20 +42,16 @@ p  { line-height: 1.6; }
 
 /* Cards */
 .card {
-  background: rgba(7,11,18,0.74);
-  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 14px;
   padding: 1.2rem;
-  border: 1px solid rgba(226,232,240,0.12);
+  border: 1px solid rgba(255,255,255,0.1);
   margin: 0.6rem 0;
-  box-shadow: 0 16px 42px rgba(0,0,0,.24);
-  backdrop-filter: blur(12px);
 }
 .card-colored {
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 1.2rem;
   margin: 0.6rem 0;
-  box-shadow: 0 16px 42px rgba(0,0,0,.24);
-  backdrop-filter: blur(12px);
 }
 
 /* Buttons */
@@ -106,7 +79,6 @@ p  { line-height: 1.6; }
 .ph {
   text-align: center;
   padding: 1.5rem 0 0.5rem;
-  text-shadow: 0 2px 24px rgba(0,0,0,.65);
 }
 .ph .icon { font-size: 3rem; margin-bottom: 0.3rem; }
 .ph h1 { margin: 0.2rem 0; }
@@ -174,11 +146,9 @@ label { color: #94a3b8; font-size: 0.85rem; display: block; margin-bottom: 0.15r
 .role-reveal-card {
   text-align: center;
   padding: 2.2rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 18px;
   border: 2px solid;
   margin: 1rem 0;
-  box-shadow: 0 18px 48px rgba(0,0,0,.32);
-  backdrop-filter: blur(12px);
 }
 .rrc-icon { font-size: 5rem; margin: 0.5rem 0; }
 .rrc-name { font-size: 2.6rem; font-weight: 900; margin: 0.2rem 0; }
@@ -246,26 +216,19 @@ details summary:hover { color: #94a3b8; }
 .log-entry { color: #64748b; font-size: 0.83rem; padding: 0.2rem 0 0.2rem 0.5rem; border-left: 2px solid rgba(255,255,255,0.08); margin: 0.2rem 0; }
 /* Chat feed */
 .chat-feed {
-  max-height: min(46vh, 430px);
-  min-height: 230px;
-  overflow-y: auto;
-  background: rgba(2,6,12,0.72);
-  border: 1px solid rgba(226,232,240,.1);
-  border-radius: 8px;
-  padding: 0.75rem;
-  margin: 0.5rem 0;
+  max-height: 260px; overflow-y: auto;
+  background: rgba(0,0,0,0.25); border-radius: 12px;
+  padding: 0.7rem; margin: 0.5rem 0;
   scroll-behavior: smooth;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 44px rgba(0,0,0,.22);
-  backdrop-filter: blur(10px);
 }
-.chat-msg { margin: 0.45rem 0; padding: 0.6rem 0.7rem; background: rgba(255,255,255,0.07); border-radius: 8px; }
+.chat-msg { margin: 0.35rem 0; padding: 0.45rem 0.7rem; background: rgba(255,255,255,0.06); border-radius: 8px; }
 .chat-name { color: #818cf8; font-weight: 700; font-size: 0.82rem; margin-right: 0.45rem; }
-.chat-text { color: #e2e8f0; font-size: 0.94rem; line-height: 1.65; }
-.chat-typing { color: #94a3b8; font-size: 0.82rem; padding: 0.45rem 0.6rem; font-style: italic; }
+.chat-text { color: #e2e8f0; font-size: 0.9rem; }
+.chat-typing { color: #475569; font-size: 0.78rem; padding: 0.3rem 0.6rem; font-style: italic; }
 .wolf-msg { background: rgba(239,68,68,0.1); border-left: 3px solid #ef444488; }
 .wolf-msg .chat-name { color: #f87171; }
 /* ── Opening Story ── */
-.story-overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(2,6,12,.24),rgba(2,6,12,.92) 68%,#02040a),url("assets/village-night-bg.png") center / cover no-repeat;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;}
+.story-overlay{position:fixed;inset:0;background:#050510;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;}
 .story-moon{font-size:4.5rem;margin-bottom:1.5rem;}
 .story-text{color:#c8d8f4;font-size:1.1rem;line-height:2;max-width:380px;min-height:4rem;transition:opacity .4s ease;}
 .story-cursor{display:inline-block;width:2px;height:1em;background:#a5b4fc;margin-left:2px;vertical-align:middle;opacity:.7;}
@@ -307,7 +270,7 @@ details summary:hover { color: #94a3b8; }
 
 /* ── Character Avatars ── */
 .avatar-grid{display:flex;flex-wrap:wrap;gap:.5rem;margin:.4rem 0;}
-.avatar-card{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.6rem .4rem;min-width:72px;max-width:80px;cursor:pointer;transition:background .15s;}
+.avatar-card{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.6rem .4rem;min-width:72px;max-width:80px;cursor:pointer;transition:background .15s;}
 .avatar-card:hover{background:rgba(255,255,255,.12);}
 .avatar-card.selected{border:2px solid #6b21a8;background:rgba(107,33,168,.15);}
 .avatar-card.dead{opacity:.4;filter:grayscale(1);}
@@ -331,21 +294,15 @@ details summary:hover { color: #94a3b8; }
 .de-role{font-size:.8rem;}
 
 /* ── Chat Message with Avatar ── */
-.chat-msg{margin:.45rem 0;padding:.62rem .72rem;background:rgba(255,255,255,.07);border-radius:8px;display:flex;align-items:flex-start;gap:.65rem;}
-.cm-av{flex-shrink:0;line-height:1;}
+.chat-msg{margin:.4rem 0;padding:.5rem .7rem;background:rgba(255,255,255,.06);border-radius:8px;display:flex;align-items:flex-start;gap:.5rem;}
+.cm-av{font-size:1.4rem;flex-shrink:0;line-height:1;}
 .cm-body{flex:1;}
-.cm-name{color:#c4b5fd;font-weight:800;font-size:.83rem;display:flex;align-items:center;gap:.28rem;flex-wrap:wrap;}
-.cm-text{color:#f8fafc;font-size:.94rem;line-height:1.68;margin-top:.18rem;word-break:break-word;}
+.cm-name{color:#818cf8;font-weight:700;font-size:.82rem;}
+.cm-text{color:#e2e8f0;font-size:.9rem;margin-top:.1rem;}
 .wolf-msg{background:rgba(239,68,68,.1);border-left:3px solid #ef444488;}
 .wolf-msg .cm-name{color:#f87171;}
 .seer-claim-msg{background:rgba(129,140,248,.1);border-left:3px solid #818cf888;}
 .my-msg{background:rgba(99,102,241,.12);border-left:3px solid #6b21a8;}
-.portrait{display:inline-block;background-image:url("assets/realistic-portraits-grid.png");background-size:400% 300%;background-repeat:no-repeat;background-color:#111827;border:1px solid rgba(255,255,255,.18);box-shadow:0 6px 18px rgba(0,0,0,.35);overflow:hidden;vertical-align:middle;}
-.portrait-chat{width:38px;height:38px;border-radius:50%;}
-.portrait-chip{width:22px;height:22px;border-radius:50%;margin-right:.25rem;flex-shrink:0;}
-.portrait-lg{width:76px;height:76px;border-radius:8px;}
-.portrait-xl{width:112px;height:112px;border-radius:8px;}
-.portrait-emoji{display:none;}
 
 /* Template picker */
 .tpl-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin: 0.5rem 0; }
@@ -363,16 +320,11 @@ details summary:hover { color: #94a3b8; }
 .music-bar{background:rgba(251,191,36,.1);border:1px solid #fbbf2433;border-radius:10px;padding:.4rem .8rem;display:flex;align-items:center;gap:.5rem;margin:.3rem 0;}
 @keyframes musicPulse{0%,100%{opacity:1;}50%{opacity:.25;}}
 /* ── Free chat input bar ── */
-.chat-compose{position:relative;background:linear-gradient(180deg,rgba(9,13,22,.76),rgba(9,13,22,.94));border:1px solid rgba(226,232,240,.12);border-radius:8px;padding:.5rem;margin:.45rem 0 .2rem;box-shadow:0 14px 34px rgba(0,0,0,.26);backdrop-filter:blur(14px);}
-.quick-chat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.32rem;margin-bottom:.42rem;}
-.quick-chat-row select{grid-column:span 3;margin:0;padding:.44rem .55rem;font-size:.82rem;background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);}
-.quick-fill{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#cbd5e1;border-radius:7px;padding:.42rem .34rem;font-size:.76rem;font-weight:700;cursor:pointer;white-space:nowrap;}
-.quick-fill:active{background:rgba(255,255,255,.14);}
-.free-chat-bar{display:flex;gap:.4rem;margin:0;}
-.free-chat-bar input{flex:1;min-width:0;padding:.66rem .75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:8px;color:#f8fafc;font-size:.95rem;outline:none;line-height:1.3;}
-.free-chat-bar input:focus{border-color:#fbbf24;box-shadow:0 0 0 2px rgba(251,191,36,.12);}
+.free-chat-bar{display:flex;gap:.35rem;margin:.35rem 0;}
+.free-chat-bar input{flex:1;min-width:0;padding:.55rem .7rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:9px;color:#e2e8f0;font-size:.9rem;outline:none;}
+.free-chat-bar input:focus{border-color:#6b21a8;}
 .free-chat-bar input::placeholder{color:#475569;}
-.free-chat-bar .send-btn{padding:.62rem .9rem;border:none;border-radius:8px;background:linear-gradient(135deg,#b45309,#0369a1);color:#fff;font-size:.88rem;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.free-chat-bar .send-btn{padding:.55rem .9rem;border:none;border-radius:9px;background:linear-gradient(135deg,#6b21a8,#4338ca);color:#fff;font-size:.88rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
 .free-chat-bar .send-btn:active{opacity:.8;}
 /* ── Quick agree button ── */
 .quick-agree{background:rgba(99,102,241,.18);border:1px solid #4338ca55;color:#a5b4fc;font-size:.66rem;padding:.1rem .32rem;border-radius:6px;cursor:pointer;margin-left:.3rem;vertical-align:middle;line-height:1.4;}
@@ -413,18 +365,16 @@ details summary:hover { color: #94a3b8; }
 <script>
 // ========== CHARACTER AVATARS ==========
 const CHARACTER_AVATARS = [
-  { emoji:'🕵️', label:'影森 レン',   hint:'冷静な観察者。小さな矛盾を見逃さない', pos:'0% 0%' },
-  { emoji:'👩‍🌾', label:'橘 ミオ',     hint:'村の事情に詳しいが、口数は多くない', pos:'33.333% 0%' },
-  { emoji:'🔮', label:'朧月 玄斎',   hint:'古い伝承を語る神秘的な老人', pos:'66.667% 0%' },
-  { emoji:'📚', label:'白井 ユキ',   hint:'記録係。発言の順番まで覚えている', pos:'100% 0%' },
-  { emoji:'🛡️', label:'黒瀬 ガク',   hint:'厳格な護衛役。疑いにも動じない', pos:'0% 50%' },
-  { emoji:'👑', label:'月城 セラ',   hint:'気品ある名家の人物。味方なら心強い', pos:'33.333% 50%' },
-  { emoji:'💊', label:'深山 ナツ',   hint:'村の医師。誰を守るべきか悩んでいる', pos:'66.667% 50%' },
-  { emoji:'🧳', label:'久遠 カイ',   hint:'旅人。外から来たぶん情報が少ない', pos:'100% 50%' },
-  { emoji:'🎭', label:'篠宮 アヤ',   hint:'表情を読ませない策士', pos:'0% 100%' },
-  { emoji:'🔥', label:'朝倉 ハル',   hint:'明るい先導役。空気を一気に変える', pos:'33.333% 100%' },
-  { emoji:'🍺', label:'樫村 ゴロウ', hint:'宿屋の主人。噂話をよく知っている', pos:'66.667% 100%' },
-  { emoji:'🌲', label:'青葉 サキ',   hint:'森を歩く案内人。夜の気配に敏感', pos:'100% 100%' },
+  { emoji:'🧙‍♂️', label:'老魔術師',   hint:'謎に包まれた老人…何か知っていそう' },
+  { emoji:'🕵️',   label:'かげろう',   hint:'鋭い目つきの調査員。信用できる？' },
+  { emoji:'🧛',   label:'ドラクール', hint:'怪しい雰囲気の貴族…人狼では？' },
+  { emoji:'👨‍🌾',  label:'のどか',    hint:'普通の農夫に見えるが…' },
+  { emoji:'🦹‍♀️', label:'シャドウ',  hint:'影のある女性。何かを隠している？' },
+  { emoji:'🧝‍♀️', label:'エルファ',  hint:'神秘的な森の住人。占い師かも' },
+  { emoji:'👮‍♂️', label:'田中巡査',  hint:'真面目そうな顔だが…' },
+  { emoji:'🧟',   label:'ゾンビ',    hint:'生気のない目。何があった？' },
+  { emoji:'🧜‍♀️', label:'ナミ',     hint:'不思議な雰囲気。本当の姿は？' },
+  { emoji:'🦸‍♂️', label:'ブレイブ',  hint:'正義感の強い青年。騎士かも' },
 ];
 
 function getAvatar(name, players) {
@@ -433,7 +383,7 @@ function getAvatar(name, players) {
 }
 
 // ========== AUDIO SYSTEM ==========
-const SONGS = ['人狼ゲーム1.mp3','人狼ゲーム2.mp3','人狼ゲーム3.mp3','人狼ゲーム4.mp3','人狼ゲーム5.mp3','人狼ゲーム6.mp3','オオカミの夜１.mp3'];
+const SONGS = ['人狼ゲーム1.mp3','人狼ゲーム2.mp3','人狼ゲーム3.mp3','人狼ゲーム4.mp3','人狼ゲーム5.mp3','人狼ゲーム6.mp3','月下の投票１','オオカミの夜１.mp3'];
 let bgmAudio = null;
 let _usedSongs = [];
 let _audioUnlocked = false;
@@ -651,14 +601,14 @@ function myRoleReminder() {
 
 // ========== チャット速度設定 ==========
 // 議論チャットの表示速度。大きいほどゆっくり。プレイヤーが画面から変更可能。
-let chatSpeedMult = 1.55; // 既定はゆっくりめ（初心者が読みやすい速度）
+let chatSpeedMult = 1.6; // 既定はゆっくりめ（初心者が読みやすい速度）
 function cycleChatSpeed() {
-  // 熟読(1.9) → ゆっくり(1.55) → 標準(1.15) → はやい(0.85) → 熟読 …
-  chatSpeedMult = chatSpeedMult >= 1.85 ? 1.55 : (chatSpeedMult >= 1.45 ? 1.15 : (chatSpeedMult >= 1.0 ? 0.85 : 1.9));
+  // ゆっくり(1.6) → 標準(1.15) → はやい(0.85) → ゆっくり …
+  chatSpeedMult = chatSpeedMult >= 1.5 ? 1.15 : (chatSpeedMult >= 1.0 ? 0.85 : 1.6);
   try { localStorage.setItem('jinrou_chatSpeed', String(chatSpeedMult)); } catch(e){}
 }
 function chatSpeedLabel() {
-  return chatSpeedMult >= 1.85 ? '📖 熟読' : chatSpeedMult >= 1.45 ? '🐢 ゆっくり' : chatSpeedMult >= 1.0 ? '🚶 標準' : '🐇 はやい';
+  return chatSpeedMult >= 1.5 ? '🐢 ゆっくり' : chatSpeedMult >= 1.0 ? '🚶 標準' : '🐇 はやい';
 }
 // 起動時に保存済み速度を復元
 try { const _s = parseFloat(localStorage.getItem('jinrou_chatSpeed')); if (_s>0) chatSpeedMult = _s; } catch(e){}
@@ -670,40 +620,7 @@ function typingDelay(personality) {
 // 発言を読む間（テキスト長に比例。速度設定をそのまま反映する主レバー）
 function readPause(text) {
   const len = text ? text.length : 12;
-  const raw = 950 + len * 78;
-  return Math.round(Math.max(1700, Math.min(5600, raw)) * chatSpeedMult);
-}
-
-function quickChatPanel(inputId='discFreeInput', targetId='quickChatTarget') {
-  const others = (O.alive||[]).filter(p=>p.name!==O.playerName);
-  const targetOptions = others.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');
-  const targetSelect = others.length
-    ? `<select id="${targetId}" aria-label="発言の対象">${targetOptions}</select>` : '';
-  return `
-    <div class="quick-chat-row">
-      ${targetSelect}
-      <button class="quick-fill" data-chat-input="${inputId}" data-chat-target="${targetId}" data-chat-template="{n}さんの発言が少し気になります。理由を聞かせてください。">疑う</button>
-      <button class="quick-fill" data-chat-input="${inputId}" data-chat-target="${targetId}" data-chat-template="{n}さんの意見に同意します。その線で見たいです。">同意</button>
-      <button class="quick-fill" data-chat-input="${inputId}" data-chat-target="${targetId}" data-chat-template="{n}さんは今のところ信用寄りで見ています。">信用</button>
-      <button class="quick-fill" data-chat-input="${inputId}" data-chat-template="役職COがある人は、結果と理由を教えてください。">CO確認</button>
-      <button class="quick-fill" data-chat-input="${inputId}" data-chat-template="誰が誰を疑っているか、一度整理したいです。">整理</button>
-      <button class="quick-fill" data-chat-input="${inputId}" data-chat-template="今日は投票先を早めに決めたいです。候補を出しましょう。">投票相談</button>
-    </div>`;
-}
-
-function quickWolfChatPanel() {
-  const targets = (O.alive||[]).filter(p=>p.name!==O.playerName);
-  const opts = targets.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');
-  return `
-    <div class="quick-chat-row">
-      ${targets.length ? `<select id="wolfQuickTarget" aria-label="メモ対象">${opts}</select>` : ''}
-      <button class="quick-fill" data-chat-input="wolfFreeInput" data-chat-target="wolfQuickTarget" data-chat-template="今夜は{n}さんを優先したいです。">優先</button>
-      <button class="quick-fill" data-chat-input="wolfFreeInput" data-chat-target="wolfQuickTarget" data-chat-template="{n}さんは発言力が強いので警戒したいです。">警戒</button>
-      <button class="quick-fill" data-chat-input="wolfFreeInput" data-chat-target="wolfQuickTarget" data-chat-template="{n}さんに票を集める流れを作れそうです。">誘導</button>
-      <button class="quick-fill" data-chat-input="wolfFreeInput" data-chat-template="占い師COの人を確認してから襲撃先を決めましょう。">CO確認</button>
-      <button class="quick-fill" data-chat-input="wolfFreeInput" data-chat-template="昼は自然に同調して、強く庇いすぎないようにします。">昼方針</button>
-      <button class="quick-fill" data-chat-input="wolfFreeInput" data-chat-template="投票先は直前に合わせましょう。">票合わせ</button>
-    </div>`;
+  return Math.round(Math.min(3600, 700 + len*70) * chatSpeedMult);
 }
 
 const CONFIGS = {
@@ -813,13 +730,7 @@ function mkSelect(id, players) {
 }
 
 function esc(s) {
-  s = String(s ?? '');
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function avatarFace(av, cls='portrait-chat') {
-  const safe = av || CHARACTER_AVATARS[0];
-  return `<span class="portrait ${cls}" style="background-position:${safe.pos||'0% 0%'};" title="${esc(safe.label||'')}"><span class="portrait-emoji">${safe.emoji||'👤'}</span></span>`;
 }
 
 function val(id) { const e = document.getElementById(id); return e ? e.value : ''; }
@@ -1019,7 +930,7 @@ function renderWolf(actors) {
     const isSel = sel === t.name;
     return `<div class="night-card${isSel?' selected':''}" onclick="localWolfPick('${t.name.replace(/'/g,"\\'")}')">
       <div class="nc-check">✓</div>
-      <div class="nc-emoji">${avatarFace(av, 'portrait-lg')}</div>
+      <div class="nc-emoji">${av.emoji}</div>
       <div class="nc-name">${esc(t.name)}</div>
     </div>`;
   }).join('');
@@ -1529,22 +1440,8 @@ function bindEvents() {
     render();
   });
 
-  // DISCUSS - チャット速度切替（熟読/ゆっくり/標準/はやい）
+  // DISCUSS - チャット速度切替（ゆっくり/標準/はやい）
   on('btnChatSpeed', () => { cycleChatSpeed(); render(); });
-
-  // DISCUSS/WOLF - クイック入力（送信せず、編集できるよう入力欄へ入れる）
-  document.querySelectorAll('[data-chat-template]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const input = document.getElementById(btn.dataset.chatInput || 'discFreeInput');
-      if (!input) return;
-      const targetEl = document.getElementById(btn.dataset.chatTarget || '');
-      const target = targetEl ? targetEl.value : '';
-      const text = (btn.dataset.chatTemplate || '').replace(/\{n\}/g, target || 'その人');
-      input.value = text;
-      input.focus();
-      input.setSelectionRange(input.value.length, input.value.length);
-    });
-  });
 
   // DISCUSS - フリーテキスト送信
   on('discFreeSend', () => {
@@ -3308,7 +3205,7 @@ function renderNotebook(){
     const bd = m==='suspect'?'#ef444455':m==='trust'?'#22c55e55':'rgba(255,255,255,.1)';
     const bg = m==='suspect'?'rgba(239,68,68,.08)':m==='trust'?'rgba(34,197,94,.08)':'rgba(255,255,255,.04)';
     return `<button class="note-btn" style="border:1px solid ${bd};background:${bg};" onclick="toggleNote('${p.name.replace(/'/g,"\\'")}')">
-      ${avatarFace(av, 'portrait-chip')}
+      <span style="font-size:1.3rem;">${av.emoji}</span>
       <span style="flex:1;font-size:.86rem;font-weight:600;">${esc(p.name)}</span>${state}
     </button>`;
   }).join('');
@@ -3451,19 +3348,20 @@ function renderOpening() {
 function renderPreOpening() {
   return `
     <div class="story-overlay" id="preOpeningTap" style="cursor:pointer;gap:0;">
-      <div style="font-size:5.5rem;margin-bottom:.8rem;filter:drop-shadow(0 8px 30px rgba(0,0,0,.72));animation:musicPulse 2.4s ease-in-out infinite;">🐺</div>
-      <h1 style="font-size:2.55rem;font-weight:900;letter-spacing:0;margin:.2rem 0 .5rem;color:#f8fafc;text-shadow:0 3px 28px rgba(0,0,0,.85);">
+      <div style="font-size:5.5rem;margin-bottom:.8rem;animation:musicPulse 2.4s ease-in-out infinite;">🐺</div>
+      <h1 style="font-size:2.6rem;font-weight:900;letter-spacing:.06em;margin:.2rem 0 .5rem;
+        background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
         人狼ゲーム
       </h1>
-      <p style="color:#cbd5e1;font-size:.95rem;margin:.3rem 0 2.4rem;line-height:1.9;text-shadow:0 2px 16px rgba(0,0,0,.8);">
+      <p style="color:#475569;font-size:.9rem;margin:.3rem 0 2.4rem;line-height:1.9;">
         夜の村に潜む人狼を<br>見つけ出せ
       </p>
-      <div style="padding:.9rem 2.5rem;background:linear-gradient(135deg,#b45309,#0369a1);
+      <div style="padding:.9rem 2.5rem;background:linear-gradient(135deg,#6b21a8,#4338ca);
         border-radius:30px;color:#fff;font-size:1.05rem;font-weight:700;letter-spacing:.04em;
-        animation:musicPulse 1.7s ease-in-out infinite;box-shadow:0 0 28px rgba(180,83,9,.42);pointer-events:none;">
+        animation:musicPulse 1.7s ease-in-out infinite;box-shadow:0 0 28px #6b21a866;pointer-events:none;">
         ▶ タップして始める
       </div>
-      <p style="color:#64748b;font-size:.68rem;margin-top:1.6rem;letter-spacing:.12em;">TAP ANYWHERE TO START</p>
+      <p style="color:#1e293b;font-size:.68rem;margin-top:1.6rem;letter-spacing:.12em;">TAP ANYWHERE TO START</p>
     </div>`;
 }
 
@@ -3477,7 +3375,7 @@ function showKillDrama(name, role, onClose) {
   el.className = 'kill-overlay';
   el.id = 'killOverlay';
   el.innerHTML = `
-    <div class="kill-icon">${avatarFace(av, 'portrait-xl')}</div>
+    <div class="kill-icon">${av.emoji}</div>
     <div class="kill-title">💀 昨夜の犠牲者</div>
     <div class="kill-name">${esc(name)}</div>
     <div style="color:#64748b;font-size:.78rem;margin:.2rem 0;">${av.label} ─ 「${av.hint}」</div>
@@ -4370,7 +4268,7 @@ function renderOWolfChat() {
         const av = getAvatar(n, O.players);
         const isMe = n === O.playerName;
         return `<div style="text-align:center;">
-          <div style="margin-bottom:.35rem;">${avatarFace(av, 'portrait-lg')}</div>
+          <div style="font-size:2.2rem;">${av.emoji}</div>
           <div style="font-size:.76rem;color:${isMe?'#fca5a5':'#f87171'};font-weight:700;margin-top:.2rem;">${esc(n)}${isMe?'（あなた）':''}</div>
           <div style="font-size:.65rem;color:#475569;">${av.label}</div>
         </div>`;
@@ -4382,7 +4280,7 @@ function renderOWolfChat() {
     const av = getAvatar(m.name, O.players);
     const isMe = m.name === O.playerName;
     return `<div class="chat-msg${isMe?' my-msg':''}">
-      <div class="cm-av">${avatarFace(av)}</div>
+      <div class="cm-av">${av.emoji}</div>
       <div class="cm-body">
         <div class="cm-name">${esc(m.name)}${isMe?' (あなた)':''}</div>
         <div class="cm-text">${esc(m.text)}</div>
@@ -4414,12 +4312,9 @@ function renderOWolfChat() {
     <div class="chat-feed" id="wolfFeed">${msgs}
       ${!msgs ? '<div class="chat-typing" style="color:#475569;">💬 メッセージを入力してください...</div>' : ''}
     </div>
-    <div class="chat-compose">
-      ${quickWolfChatPanel()}
-      <div class="free-chat-bar">
-        <input type="text" id="wolfFreeInput" placeholder="メモを入力..." maxlength="200">
-        <button class="send-btn" id="wolfFreeSend">送信</button>
-      </div>
+    <div class="free-chat-bar">
+      <input type="text" id="wolfFreeInput" placeholder="メモを入力..." maxlength="200">
+      <button class="send-btn" id="wolfFreeSend">送信</button>
     </div>
     <p class="tpl-section-label" style="color:#334155;">クイック入力</p>
     ${tplButtons}
@@ -4444,7 +4339,7 @@ function renderODiscuss() {
     const agreeBtn = (O.isMyDiscTurn && !isMe)
       ? `<button class="quick-agree" data-agree-name="${esc(m.name)}">👍 同調</button>` : '';
     return `<div class="chat-msg${isMe?' my-msg':''}">
-      <div class="cm-av">${avatarFace(av)}</div>
+      <div class="cm-av">${av.emoji}</div>
       <div class="cm-body">
         <div class="cm-name">${esc(m.name)} ${claimBadge}${agreeBtn}</div>
         <div class="cm-text">${esc(m.text)}</div>
@@ -4454,10 +4349,10 @@ function renderODiscuss() {
 
   // タイピングインジケーター（アバター付き）
   const typingHtml = (O.currentSpeaker && !O.isMyDiscTurn)
-      ? (() => {
+    ? (() => {
         const av = getAvatar(O.currentSpeaker, O.players);
         return `<div class="chat-typing" style="display:flex;align-items:center;gap:.4rem;">
-          ${avatarFace(av, 'portrait-chip')}<span>⏳ ${esc(O.currentSpeaker)} が話しています...</span>
+          <span>${av.emoji}</span><span>⏳ ${esc(O.currentSpeaker)} が話しています...</span>
         </div>`;
       })() : '';
   const waitHtml = (!O.isMyDiscTurn && !O.currentSpeaker && msgs)
@@ -4473,7 +4368,7 @@ function renderODiscuss() {
           <p style="color:#ef4444; font-size:.78rem; font-weight:700; letter-spacing:.14em; margin:0 0 .5rem;">
             🌑 第${O.day}日の夜明け ─ 犠牲者が発見されました
           </p>
-          <div style="margin:.45rem 0;">${avatarFace(av, 'portrait-xl')}</div>
+          <div style="font-size:4rem; line-height:1; margin:.3rem 0;">${av.emoji}</div>
           <div style="font-size:1.9rem; font-weight:900; color:#fff; margin:.3rem 0;">${esc(elim.name)}</div>
           <div style="color:#64748b; font-size:.75rem; margin:.1rem 0;">${av.label} ─ 「${av.hint}」</div>
           <div style="color:#64748b; font-size:.8rem; margin-top:.4rem; font-style:italic;">役職は不明…</div>
@@ -4493,7 +4388,7 @@ function renderODiscuss() {
     const badge = claim ? `<span class="claim-badge claim-unverified">${
       claim==='SEER'?'🔮?':claim==='DOCTOR'?'💊?':claim==='MEDIUM'?'👁️?':'🐱?'
     }</span>` : '';
-    return `<span class="chip" style="display:inline-flex;align-items:center;">${avatarFace(av, 'portrait-chip')} ${esc(p.name)}${badge}</span>`;
+    return `<span class="chip">${av.emoji} ${esc(p.name)}${badge}</span>`;
   }).join('');
 
   // 死亡リスト（役職確定済みのみ）
@@ -4508,7 +4403,7 @@ function renderODiscuss() {
           const causeIsNeko = d.cause === '猫又';
           const causeLabel = causeIsWolf ? '🐺 人狼に' : causeIsNeko ? '🐱 猫又に' : '⚖️ 処刑で';
           return `<div class="death-entry">
-            ${avatarFace(d.avatar, 'portrait-chip')}
+            <span class="de-avatar">${d.avatar.emoji}</span>
             <span class="de-name">${esc(d.name)}</span>
             <span class="de-role" style="color:#475569;">❓ 役職不明</span>
             <span style="font-size:.7rem;color:#475569;">${causeLabel}死亡</span>
@@ -4533,12 +4428,9 @@ function renderODiscuss() {
   // フリーテキスト入力（生存者なら常に表示）
   const myAlive = O.alive.some(p=>p.name===O.playerName);
   const freeInput = myAlive ? `
-    <div class="chat-compose">
-      ${quickChatPanel()}
-      <div class="free-chat-bar">
-        <input type="text" id="discFreeInput" placeholder="${O.isMyDiscTurn?'💬 あなたの番！自由に発言...':'💬 自由に発言できます...'}" maxlength="220">
-        <button class="send-btn" id="discFreeSend">送信</button>
-      </div>
+    <div class="free-chat-bar">
+      <input type="text" id="discFreeInput" placeholder="${O.isMyDiscTurn?'💬 あなたの番！自由に発言...':'💬 自由に発言できます...'}" maxlength="200">
+      <button class="send-btn" id="discFreeSend">送信</button>
     </div>` : '';
 
   // 投票開始ボタン
@@ -4761,7 +4653,7 @@ function renderORole() {
           ${O.wolfPartners.map(name => {
             const pav = getAvatar(name, O.players);
             return `<div style="text-align:center;">
-              <div style="margin-bottom:.35rem;">${avatarFace(pav, 'portrait-lg')}</div>
+              <div style="font-size:2rem;">${pav.emoji}</div>
               <div style="font-size:.8rem;color:#f87171;font-weight:700;margin-top:.2rem;">${esc(name)}</div>
               <div style="font-size:.68rem;color:#475569;">${pav.label}</div>
             </div>`;
@@ -4774,7 +4666,7 @@ function renderORole() {
   return `
     ${ph('📱','あなたの役職','他の人に見せないでください')}
     <div style="text-align:center;margin:.5rem 0;">
-      <div>${avatarFace(myAv, 'portrait-xl')}</div>
+      <div style="font-size:3.5rem;">${myAv.emoji}</div>
       <div style="font-size:.85rem;color:#94a3b8;margin-top:.2rem;">${myAv.label}</div>
       <div style="font-size:.75rem;color:#475569;font-style:italic;margin-top:.1rem;">「${myAv.hint}」</div>
     </div>
@@ -4804,7 +4696,7 @@ function renderONight() {
       extra = `
         <div style="border:2px solid ${c}; background:${c}14; border-radius:16px; padding:1.4rem; text-align:center; margin-top:1rem;">
           <p style="color:#818cf8; font-size:.8rem; font-weight:700; letter-spacing:.1em; margin:0 0 .5rem;">🔮 占い結果</p>
-          <div style="margin:.35rem 0;">${avatarFace(tav, 'portrait-xl')}</div>
+          <div style="font-size:3rem; line-height:1; margin:.3rem 0;">${tav.emoji}</div>
           <div style="font-size:1.7rem; font-weight:900; color:#fff; margin:.3rem 0;">${esc(O.seerResult.target)}</div>
           <div style="color:#64748b; font-size:.72rem; margin-bottom:.4rem;">${tav.label} ─ 「${tav.hint}」</div>
           <div style="font-size:1.4rem; font-weight:800; color:${c}; margin:.4rem 0;">
@@ -4888,7 +4780,7 @@ function renderONight() {
       const isSel = sel === t.name;
       return `<div class="night-card${isSel?' selected':''}" data-wolf-pick="${esc(t.name)}">
         <div class="nc-check">✓</div>
-        <div class="nc-emoji">${avatarFace(av, 'portrait-lg')}</div>
+        <div class="nc-emoji">${av.emoji}</div>
         <div class="nc-name">${esc(t.name)}</div>
       </div>`;
     }).join('');
@@ -4904,10 +4796,7 @@ function renderONight() {
 
 function renderODay() {
   const elim = O.eliminatedLastNight;
-  const chips = O.alive.map(p => {
-    const av = getAvatar(p.name, O.players);
-    return `<span class="chip" style="display:inline-flex;align-items:center;">${avatarFace(av, 'portrait-chip')} ${esc(p.name)}</span>`;
-  }).join('');
+  const chips = O.alive.map(p => `<span class="chip">${esc(p.name)}</span>`).join('');
   const elimCard = elim
     ? `<div class="card-colored vote-drama" style="text-align:center; border:2px solid #ef4444; background:#ef444418; padding:1.5rem;">
         <p style="color:#ef4444;font-size:.8rem;font-weight:700;letter-spacing:.1em;margin:0 0 .4rem;">💀 昨夜の犠牲者</p>
@@ -4947,7 +4836,7 @@ function renderOVote() {
         ${O.deadPlayers.map(d => {
           const causeLabel = d.cause==='人狼'?'🐺':d.cause==='猫又'?'🐱':'⚖️';
           return `<div class="death-entry">
-            ${avatarFace(d.avatar, 'portrait-chip')}
+            <span class="de-avatar">${d.avatar.emoji}</span>
             <span class="de-name">${esc(d.name)}</span>
             <span class="de-role" style="color:#475569;">❓ 役職不明</span>
             <span style="font-size:.7rem;color:#475569;">${causeLabel}</span>
@@ -4985,7 +4874,7 @@ function renderOVote() {
           style="display:flex;flex-direction:column;align-items:center;min-width:68px;padding:.5rem .4rem;
                  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;
                  cursor:pointer;transition:background .15s;color:#e2e8f0;">
-          ${avatarFace(av, 'portrait-lg')}
+          <span style="font-size:2rem;line-height:1;">${av.emoji}</span>
           <span style="font-size:.75rem;font-weight:600;margin-top:.2rem;">${esc(p.name)}</span>
           ${(['solo','p2p','online'].includes(mode) && (O.notebook||{})[p.name]) ? `<span style="font-size:.58rem;display:block;color:${O.notebook[p.name]==='suspect'?'#f87171':'#4ade80'};">${O.notebook[p.name]==='suspect'?'🐺怪しい':'🤍信用'}</span>` : ''}
           ${badge}
