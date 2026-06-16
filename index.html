@@ -318,9 +318,19 @@ details summary:hover { color: #94a3b8; }
 
 /* ── Role Claim Badge ── */
 .claim-badge{display:inline-flex;align-items:center;gap:.2rem;font-size:.72rem;padding:.1rem .4rem;border-radius:10px;margin-left:.3rem;font-weight:700;}
+.claim-badge .claim-icon{font-size:.9rem;line-height:1;}
+.claim-badge.compact{gap:.12rem;margin-left:.25rem;padding:.08rem .32rem;font-size:.66rem;}
 .claim-unverified{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid #fbbf2433;}
 .claim-confirmed{background:rgba(129,140,248,.2);color:#a5b4fc;border:1px solid #818cf855;}
 .claim-dead-wolf{background:rgba(239,68,68,.2);color:#f87171;border:1px solid #ef444455;}
+.co-chat-panel{background:rgba(7,11,18,.72);border:1px solid rgba(251,191,36,.26);border-radius:8px;margin:.45rem 0;padding:.65rem;box-shadow:0 14px 34px rgba(0,0,0,.22);backdrop-filter:blur(12px);}
+.co-chat-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;color:#fbbf24;font-size:.82rem;font-weight:900;margin-bottom:.45rem;}
+.co-chat-count{color:#94a3b8;font-size:.72rem;font-weight:700;}
+.co-chat-feed{display:flex;flex-direction:column;gap:.38rem;max-height:170px;overflow-y:auto;scroll-behavior:smooth;}
+.co-chat-empty{color:#64748b;font-size:.8rem;line-height:1.6;padding:.25rem .35rem;}
+.co-msg{display:flex;gap:.5rem;align-items:flex-start;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.16);border-radius:8px;padding:.5rem .55rem;}
+.co-msg-name{display:flex;align-items:center;gap:.25rem;flex-wrap:wrap;color:#f8fafc;font-size:.82rem;font-weight:900;margin-bottom:.12rem;}
+.co-msg-text{color:#e2e8f0;font-size:.86rem;line-height:1.55;word-break:break-word;}
 
 /* ── Death List ── */
 .death-list{background:rgba(0,0,0,.3);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:.7rem .8rem;margin:.5rem 0;}
@@ -340,7 +350,7 @@ details summary:hover { color: #94a3b8; }
 .wolf-msg .cm-name{color:#f87171;}
 .seer-claim-msg{background:rgba(129,140,248,.1);border-left:3px solid #818cf888;}
 .my-msg{background:rgba(99,102,241,.12);border-left:3px solid #6b21a8;}
-.portrait{display:inline-block;background-image:url("assets/realistic-portraits-grid.png");background-size:400% 300%;background-repeat:no-repeat;background-color:#111827;border:1px solid rgba(255,255,255,.18);box-shadow:0 6px 18px rgba(0,0,0,.35);overflow:hidden;vertical-align:middle;}
+.portrait{display:inline-block;background-image:url("assets/werewolf-solo-portraits.png");background-size:400% 400%;background-repeat:no-repeat;background-color:#111827;border:1px solid rgba(255,255,255,.18);box-shadow:0 6px 18px rgba(0,0,0,.35);overflow:hidden;vertical-align:middle;}
 .portrait-chat{width:38px;height:38px;border-radius:50%;}
 .portrait-chip{width:22px;height:22px;border-radius:50%;margin-right:.25rem;flex-shrink:0;}
 .portrait-lg{width:76px;height:76px;border-radius:8px;}
@@ -405,6 +415,30 @@ details summary:hover { color: #94a3b8; }
 .xp-bar > div{height:100%;background:linear-gradient(90deg,#6b21a8,#818cf8);transition:width .8s ease;}
 @keyframes scorePop{0%{transform:scale(.6);opacity:0;}60%{transform:scale(1.12);}100%{transform:scale(1);opacity:1;}}
 .score-pop{animation:scorePop .5s ease;}
+/* ── Case file / reasoning layer ── */
+.case-file{background:rgba(7,11,18,.78);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:.7rem .8rem;margin:.5rem 0;box-shadow:0 14px 34px rgba(0,0,0,.22);backdrop-filter:blur(12px);}
+.case-file summary{list-style:none;color:#fbbf24;font-size:.84rem;font-weight:900;display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:0;cursor:pointer;}
+.case-file summary::-webkit-details-marker{display:none;}
+.case-file-body{display:grid;gap:.52rem;margin-top:.65rem;}
+.case-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.38rem;}
+.case-stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.45rem .35rem;text-align:center;}
+.case-stat strong{display:block;color:#f8fafc;font-size:1.05rem;line-height:1.1;}
+.case-stat span{display:block;color:#64748b;font-size:.68rem;margin-top:.12rem;}
+.case-mini-title{color:#94a3b8;font-size:.72rem;font-weight:800;letter-spacing:.05em;margin-bottom:.25rem;}
+.case-chip-row{display:flex;flex-wrap:wrap;gap:.28rem;}
+.case-chip{display:inline-flex;align-items:center;gap:.18rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#cbd5e1;font-size:.72rem;font-weight:700;padding:.18rem .45rem;}
+.case-chip.suspect{background:rgba(239,68,68,.12);border-color:#ef444455;color:#fca5a5;}
+.case-chip.trust{background:rgba(34,197,94,.12);border-color:#22c55e55;color:#86efac;}
+.case-empty{color:#64748b;font-size:.78rem;line-height:1.5;}
+.dawn-intel{background:rgba(15,23,42,.74);border:1px solid rgba(96,165,250,.22);border-radius:8px;padding:.65rem .75rem;margin:.45rem 0;color:#cbd5e1;font-size:.82rem;line-height:1.6;}
+.dawn-intel strong{color:#93c5fd;}
+.vote-reason-box{margin-top:.65rem;}
+.vote-reason-box textarea{width:100%;min-height:74px;resize:vertical;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#f8fafc;font-size:.88rem;line-height:1.55;padding:.65rem .7rem;outline:none;}
+.vote-reason-box textarea:focus{border-color:#fbbf24;box-shadow:0 0 0 2px rgba(251,191,36,.12);}
+.vote-reasons{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.7rem .8rem;margin:.6rem 0;}
+.vote-reason-item{border-top:1px solid rgba(255,255,255,.06);padding:.48rem 0;font-size:.8rem;line-height:1.55;color:#cbd5e1;}
+.vote-reason-item:first-child{border-top:none;padding-top:0;}
+.vote-reason-item b{color:#f8fafc;}
 </style>
 </head>
 <body>
@@ -413,22 +447,30 @@ details summary:hover { color: #94a3b8; }
 <script>
 // ========== CHARACTER AVATARS ==========
 const CHARACTER_AVATARS = [
-  { emoji:'🕵️', label:'影森 レン',   hint:'冷静な観察者。小さな矛盾を見逃さない', pos:'0% 0%' },
-  { emoji:'👩‍🌾', label:'橘 ミオ',     hint:'村の事情に詳しいが、口数は多くない', pos:'33.333% 0%' },
-  { emoji:'🔮', label:'朧月 玄斎',   hint:'古い伝承を語る神秘的な老人', pos:'66.667% 0%' },
-  { emoji:'📚', label:'白井 ユキ',   hint:'記録係。発言の順番まで覚えている', pos:'100% 0%' },
-  { emoji:'🛡️', label:'黒瀬 ガク',   hint:'厳格な護衛役。疑いにも動じない', pos:'0% 50%' },
-  { emoji:'👑', label:'月城 セラ',   hint:'気品ある名家の人物。味方なら心強い', pos:'33.333% 50%' },
-  { emoji:'💊', label:'深山 ナツ',   hint:'村の医師。誰を守るべきか悩んでいる', pos:'66.667% 50%' },
-  { emoji:'🧳', label:'久遠 カイ',   hint:'旅人。外から来たぶん情報が少ない', pos:'100% 50%' },
-  { emoji:'🎭', label:'篠宮 アヤ',   hint:'表情を読ませない策士', pos:'0% 100%' },
-  { emoji:'🔥', label:'朝倉 ハル',   hint:'明るい先導役。空気を一気に変える', pos:'33.333% 100%' },
-  { emoji:'🍺', label:'樫村 ゴロウ', hint:'宿屋の主人。噂話をよく知っている', pos:'66.667% 100%' },
-  { emoji:'🌲', label:'青葉 サキ',   hint:'森を歩く案内人。夜の気配に敏感', pos:'100% 100%' },
+  { emoji:'🌍', label:'ボブ',             hint:'陽気な異国の村人。笑顔の奥に秘密を隠す', pos:'0% 0%' },
+  { emoji:'📚', label:'井沢',             hint:'冷静な分析役。発言の矛盾を細かく拾う', pos:'33.333% 0%' },
+  { emoji:'🏭', label:'工場長',           hint:'現場を仕切る頑固者。頼れるが押しが強い', pos:'66.667% 0%' },
+  { emoji:'⛩️', label:'狩野英孝',         hint:'派手な祈祷師風の芸人肌。場の空気をかき回す', pos:'100% 0%' },
+  { emoji:'🎩', label:'マリック',         hint:'奇術師めいた謎の人物。手元と本心を見せない', pos:'0% 33.333%' },
+  { emoji:'👑', label:'キングカズ',       hint:'不屈のベテラン。沈んだ村の士気を支える', pos:'33.333% 33.333%' },
+  { emoji:'🧠', label:'カズレーザー',     hint:'赤い服の切れ者。笑顔で核心を突く', pos:'66.667% 33.333%' },
+  { emoji:'🍎', label:'リンゴちゃん',     hint:'華やかな歌い手。声色ひとつで空気を変える', pos:'100% 33.333%' },
+  { emoji:'⚽', label:'柳沢',             hint:'俊敏な元スポーツマン。動きが読みにくい', pos:'0% 66.667%' },
+  { emoji:'🥋', label:'武藤',             hint:'威圧感ある格闘家肌。沈黙にも圧がある', pos:'33.333% 66.667%' },
+  { emoji:'💄', label:'イッコー',         hint:'美意識の高い占い客。細部の違和感に鋭い', pos:'66.667% 66.667%' },
+  { emoji:'💬', label:'マツコ',           hint:'重厚な観察者。ひと言で議論の流れを変える', pos:'100% 66.667%' },
+  { emoji:'🍷', label:'アンジャッシュ渡部', hint:'品の良い情報通。食卓の噂にやけに詳しい', pos:'0% 100%' },
+  { emoji:'🎸', label:'ピコ太郎',         hint:'奇抜な吟遊詩人。軽口で疑いを逸らす', pos:'33.333% 100%' },
+  { emoji:'🌘', label:'夜見の番人',       hint:'月明かりの下で村を見張る無口な影', pos:'66.667% 100%' },
+  { emoji:'🌿', label:'月草の薬師',       hint:'薬草を抱えた静かな治療師。誰にも本音を言わない', pos:'100% 100%' },
 ];
 
 function getAvatar(name, players) {
+  const matched = CHARACTER_AVATARS.find(a => a.label === name);
+  if (matched) return matched;
   const idx = (players||[]).findIndex(p=>(p.name||p)===name);
+  const fallback = CHARACTER_AVATARS.slice(14);
+  if (fallback.length) return fallback[(idx<0?0:idx) % fallback.length];
   return CHARACTER_AVATARS[(idx<0?0:idx) % CHARACTER_AVATARS.length];
 }
 
@@ -706,6 +748,123 @@ function quickWolfChatPanel() {
     </div>`;
 }
 
+function detectExplicitRoleClaim(text) {
+  const t = String(text || '').replace(/\s+/g, '');
+  if (!t) return null;
+  const rolePatterns = {
+    SEER: [
+      /(?:私|わたし|自分|僕|俺|うち)(?:が|は|の役職は)?占い師(?:です|だ|でした|である)?(?:。|、|!|！|$)/,
+      /占い師(?:として)?(?:CO|カミングアウト)(?:します|する|しました|です|だ|。|、|!|！|$)/,
+      /占い師として(?:名乗|宣言|報告|出ます|出る)/,
+      /(?:CO|カミングアウト)(?:します|する|しました)?(?:。|、)?占い師(?:です|として|だ|。|、|!|！|$)/
+    ],
+    DOCTOR: [
+      /(?:私|わたし|自分|僕|俺|うち)(?:が|は|の役職は)?騎士(?:です|だ|でした|である)?(?:。|、|!|！|$)/,
+      /騎士(?:として)?(?:CO|カミングアウト)(?:します|する|しました|です|だ|。|、|!|！|$)/,
+      /騎士として(?:名乗|宣言|報告|出ます|出る)/,
+      /騎士です(?:。|、|!|！|$)/,
+      /(?:CO|カミングアウト)(?:します|する|しました)?(?:。|、)?騎士(?:です|として|だ|。|、|!|！|$)/
+    ],
+    MEDIUM: [
+      /(?:私|わたし|自分|僕|俺|うち)(?:が|は|の役職は)?霊媒師?(?:です|だ|でした|である)?(?:。|、|!|！|$)/,
+      /霊媒師?(?:として)?(?:CO|カミングアウト)(?:します|する|しました|です|だ|。|、|!|！|$)/,
+      /霊媒師?として(?:名乗|宣言|報告|出ます|出る)/,
+      /(?:CO|カミングアウト)(?:します|する|しました)?(?:。|、)?霊媒師?(?:です|として|だ|。|、|!|！|$)/
+    ],
+    NEKOMATA: [
+      /(?:私|わたし|自分|僕|俺|うち)(?:が|は|の役職は)?猫又(?:です|だ|でした|である)?(?:。|、|!|！|$)/,
+      /猫又(?:として)?(?:CO|カミングアウト)(?:します|する|しました|です|だ|。|、|!|！|$)/,
+      /猫又として(?:名乗|宣言|報告|出ます|出る)/,
+      /猫又です(?:。|、|!|！|$)/,
+      /猫又なので/,
+      /(?:CO|カミングアウト)(?:します|する|しました)?(?:。|、)?猫又(?:です|として|だ|。|、|!|！|$)/
+    ],
+  };
+  for (const [role, patterns] of Object.entries(rolePatterns)) {
+    if (patterns.some(re => re.test(t))) return role;
+  }
+  return null;
+}
+
+function renderCoChat() {
+  const coMsgs = (O.discMsgs || [])
+    .map((m, idx) => ({ ...m, idx, claim: detectExplicitRoleClaim(m.text) }))
+    .filter(m => !!m.claim);
+  const body = coMsgs.length ? coMsgs.map(m => {
+    const av = getAvatar(m.name, O.players);
+    return `<div class="co-msg">
+      ${avatarFace(av, 'portrait-chip')}
+      <div style="flex:1;min-width:0;">
+        <div class="co-msg-name">${esc(m.name)}${roleClaimBadge(m.claim)}</div>
+        <div class="co-msg-text">${esc(m.text)}</div>
+      </div>
+    </div>`;
+  }).join('') : `<div class="co-chat-empty">まだCOはありません。COした発言だけがここにまとまります。</div>`;
+  return `
+    <div class="co-chat-panel">
+      <div class="co-chat-head">
+        <span>📣 CO専用チャット</span>
+        <span class="co-chat-count">${coMsgs.length}件</span>
+      </div>
+      <div class="co-chat-feed" id="coFeed">${body}</div>
+    </div>`;
+}
+
+function renderDawnIntel() {
+  const r = O.nightReport;
+  if (!r || O.phase !== 'discuss') return '';
+  const clue = r.guarded
+    ? `騎士の気配が残っています。<strong>${esc(r.protected || '誰か')}</strong> の周辺で争った跡だけが見つかりました。`
+    : r.victim
+      ? `現場には足跡が二方向に分かれていました。<strong>${esc(r.victim)}</strong> は発言力か役職COを警戒された可能性があります。`
+      : '夜は不気味なほど静かでした。人狼が襲撃先を読まれたか、狙いを外した可能性があります。';
+  return `<div class="dawn-intel">🔎 <strong>夜明けの手掛かり</strong><br>${clue}</div>`;
+}
+
+function renderCaseFile() {
+  const aliveList = O.alive || [];
+  const deadList = O.deadPlayers || [];
+  const claims = Object.entries(O.roleClaims || {})
+    .filter(([name]) => aliveList.some(p => p.name === name));
+  const notes = Object.entries(O.notebook || {})
+    .filter(([name]) => aliveList.some(p => p.name === name));
+  if (!aliveList.length && !deadList.length && !claims.length && !notes.length) return '';
+
+  const claimChips = claims.length
+    ? `<div class="case-chip-row">${claims.map(([name, role]) => `<span class="case-chip">${esc(name)} ${roleClaimBadge(role, true)}</span>`).join('')}</div>`
+    : `<div class="case-empty">COはまだ記録されていません。</div>`;
+  const noteChips = notes.length
+    ? `<div class="case-chip-row">${notes.map(([name, mark]) => `<span class="case-chip ${mark==='suspect'?'suspect':'trust'}">${mark==='suspect'?'🐺':'🤍'} ${esc(name)}</span>`).join('')}</div>`
+    : `<div class="case-empty">生存者の名前をタップすると、怪しい/信用メモを切り替えられます。</div>`;
+  const deathChips = deadList.length
+    ? `<div class="case-chip-row">${deadList.slice(-4).map(d => `<span class="case-chip">${d.cause==='人狼'?'🌙':d.cause==='猫又'?'🐱':'⚖️'} ${esc(d.name)}</span>`).join('')}</div>`
+    : `<div class="case-empty">死亡者はまだいません。</div>`;
+
+  return `
+    <details class="case-file" open>
+      <summary><span>🗂️ 事件ファイル</span><span style="color:#64748b;font-size:.72rem;">推理メモ</span></summary>
+      <div class="case-file-body">
+        <div class="case-stat-row">
+          <div class="case-stat"><strong>${aliveList.length}</strong><span>生存</span></div>
+          <div class="case-stat"><strong>${deadList.length}</strong><span>死亡</span></div>
+          <div class="case-stat"><strong>${claims.length}</strong><span>CO</span></div>
+        </div>
+        <div><div class="case-mini-title">CO記録</div>${claimChips}</div>
+        <div><div class="case-mini-title">あなたの推理メモ</div>${noteChips}</div>
+        <div><div class="case-mini-title">死亡記録</div>${deathChips}</div>
+      </div>
+    </details>`;
+}
+
+function renderVoteReasons(reasons) {
+  const entries = Object.entries(reasons || {}).filter(([, r]) => r && String(r).trim());
+  if (!entries.length) return '';
+  return `<div class="vote-reasons">
+    <div class="case-mini-title" style="margin-bottom:.4rem;">🧾 投票理由</div>
+    ${entries.map(([name, reason]) => `<div class="vote-reason-item"><b>${esc(name)}</b>：${esc(reason)}</div>`).join('')}
+  </div>`;
+}
+
 const CONFIGS = {
   4:  ['WEREWOLF','SEER','VILLAGER','VILLAGER'],
   5:  ['WEREWOLF','SEER','DOCTOR','VILLAGER','VILLAGER'],
@@ -726,6 +885,180 @@ const CONFIGS = {
 // quiet:寡黙・必要時のみ発言  bluffer:騙り屋・大胆  follower:同調派・多数派  analytical:分析派・矛盾指摘
 // 配分: 各性格を1個以上＋followerを多めに（同調しやすい性格をベースに）
 const CPU_PERSONALITIES = ['logical','aggressive','cautious','talkative','quiet','bluffer','follower','analytical','follower','logical','analytical'];
+
+// 実在人物の口真似ではなく、名前から連想した「人狼ゲーム用の架空キャラ」プロフィール。
+const CPU_PERSONA_PROFILES = {
+  'ボブ': {
+    personality:'talkative', thought:'空気の変化と笑顔の裏を読む陽気な観察者',
+    neutral:['えっとね、僕はまず空気の変化を見たい。焦って決めるのは危ないよ。','この村、笑ってる人ほど目を見た方がいいね。誰が一番無理してるかな。'],
+    accuse:['{n}さん、さっきから笑顔だけで中身が少ない。そこが気になるよ。','{n}さんは話を丸くしすぎ。人狼が隠れる動きに見えるね。'],
+    defend:['待って待って、僕を吊るなら理由をもう少し出して。雑な疑いは村が損するよ。'],
+    voteReason:['{n}さんは場をなだめすぎていて、疑いを避ける動きに見えました。','{n}さんの発言は柔らかいけど核心がなく、潜伏を疑いました。'],
+    wolfNight:['{n}さんは場を明るくしながら情報を集めてる。今夜は先に消したいね。']
+  },
+  '井沢': {
+    personality:'analytical', thought:'発言順・矛盾・投票筋を表で考える分析役',
+    neutral:['いったん発言順で整理します。誰が最初に疑いを出したかが大事です。','印象ではなく、前の発言との整合性で見ましょう。'],
+    accuse:['{n}さん、前半と後半で疑い先が変わっています。理由の接続が弱いです。','{n}さんの主張は結論が先で、根拠が後付けに見えます。'],
+    defend:['私を疑うなら、どの発言が矛盾しているか番号で示してください。そこから反証します。'],
+    voteReason:['{n}さんは発言の前提が途中で変わっており、村視点の一貫性が薄いです。','{n}さんの疑い先変更に合理的な説明がなく、投票で確認します。'],
+    wolfNight:['{n}さんは情報整理が速い。議論の軸になる前に襲撃したいです。']
+  },
+  '工場長': {
+    personality:'aggressive', thought:'現場の違和感と作業手順で白黒を切る指揮役',
+    neutral:['現場で大事なのは段取りだ。今日は疑い先を一つずつ潰していくぞ。','声の大きさじゃなく、動きが現場に合ってるかで見る。'],
+    accuse:['{n}さん、作業の手順が飛んでる。結論だけ急ぐやつは信用できない。','{n}さんは報告が薄い。現場感覚ではそこが一番怪しい。'],
+    defend:['俺を吊るなら現場が止まるぞ。理由を出せ、理由を。'],
+    voteReason:['{n}さんは結論までの手順が雑で、現場を混乱させる動きに見えました。','{n}さんの報告量が少なく、作業を隠しているように感じました。'],
+    wolfNight:['{n}さんは現場をまとめる力がある。先に外しておいた方が楽だ。']
+  },
+  '狩野英孝': {
+    personality:'bluffer', thought:'派手な言葉で空気を揺らし、反応の速さを見る祈祷師風',
+    neutral:['神社の鈴が鳴ってる気がしますね。今、空気が少し変わりました。','ちょっと待ってください、今の沈黙、僕にはサインに見えます。'],
+    accuse:['{n}さん、その反応はお祓い案件です。目線が逃げました。','{n}さん、今のかわし方は逆に目立ちました。ここ見たいです。'],
+    defend:['僕を疑うのは早いです。まだ儀式の途中です、ちゃんと理由を聞いてください。'],
+    voteReason:['{n}さんの反応が一拍遅れていて、場の空気を読んでから合わせたように見えました。','{n}さんは疑われた瞬間の返しが軽く、誤魔化しの気配がありました。'],
+    wolfNight:['{n}さんは空気を読むのが早いです。今夜の儀式はそこにしましょう。']
+  },
+  'マリック': {
+    personality:'quiet', thought:'寡黙に観察し、手元を隠したまま核心だけを突く奇術師',
+    neutral:['見えているものだけを信じると、簡単に騙されます。','今は種を探しています。焦って手を開く必要はありません。'],
+    accuse:['{n}さんの言葉には、見せたい面と隠したい面があります。そこが気になります。','{n}さん、今の発言は煙幕です。視線を逸らしていますね。'],
+    defend:['私を疑うなら、まず種明かしをしてください。根拠のない手品には乗りません。'],
+    voteReason:['{n}さんは発言で視線を逸らしており、隠し玉を持っているように見えました。','{n}さんの立ち回りは煙幕が多く、正体を確認したいです。'],
+    wolfNight:['{n}さんは種を見抜きそうです。幕が上がる前に消しましょう。']
+  },
+  'キングカズ': {
+    personality:'cautious', thought:'最後まで走り切る粘りとチームの士気を重視するベテラン',
+    neutral:['まだ試合は終わっていません。焦らず、最後まで走り切りましょう。','大事なのはチームで同じ絵を見ることです。票をばらけさせない。'],
+    accuse:['{n}さんは守備の戻りが遅い。村目線のカバーが足りません。','{n}さん、今の動きは味方を助けるより自分を守っていました。'],
+    defend:['私を疑うのは構いません。ただ、村の勝ち筋まで一緒に考えてください。'],
+    voteReason:['{n}さんは村全体の勝ち筋より、自分の安全を優先しているように見えました。','{n}さんの動きは守備が遅く、終盤に残すと危険だと判断しました。'],
+    wolfNight:['{n}さんはチームをまとめる選手です。今夜止めないと流れを作られます。']
+  },
+  'カズレーザー': {
+    personality:'analytical', thought:'にこやかに前提を分解し、矛盾だけを淡々と刺す切れ者',
+    neutral:['前提を分けましょう。事実、推測、願望が混ざっています。','その理屈、面白いですね。ただ成立条件が一つ足りません。'],
+    accuse:['{n}さんの話は、途中から結論を守るための説明になっています。','{n}さん、それは村の推理ではなく、自分を白く見せる文章です。'],
+    defend:['僕を疑うのは全然ありです。ただ、その仮説だと他の行動が説明できません。'],
+    voteReason:['{n}さんは結論を守るために理屈を組み替えており、村視点に見えません。','{n}さんの説明は成立条件が足りず、人外の防御に見えました。'],
+    wolfNight:['{n}さんは前提を崩してきます。議論が進む前に消すのが合理的です。']
+  },
+  'リンゴちゃん': {
+    personality:'talkative', thought:'声色とテンションの揺れで嘘を感じ取る舞台型',
+    neutral:['今の村、声のトーンが少し重いですね。誰かが隠してます。','言葉の中身だけじゃなくて、出すタイミングも見たいです。'],
+    accuse:['{n}さん、急に声色が変わりましたね。そこ、私は聞き逃しません。','{n}さんの返事、綺麗すぎます。舞台なら作り声に見えます。'],
+    defend:['私を疑うなら、声じゃなくて発言の中身で見てください。そこは負けません。'],
+    voteReason:['{n}さんは発言のトーンが途中で変わり、場に合わせて演じたように見えました。','{n}さんの返答は整いすぎていて、本音より演技を感じました。'],
+    wolfNight:['{n}さんは声の揺れを拾ってきます。今夜は黙ってもらいましょう。']
+  },
+  '柳沢': {
+    personality:'follower', thought:'流れとポジション取りを重視し、素早く疑い先へ走るスポーツマン',
+    neutral:['流れを見ましょう。今、ボールを持っているのは誰かです。','無理に決めに行くより、空いたスペースを見たいですね。'],
+    accuse:['{n}さん、今のポジション取りが不自然です。安全地帯に逃げています。','{n}さんは決定機で踏み込まなかった。そこが気になります。'],
+    defend:['僕は逃げてません。流れを見てから動いただけです。'],
+    voteReason:['{n}さんは安全な位置に逃げる動きが多く、潜伏役に見えました。','{n}さんは決める場面で踏み込まず、村の攻め筋をぼかしました。'],
+    wolfNight:['{n}さんはスペースを見つけるのが早い。先にマークを外しましょう。']
+  },
+  '武藤': {
+    personality:'aggressive', thought:'沈黙の圧と一撃の指摘で相手を追い込む格闘家肌',
+    neutral:['黙って見ていたが、そろそろ踏み込む。','リングに上がった以上、曖昧な返事では逃げられない。'],
+    accuse:['{n}さん、受け身ばかりだな。自分から攻める気がない。','{n}さんの防御は固いが、村を勝たせる攻めがない。'],
+    defend:['俺を倒したいなら正面から来い。根拠の薄い打撃は効かない。'],
+    voteReason:['{n}さんは防御姿勢が強く、村を前に進める発言が足りませんでした。','{n}さんは疑いを受け流すだけで、正面から答えていないと判断しました。'],
+    wolfNight:['{n}さんは踏み込むと強い。リングに上がる前に落とす。']
+  },
+  'イッコー': {
+    personality:'analytical', thought:'細部の乱れと美意識のズレから嘘を見抜く審美眼',
+    neutral:['発言の並び、少し整っていませんね。そこに違和感があります。','細部に本音は出ます。言葉尻まで見ています。'],
+    accuse:['{n}さん、その説明は飾りが多いです。芯が見えません。','{n}さんの発言、最後だけ急に整えましたね。そこが不自然です。'],
+    defend:['私を疑うなら、雑に塗らないで。ちゃんと筋を整えて持ってきてください。'],
+    voteReason:['{n}さんの説明は飾りが多く、肝心の根拠がぼやけていました。','{n}さんは最後に発言を整えた印象が強く、嘘を隠したように見えました。'],
+    wolfNight:['{n}さんは細部の乱れを拾います。見つかる前に外しましょう。']
+  },
+  'マツコ': {
+    personality:'logical', thought:'場全体の薄さと違和感を太くまとめる重厚な観察者',
+    neutral:['ちょっと全体的に薄いのよ。誰も傷つかない話ばかりしてる。','今の村、正しいことを言う人より、損をしない人が目立つわね。'],
+    accuse:['{n}さん、ずっと安全圏から眺めてるだけなのよ。そこが嫌。','{n}さんの言葉、綺麗だけど体温がないのよね。'],
+    defend:['私を疑うのはいいけど、それで誰が得するのかまで言いなさい。'],
+    voteReason:['{n}さんは安全圏からの発言が多く、村を動かす責任を避けていました。','{n}さんの発言は綺麗ですが、本人のリスクがなく潜伏に見えました。'],
+    wolfNight:['{n}さんは一言で空気を変えるわ。残すと面倒ね。']
+  },
+  'アンジャッシュ渡部': {
+    personality:'logical', thought:'情報の出どころと会話の噛み合わせを気にする上品な情報通',
+    neutral:['情報の出どころを確認しましょう。噂だけで票を動かすのは危険です。','今の会話、少し噛み合っていません。そこにヒントがあります。'],
+    accuse:['{n}さん、その情報はどこから出ました？出どころが曖昧です。','{n}さんは会話の噛み合わせをわざと外しているように見えます。'],
+    defend:['私を疑うなら、どの情報が誤りかを確認しましょう。印象だけでは弱いです。'],
+    voteReason:['{n}さんは情報の出どころを曖昧にしたまま誘導していました。','{n}さんは会話の噛み合わせをずらし、疑いを散らしているように見えました。'],
+    wolfNight:['{n}さんは情報の裏取りを始めそうです。今夜の候補にしましょう。']
+  },
+  'ピコ太郎': {
+    personality:'bluffer', thought:'リズムと奇抜さで場を崩し、隙を作る吟遊詩人',
+    neutral:['リズムがずれてますね。村の拍が一つ足りません。','言葉と言葉をつなげると、隠れてる音が聞こえます。'],
+    accuse:['{n}さん、発言のリズムが急に変わりました。そこ、怪しいです。','{n}さんは軽く見せてますが、疑いをかわす拍だけは正確です。'],
+    defend:['私を吊る前に、疑いのリズムをもう一回聞いてください。今の流れは雑です。'],
+    voteReason:['{n}さんは発言のリズムが途中で変わり、疑いをかわす動きが見えました。','{n}さんは軽く振る舞いながら、投票の流れだけ慎重に避けていました。'],
+    wolfNight:['{n}さんは流れのリズムを読んできます。今夜はテンポを崩しましょう。']
+  }
+};
+
+function pickCpuPersonaLine(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getCpuPersona(name) {
+  return CPU_PERSONA_PROFILES[name] || null;
+}
+
+function applyCpuPersona(player) {
+  const profile = getCpuPersona(player.name);
+  if (profile) {
+    player.personality = profile.personality || 'logical';
+    player.thoughtStyle = profile.thought || '';
+  } else {
+    player.personality = pickCpuPersonaLine(CPU_PERSONALITIES);
+  }
+  return player;
+}
+
+function personaTargetFromText(R, cpu, text) {
+  const players = (R.players || []).filter(p => p.name !== cpu.name);
+  const found = players.find(p => text.includes(p.name));
+  return found ? found.name : '';
+}
+
+function personaSpeechKind(text, targetName) {
+  if (/無実|信じて|疑うなら|吊っても|誤解|根拠/.test(text)) return 'defend';
+  if (targetName && /怪しくない|信頼|白|かば|反対|村目線|吊りたくない|安全/.test(text)) return 'neutral';
+  if (targetName && /怪しい|疑|投票|処刑|吊|矛盾|黒|人狼|不自然|沈黙|発言少な|騙/.test(text)) return 'accuse';
+  return 'neutral';
+}
+
+function personagizeSpeech(R, cpu, text) {
+  const profile = getCpuPersona(cpu.name);
+  if (!profile || !text) return text;
+  // 役職COや占い/霊媒結果はゲーム解析に関わるため、内容を崩さずそのまま出す。
+  if (detectExplicitRoleClaim(text) || /占い結果|霊媒結果|黒判定|白判定|占いました|霊視|騎士CO|猫又CO|占い師CO|霊媒師CO/.test(text)) return text;
+  const targetName = personaTargetFromText(R, cpu, text);
+  const kind = personaSpeechKind(text, targetName);
+  const pool = profile[kind] || profile.neutral;
+  if (!pool || !pool.length) return text;
+  const replaceProb = kind === 'neutral' ? 0.58 : 0.88;
+  if (Math.random() > replaceProb) return text;
+  return tplFill(pickCpuPersonaLine(pool), targetName || 'その人');
+}
+
+function personagizeVoteReason(cpu, targetName, baseReason) {
+  const profile = getCpuPersona(cpu.name);
+  if (!profile?.voteReason?.length) return baseReason;
+  return tplFill(pickCpuPersonaLine(profile.voteReason), targetName);
+}
+
+function personagizeWolfNight(cpu, targetName) {
+  const profile = getCpuPersona(cpu.name);
+  if (profile?.wolfNight?.length) return tplFill(pickCpuPersonaLine(profile.wolfNight), targetName);
+  return tplFill(pickCpuPersonaLine(TPL.wolf_night), targetName);
+}
 
 // ========== STATE ==========
 let S = {};
@@ -755,6 +1088,7 @@ function initState() {
     elimLastNight: null,     // player obj
     // day/vote
     votes: {},               // {voterName: targetName}
+    voteReasons: {},         // {voterName: reason}
     voteIdx: 0,
     voteResult: null,        // {executed, tally}
     winner: null,            // 'village' | 'wolf'
@@ -820,6 +1154,23 @@ function esc(s) {
 function avatarFace(av, cls='portrait-chat') {
   const safe = av || CHARACTER_AVATARS[0];
   return `<span class="portrait ${cls}" style="background-position:${safe.pos||'0% 0%'};" title="${esc(safe.label||'')}"><span class="portrait-emoji">${safe.emoji||'👤'}</span></span>`;
+}
+
+function roleClaimInfo(role) {
+  const map = {
+    SEER:     { icon:'🔮', label:'占い師CO', short:'占', color:'#818cf8' },
+    DOCTOR:   { icon:'💊', label:'騎士CO',   short:'騎', color:'#34d399' },
+    MEDIUM:   { icon:'👁️', label:'霊媒師CO', short:'霊', color:'#a78bfa' },
+    NEKOMATA: { icon:'🐱', label:'猫又CO',   short:'猫', color:'#fb923c' },
+  };
+  return map[role] || { icon:'❔', label:'役職CO', short:'CO', color:'#fbbf24' };
+}
+
+function roleClaimBadge(role, compact=false) {
+  const info = roleClaimInfo(role);
+  return `<span class="claim-badge claim-unverified${compact?' compact':''}" title="${esc(info.label)}" style="border-color:${info.color}66;color:${info.color};background:${info.color}18;">
+    <span class="claim-icon">${info.icon}</span>${compact ? `<span>${info.short}</span>` : `<span>${info.label}</span>`}
+  </span>`;
 }
 
 function val(id) { const e = document.getElementById(id); return e ? e.value : ''; }
@@ -1077,6 +1428,10 @@ function renderVote() {
     </div>
     <label style="margin-top:0.8rem;">処刑する人を選んでください</label>
     ${mkSelect('voteTgt', targets)}
+    <div class="vote-reason-box">
+      <label for="voteReason">投票理由</label>
+      <textarea id="voteReason" maxlength="120" placeholder="例：発言が少なく、疑いへの反応が薄かったため"></textarea>
+    </div>
     <button class="btn btn-primary" id="castVote">🗳️　投票する</button>
   `;
 }
@@ -1108,6 +1463,7 @@ function renderVoteResult() {
       <p class="sec-label" style="margin-top:0;">📊 得票数</p>
       ${bars}
     </div>
+    ${renderVoteReasons(S.voteResult.voteReasons)}
     <div class="vote-drama" style="text-align:center; padding:1.5rem; border-radius:16px;
          border:2px solid #ef4444; background:linear-gradient(135deg,#1a0505,#2d0a0a); margin:.6rem 0;">
       <p style="color:#f87171; font-size:.78rem; font-weight:700; letter-spacing:.12em; margin:0 0 .5rem;">⚖️ 処刑決定</p>
@@ -1277,6 +1633,7 @@ function bindEvents() {
       S.phase = 'game_over';
     } else {
       S.votes = {};
+      S.voteReasons = {};
       S.voteIdx = 0;
       S.voteResult = null;
       S.phase = 'day';
@@ -1287,6 +1644,7 @@ function bindEvents() {
   // DAY
   on('goVote', () => {
     S.votes = {};
+    S.voteReasons = {};
     S.voteIdx = 0;
     S.voteResult = null;
     S.phase = 'vote';
@@ -1298,6 +1656,7 @@ function bindEvents() {
     const alivePl = alive();
     const voter = alivePl[S.voteIdx];
     S.votes[voter.name] = val('voteTgt');
+    S.voteReasons[voter.name] = (val('voteReason') || '').trim() || `${val('voteTgt')}さんの発言と立ち位置が気になりました。`;
     S.voteIdx++;
 
     if (S.voteIdx >= alivePl.length) {
@@ -1323,7 +1682,7 @@ function bindEvents() {
           log(`第${S.day}日: 猫又の道連れで ${nekomataVictim.name} も倒れました`);
         }
       }
-      S.voteResult = {executed, tally, nekomataVictim: nekomataVictim?.name};
+      S.voteResult = {executed, tally, nekomataVictim: nekomataVictim?.name, voteReasons: S.voteReasons};
       S.winner = checkWin();
       S.phase = 'vote_result';
     }
@@ -1551,15 +1910,8 @@ function bindEvents() {
     const input = document.getElementById('discFreeInput');
     const text = (input ? input.value : '').trim();
     if (!text) return;
-    // CO検出
-    const seerKw  = ['占い師','占いまし','占った','黒でした','白でした','人狼です','占い結果'];
-    const docKw   = ['騎士','護衛','守りまし'];
-    const medKw   = ['霊媒師','霊媒','霊視','処刑された','処刑者の役職'];
-    const nekoKw  = ['猫又','道連れ','ねこまた'];
-    if      (seerKw.some(kw=>text.includes(kw)))                             O.roleClaims[O.playerName]='SEER';
-    else if (docKw.some(kw=>text.includes(kw)))                              O.roleClaims[O.playerName]='DOCTOR';
-    else if (medKw.some(kw=>text.includes(kw)) && !O.roleClaims[O.playerName])  O.roleClaims[O.playerName]='MEDIUM';
-    else if (nekoKw.some(kw=>text.includes(kw)) && !O.roleClaims[O.playerName]) O.roleClaims[O.playerName]='NEKOMATA';
+    const explicitClaim = detectExplicitRoleClaim(text);
+    if (explicitClaim) O.roleClaims[O.playerName] = explicitClaim;
     wsSend({type:'disc_message', text});
     if (O.isMyDiscTurn) { O.isMyDiscTurn=false; O.tplStep=null; }
     if (input) input.value='';
@@ -1608,6 +1960,8 @@ function bindEvents() {
       const name = btn.dataset.name;
       const sel = document.getElementById('oVoteTgt');
       if (sel) sel.value = name;
+      const reason = document.getElementById('oVoteReason');
+      if (reason && !reason.value.trim()) reason.value = `${name}さんの発言と立ち位置が気になっています。`;
       document.querySelectorAll('.vote-avatar-btn').forEach(b => {
         b.style.background = 'rgba(255,255,255,.06)';
         b.style.border = '1px solid rgba(255,255,255,.12)';
@@ -1645,8 +1999,9 @@ function bindEvents() {
     if (O.voteSubmitted) return; // 二重投票防止
     const target = val('oVoteTgt');
     if (!target) return;
+    const reason = (val('oVoteReason') || '').trim() || `${target}さんの発言と投票の流れが気になりました。`;
     (O.myVotes = O.myVotes||[]).push(target); // 戦績スコア用（自分の投票履歴）
-    wsSend({type:'vote', target});
+    wsSend({type:'vote', target, reason});
     O.voteSubmitted = true;
     render();
   });
@@ -1670,7 +2025,7 @@ function bindEvents() {
 
 // ========== SOLO ENGINE (サーバー不要 / GitHub Pages 対応) ==========
 const SoloEngine = (() => {
-  const CPU_NAMES = ['ハル','ユキ','アオイ','カイ','リン','ソラ','ナギ','ツバキ','コウ','アン','ミオ','レン','サキ','ジン','ノア'];
+  const CPU_NAMES = CHARACTER_AVATARS.slice(0, 14).map(a => a.label);
   let R = {};
 
   let _timers = [];
@@ -1700,16 +2055,17 @@ const SoloEngine = (() => {
     const roles = shuffle([...CONFIGS[total]]);
     players.forEach((p,i) => p.role = roles[i]);
     // CPUにパーソナリティをランダム付与
-    players.forEach(p => { if (p.isCpu) p.personality = rand(CPU_PERSONALITIES); });
+    players.forEach(p => { if (p.isCpu) applyCpuPersona(p); });
 
     R = {
       players, day: 0, phase: 'role',
       wolfTarget: null, doctorTarget: null,
       lastDoctorTarget: null, lastExecuted: null, lastExecutedRole: null,
+      nightReport: null,
       humanNightDone: false, cpuNightDone: false,
       humanWolfChoice: null,
       discMsgs: [], discOrder: [], discIdx: 0, discRound: 1,
-      votes: {}, humanVoted: false, tallyDone: false, resolveDone: false,
+      votes: {}, voteReasons: {}, humanVoted: false, tallyDone: false, resolveDone: false,
       accuCount: {}, seerKnown: {}, log: [],
     };
     BRAIN.initR(R); // BRAIN メモリ初期化
@@ -1742,7 +2098,7 @@ const SoloEngine = (() => {
       let t = 1000;
       cpuWolves.forEach((w, idx) => {
         later(t, () => emit({ type:'wolf_chat_msg', name:w.name,
-          text: tplFill(rand(TPL.wolf_night), tgt.name) }));
+          text: personagizeWolfNight(w, tgt.name) }));
         t += 1300 + Math.floor(Math.random()*600);
       });
     }
@@ -1843,6 +2199,7 @@ const SoloEngine = (() => {
     R.resolveDone = true;
     const wt = R.humanWolfChoice || R.wolfTarget;
     const dt = R.doctorTarget;
+    R.nightReport = { day:R.day, target:wt||null, protected:dt||null, guarded:false, victim:null, dragged:null };
     // 騎士護衛対象を次夜用に記録（連続護衛禁止）
     R.lastDoctorTarget = dt;
     R.wolfTarget = null; R.doctorTarget = null; R.humanWolfChoice = null;
@@ -1855,6 +2212,7 @@ const SoloEngine = (() => {
         const p = byName(wt);
         if (p && p.alive) {
           p.alive = false; victim = p;
+          R.nightReport.victim = p.name;
           R.log.push(`第${R.day}夜: ${wt} が人狼に襲われた`);
           // 猫又ルール: 猫又が夜に殺されると人狼を1人道連れ
           if (p.role === 'NEKOMATA') {
@@ -1862,11 +2220,13 @@ const SoloEngine = (() => {
             if (wolves.length) {
               const dragged = rand(wolves);
               dragged.alive = false;
+              R.nightReport.dragged = dragged.name;
               R.log.push(`第${R.day}夜: 猫又の道連れで ${dragged.name}（人狼）も倒れた`);
             }
           }
         }
       }
+      if (dt === wt) R.nightReport.guarded = true;
     }
     const win = checkWin();
     if (win) { doGameOver(win, victim); return; }
@@ -1899,6 +2259,7 @@ const SoloEngine = (() => {
     emit({
       type: 'discuss_start', round: 1, total_rounds: 2,
       eliminated: victim ? { name:victim.name } : null,
+      night_report: R.nightReport,
       alive: alive().map(p=>({ name:p.name })),
       song, songStarted,
     });
@@ -1956,7 +2317,7 @@ const SoloEngine = (() => {
 
   // ── 投票フェーズ ──────────────────────────────────────
   function startVote() {
-    R.phase = 'vote'; R.votes = {}; R.humanVoted = false; R.tallyDone = false;
+    R.phase = 'vote'; R.votes = {}; R.voteReasons = {}; R.humanVoted = false; R.tallyDone = false;
     if (R._discFallback) { clearTimeout(R._discFallback); R._discFallback = null; } // 議論フォールバックを確実に停止
     const al = alive();
     if (!R.players[0].alive) R.humanVoted = true; // 死亡プレイヤーは投票不要
@@ -1965,10 +2326,13 @@ const SoloEngine = (() => {
     cpus.forEach((cpu, i) => {
       later(1500 + i*1200, () => {
         const tgt = BRAIN.vote(R, cpu);
-        if (tgt) R.votes[cpu.name] = tgt.name;
-        const done = Object.keys(R.votes).length + (R.humanVoted?1:0);
+        if (tgt) {
+          R.votes[cpu.name] = tgt.name;
+          R.voteReasons[cpu.name] = BRAIN.voteReason(R, cpu, tgt);
+        }
+        const done = Object.keys(R.votes).length;
         emit({ type:'vote_progress', done, total:al.length });
-        if (R.humanVoted && Object.keys(R.votes).length >= cpus.length)
+        if (R.humanVoted && Object.keys(R.votes).length >= al.length)
           later(400, tallyVotes);
       });
     });
@@ -2006,6 +2370,7 @@ const SoloEngine = (() => {
       type: 'vote_result',
       executed, executed_role: execP?.role, tally: count,
       nekomata_victim: nekomataVictim?.name,
+      vote_reasons: R.voteReasons,
       winner: win,
       players: win ? R.players.map(p=>({name:p.name,role:p.role,alive:p.alive})) : null,
       log: win ? R.log : null,
@@ -2161,6 +2526,7 @@ const SoloEngine = (() => {
       case 'vote': {
         const al = alive();
         R.votes[R.players[0].name] = data.target;
+        R.voteReasons[R.players[0].name] = (data.reason || '').trim() || `${data.target}さんの発言と投票の流れが気になりました。`;
         R.humanVoted = true;
         const done = Object.keys(R.votes).length;
         emit({ type:'vote_progress', done, total:al.length });
@@ -2523,20 +2889,18 @@ const BRAIN = (function(){
     const hasNegateWolf = /(人狼|黒)\s*(?:ではない|じゃない|では無|じゃ無)/.test(text)
                        || /人狼じゃ(ない|なさそう)/.test(text);
 
-    // 占い師CO検出
-    if (/占い師(として)?CO|占い師として(名乗|宣言|出ます)|私(が|は)占い師|占い師として名乗り出ます/.test(text)) {
+    const explicitClaim = detectExplicitRoleClaim(text);
+    if (explicitClaim === 'SEER') {
       if (!R.claims[name]) R.claims[name] = 'SEER';
       if (!R.seerCOs.find(c=>c.name===name)) R.seerCOs.push({name, day:R.day, results:[]});
-    }
-    // 騎士CO
-    if (/騎士(として)?CO|私(が|は)騎士|護衛(してます|中)/.test(text)) {
+    } else if (explicitClaim === 'DOCTOR') {
       if (!R.claims[name]) R.claims[name] = 'DOCTOR';
       if (!R.docCOs.find(c=>c.name===name)) R.docCOs.push({name, day:R.day});
-    }
-    // 霊媒師CO
-    if (/霊媒師?(として)?CO|私(が|は)霊媒|霊視|霊媒結果|霊媒師として(名乗|報告)/.test(text)) {
+    } else if (explicitClaim === 'MEDIUM') {
       if (!R.claims[name]) R.claims[name] = 'MEDIUM';
       if (!R.mediumCOs.find(c=>c.name===name)) R.mediumCOs.push({name, day:R.day, results:[]});
+    } else if (explicitClaim === 'NEKOMATA') {
+      if (!R.claims[name]) R.claims[name] = 'NEKOMATA';
     }
 
     // 占い結果は CO 済 or 「占い」キーワード含むときだけ解析（否定文除外）
@@ -2622,30 +2986,35 @@ const BRAIN = (function(){
     const al = alive(R);
 
     // 寡黙キャラはたまに沈黙風（中立寄り）
-    if (pers==='quiet' && Math.random()<0.45) return rand(TPL.neutral);
+    if (pers==='quiet' && Math.random()<0.45) return personagizeSpeech(R, cpu, rand(TPL.neutral));
+
+    let text = '';
 
     // ── 人狼・狂人ロジック ──
     if (cpu.role==='WEREWOLF' || cpu.role==='MADMAN') {
-      return speakWolfSide(R, cpu, pers, round, wasAcc, ot);
+      text = speakWolfSide(R, cpu, pers, round, wasAcc, ot);
     }
     // ── 占い師ロジック ──
-    if (cpu.role==='SEER') {
-      return speakSeer(R, cpu, pers, day, round, wasAcc, ot);
+    else if (cpu.role==='SEER') {
+      text = speakSeer(R, cpu, pers, day, round, wasAcc, ot);
     }
     // ── 霊媒師ロジック ──
-    if (cpu.role==='MEDIUM') {
-      return speakMedium(R, cpu, pers, day, round, wasAcc, ot);
+    else if (cpu.role==='MEDIUM') {
+      text = speakMedium(R, cpu, pers, day, round, wasAcc, ot);
     }
     // ── 騎士ロジック ──
-    if (cpu.role==='DOCTOR') {
-      return speakDoctor(R, cpu, pers, day, round, wasAcc, ot);
+    else if (cpu.role==='DOCTOR') {
+      text = speakDoctor(R, cpu, pers, day, round, wasAcc, ot);
     }
     // ── 猫又ロジック ──
-    if (cpu.role==='NEKOMATA') {
-      return speakNekomata(R, cpu, pers, day, round, wasAcc, ot);
+    else if (cpu.role==='NEKOMATA') {
+      text = speakNekomata(R, cpu, pers, day, round, wasAcc, ot);
     }
     // ── 村人ロジック ──
-    return speakVillager(R, cpu, pers, day, round, wasAcc, ot);
+    else {
+      text = speakVillager(R, cpu, pers, day, round, wasAcc, ot);
+    }
+    return personagizeSpeech(R, cpu, text);
   }
 
   // === 人狼／狂人 ===
@@ -3034,6 +3403,27 @@ const BRAIN = (function(){
     return rand(ot);
   }
 
+  function voteReason(R, cpu, target) {
+    initR(R);
+    const name = typeof target === 'string' ? target : target?.name;
+    if (!name) return '';
+    const susp = R.suspicion?.[name] || 0;
+    const claim = R.claims?.[name];
+    const isWolfTeam = cpu.role === 'WEREWOLF' || cpu.role === 'MADMAN';
+    const blackBySeer = (R.seerCOs || []).some(c => (c.results || []).some(r => r.target === name && r.isWolf));
+    const protectedByTalk = R.coverCount?.[name] || 0;
+    const styled = reason => personagizeVoteReason(cpu, name, reason);
+    if (blackBySeer && !isWolfTeam) return styled(`${name}さんに黒判定が出ているため、情報を信じて投票します。`);
+    if (claim && isWolfTeam) return styled(`${name}さんの${ROLES[claim]?.name || '役職'}COは脅威なので、村の流れに乗せたいです。`);
+    if (claim && !isWolfTeam && susp >= 2) return styled(`${name}さんのCOと発言の筋に違和感があります。`);
+    if (susp >= 3) return styled(`${name}さんへの疑いが重なっており、今日はここを確認したいです。`);
+    if (susp >= 1) return styled(`${name}さんの発言に引っかかる点があり、投票で圧をかけます。`);
+    if (protectedByTalk >= 2 && isWolfTeam) return styled(`${name}さんは信用を集めているので、今のうちに吊り候補へ動かします。`);
+    return styled(isWolfTeam
+      ? `${name}さんなら投票先として自然に見えます。`
+      : `${name}さんの立ち位置がまだ見えにくいため、情報を増やす投票です。`);
+  }
+
   // ── 人狼の夜の襲撃対象（智略つき） ─────────────────────
   function wolfNightTarget(R){
     initR(R);
@@ -3086,7 +3476,7 @@ const BRAIN = (function(){
     return rand(vill);
   }
 
-  return { initR, parseClaim, speak, vote, wolfNightTarget, bumpSuspicion, bumpCover };
+  return { initR, parseClaim, speak, vote, voteReason, wolfNightTarget, bumpSuspicion, bumpCover };
 })();
 
 // ========== PROGRESSION & DETECTIVE SCORE（ソロの成長・中毒性レイヤー） ==========
@@ -3505,7 +3895,7 @@ function spawnConfetti(color1, color2) {
 
 // ========== P2P ENGINE (PeerJS サーバーレスオンライン) ==========
 const P2PEngine = (() => {
-  const CPU_NAMES = ['ハル','ユキ','アオイ','カイ','リン','ソラ','ナギ','ツバキ','コウ','アン','ミオ','レン','サキ','ジン','ノア'];
+  const CPU_NAMES = CHARACTER_AVATARS.slice(0, 14).map(a => a.label);
   let peer = null;
   let guestConn = null;   // guest→host接続
   let hostConns = {};     // host: { connId: DataConnection }
@@ -3546,6 +3936,10 @@ const P2PEngine = (() => {
 
   // ── ホスト: 部屋作成 ──────────────────────────────────
   function createRoom(hostName, onCode) {
+    if (typeof Peer === 'undefined') {
+      alert('P2P機能の読み込みに失敗しました。インターネット接続を確認するか、ソロデモ/ローカルモードで遊んでください。');
+      return;
+    }
     isHost = true;
     R.hostName = hostName;
     R.pendingPlayers = [{ name: hostName, isCpu: false }];
@@ -3582,6 +3976,10 @@ const P2PEngine = (() => {
 
   // ── ゲスト: 部屋参加 ─────────────────────────────────
   function joinRoom(guestName, code, onJoined, onError) {
+    if (typeof Peer === 'undefined') {
+      onError(new Error('P2P機能の読み込みに失敗しました。インターネット接続を確認してください。'));
+      return;
+    }
     isHost = false;
     peer = new Peer({ debug: 0 });
     peer.on('open', () => {
@@ -3638,7 +4036,7 @@ const P2PEngine = (() => {
         if (pname) handleDiscMsg(pname, data.text);
         break;
       case 'vote':
-        if (pname) handleVote(pname, data.target);
+        if (pname) handleVote(pname, data.target, data.reason);
         break;
       case 'music_ended':
         if (isHost && R.phase === 'discuss') { R.phase = 'voting'; later(300, startVote); }
@@ -3674,16 +4072,17 @@ const P2PEngine = (() => {
       day:0, phase:'role',
       wolfTarget:null, doctorTarget:null,
       lastDoctorTarget:null, lastExecuted:null, lastExecutedRole:null,
+      nightReport:null,
       humanActionDone:{}, cpuNightDone:false,
       humanWolfChoice:null, resolveDone:false,
       discMsgs:[], discOrder:[], discIdx:0, discRound:1,
       waitingForHuman: null, _discFallback: null,
-      votes:{}, humanVotedSet:new Set(), tallyDone:false,
+      votes:{}, voteReasons:{}, humanVotedSet:new Set(), tallyDone:false,
       accuCount:{}, seerKnown:{}, log:[],
     };
     BRAIN.initR(R); // BRAIN メモリ初期化
     // CPUにパーソナリティをランダム付与
-    R.players.forEach(p => { if (p.isCpu) p.personality = rand(CPU_PERSONALITIES); });
+    R.players.forEach(p => { if (p.isCpu) applyCpuPersona(p); });
 
     // 各プレイヤーに役職送信
     R.players.forEach(player => {
@@ -3711,7 +4110,7 @@ const P2PEngine = (() => {
       const tgt = BRAIN.wolfNightTarget(R) || topAcc(vill) || rand(vill);
       let t = 1000;
       cpuWolves.forEach(w => {
-        later(t, ()=>sendToWolves({type:'wolf_chat_msg',name:w.name,text:tplFill(rand(TPL.wolf_night),tgt.name)}));
+        later(t, ()=>sendToWolves({type:'wolf_chat_msg',name:w.name,text:personagizeWolfNight(w,tgt.name)}));
         t += 1400 + Math.floor(Math.random()*600);
       });
     }
@@ -3825,6 +4224,7 @@ const P2PEngine = (() => {
     if (R.resolveDone) return; R.resolveDone=true;
     const wt=R.humanWolfChoice||R.wolfTarget;
     const dt=R.doctorTarget;
+    R.nightReport={day:R.day,target:wt||null,protected:dt||null,guarded:false,victim:null,dragged:null};
     // 騎士護衛対象を次夜用に記録（連続護衛禁止）
     R.lastDoctorTarget=dt;
     R.wolfTarget=null; R.doctorTarget=null; R.humanWolfChoice=null;
@@ -3833,14 +4233,15 @@ const P2PEngine = (() => {
         const v=byName(wt);
         if(v&&v.alive){
           v.alive=false; victim=v;
+          R.nightReport.victim=v.name;
           R.log.push(`第${R.day}夜:${wt}が人狼に倒された`);
           // 猫又ルール
           if (v.role==='NEKOMATA') {
             const wolves=alive().filter(x=>x.role==='WEREWOLF');
-            if(wolves.length){const dragged=rand(wolves);dragged.alive=false;R.log.push(`第${R.day}夜:猫又道連れで${dragged.name}も倒れた`);}
+            if(wolves.length){const dragged=rand(wolves);dragged.alive=false;R.nightReport.dragged=dragged.name;R.log.push(`第${R.day}夜:猫又道連れで${dragged.name}も倒れた`);}
           }
         }
-    } else if (wt&&wt===dt) R.log.push(`第${R.day}夜:騎士が${wt}を護衛した`);
+    } else if (wt&&wt===dt) { R.nightReport.guarded=true; R.log.push(`第${R.day}夜:騎士が${wt}を護衛した`); }
     const win=checkWinP2P();
     if (win) { doGameOver(win,victim); return; }
     later(400,()=>startDiscuss(victim));
@@ -3866,7 +4267,7 @@ const P2PEngine = (() => {
     const songStarted = Date.now() + 650;
     if (R._discFallback) clearTimeout(R._discFallback);
     R._discFallback = setTimeout(()=>{ if(R.phase==='discuss'){R.phase='voting';startVote();} }, 5*60*1000);
-    broadcast({type:'discuss_start',round:1,total_rounds:2,eliminated:elim,alive:al.map(p=>({name:p.name})),song,songStarted});
+    broadcast({type:'discuss_start',round:1,total_rounds:2,eliminated:elim,night_report:R.nightReport,alive:al.map(p=>({name:p.name})),song,songStarted});
     R.discOrder=shuffle([...al]);
     R.discIdx=0;
     later(600,advanceDisc);
@@ -3935,7 +4336,7 @@ const P2PEngine = (() => {
 
   // ── 投票 ─────────────────────────────────────────────
   function startVote() {
-    R.phase='vote'; R.votes={}; R.humanVotedSet=new Set(); R.tallyDone=false;
+    R.phase='vote'; R.votes={}; R.voteReasons={}; R.humanVotedSet=new Set(); R.tallyDone=false;
     if (R._discFallback) { clearTimeout(R._discFallback); R._discFallback = null; } // 議論フォールバックを停止
     const al=alive();
     // 死亡プレイヤーは投票不要
@@ -3944,22 +4345,25 @@ const P2PEngine = (() => {
     const cpus=al.filter(p=>p.isCpu);
     cpus.forEach((cpu,i)=>later(900+i*600,()=>{
       const tgt=BRAIN.vote(R, cpu);
-      if (tgt) R.votes[cpu.name]=tgt.name;
-      const humansVoted=R.humanVotedSet.size;
+      if (tgt) {
+        R.votes[cpu.name]=tgt.name;
+        R.voteReasons[cpu.name]=BRAIN.voteReason(R, cpu, tgt);
+      }
       const humanCount=al.filter(p=>!p.isCpu).length;
-      broadcast({type:'vote_progress',done:Object.keys(R.votes).length+humansVoted,total:al.length});
-      if (humansVoted>=humanCount&&Object.keys(R.votes).length>=cpus.length) later(400,tallyVotes);
+      broadcast({type:'vote_progress',done:Object.keys(R.votes).length,total:al.length});
+      if (R.humanVotedSet.size>=humanCount&&Object.keys(R.votes).length>=cpus.length+humanCount) later(400,tallyVotes);
     }));
     if (!cpus.length && al.filter(p=>!p.isCpu).length===0) later(500,tallyVotes);
   }
 
-  function handleVote(pname, target) {
+  function handleVote(pname, target, reason='') {
     R.votes[pname]=target;
+    R.voteReasons[pname]=(reason || '').trim() || `${target}さんへの疑いを確認する投票です。`;
     R.humanVotedSet.add(pname);
     const al=alive();
     broadcast({type:'vote_progress',done:Object.keys(R.votes).length,total:al.length});
     const humansAlive=al.filter(p=>!p.isCpu);
-    if (R.humanVotedSet.size>=humansAlive.length&&Object.keys(R.votes).length>=al.filter(p=>p.isCpu).length)
+    if (R.humanVotedSet.size>=humansAlive.length&&Object.keys(R.votes).length>=al.length)
       later(500,tallyVotes);
   }
 
@@ -3997,6 +4401,7 @@ const P2PEngine = (() => {
     broadcast({
       type:'vote_result', executed, executed_role:execP?.role, tally,
       nekomata_victim:nekomataVictim?.name,
+      vote_reasons:R.voteReasons,
       winner:win,
       players:win?R.players.map(p=>({name:p.name,role:p.role,alive:p.alive})):null,
       log:win?R.log:null,
@@ -4110,7 +4515,7 @@ function initOnline() {
     players: [], cpuCount: 0,
     myRole: null, wolfPartners: [],
     phase: 'setup',
-    day: 0, alive: [], eliminatedLastNight: null,
+    day: 0, alive: [], eliminatedLastNight: null, nightReport: null,
     nightActionNeeded: null, nightActionDone: false,
     seerResult: null, wolfChosen: null,
     // Wolf chat
@@ -4122,7 +4527,7 @@ function initOnline() {
     tplTarget: null,
     tplSeerType: null, // 'wolf'|'safe'
     // Vote
-    voteSubmitted: false, voteDone: 0, voteTotal: 0,
+    voteSubmitted: false, voteDone: 0, voteTotal: 0, voteReasons: {},
     voteResult: null, winner: null,
     finalPlayers: [], log: [],
     // 役職カミングアウト追跡
@@ -4213,7 +4618,7 @@ function handleServer(data) {
       O.nightActionDone = true; break;
     case 'discuss_start':
       O.discMsgs = []; O.discRound = data.round; O.discTotalRounds = data.total_rounds;
-      O.eliminatedLastNight = data.eliminated; O.alive = data.alive;
+      O.eliminatedLastNight = data.eliminated; O.nightReport = data.night_report || null; O.alive = data.alive;
       // 戦績: 騎士の護衛成功を夜明けの結果から推定（守った夜に死者ゼロ＝成功）
       if (O.myRole==='DOCTOR' && O._myLastGuard) {
         if (!data.eliminated) O.myGuardSuccess = (O.myGuardSuccess||0) + 1;
@@ -4260,16 +4665,10 @@ function handleServer(data) {
       O.isMyDiscTurn = true; O.tplStep = 'cat'; O.tplTarget = null; break;
     case 'disc_message':
       O.discMsgs.push({name: data.name, text: data.text});
-      // カミングアウト自動検出（占い師・騎士・霊媒師・猫又キーワード）
+      // カミングアウト自動検出（明示的に本人が名乗った場合のみ）
       if (!O.deadPlayers.find(d=>d.name===data.name)) {
-        const seerKw   = ['占い師','占いまし','占い結果','占った','黒でした','白でした','人狼です！','人狼ではありません'];
-        const docKw    = ['騎士','護衛','守りまし'];
-        const medKw    = ['霊媒師','霊媒','霊視','処刑された','処刑者の役職'];
-        const nekoKw   = ['猫又','道連れ','ねこまた'];
-        if      (seerKw.some(kw=>data.text.includes(kw)))                           O.roleClaims[data.name] = 'SEER';
-        else if (docKw.some(kw=>data.text.includes(kw)) && !O.roleClaims[data.name]) O.roleClaims[data.name] = 'DOCTOR';
-        else if (medKw.some(kw=>data.text.includes(kw)) && !O.roleClaims[data.name]) O.roleClaims[data.name] = 'MEDIUM';
-        else if (nekoKw.some(kw=>data.text.includes(kw)) && !O.roleClaims[data.name]) O.roleClaims[data.name] = 'NEKOMATA';
+        const explicitClaim = detectExplicitRoleClaim(data.text);
+        if (explicitClaim) O.roleClaims[data.name] = explicitClaim;
       }
       O.currentSpeaker = null; break;
     case 'day_start':
@@ -4284,7 +4683,7 @@ function handleServer(data) {
     case 'vote_start':
       stopMusic(); // 議論BGMを停止
       if (O._musicFailTimer) { clearTimeout(O._musicFailTimer); O._musicFailTimer = null; }
-      O.alive = data.alive; O.voteSubmitted = false;
+      O.alive = data.alive; O.voteSubmitted = false; O.voteReasons = {};
       O.voteDone = 0; O.voteTotal = data.alive.length;
       O.voteResult = null; O.phase = 'vote'; break;
     case 'vote_progress':
@@ -4294,7 +4693,7 @@ function handleServer(data) {
       O.mediumReveal = { target: data.target, role: data.role };
       break;
     case 'vote_result':
-      O.voteResult = {executed: data.executed, role: data.executed_role, tally: data.tally, nekomataVictim: data.nekomata_victim};
+      O.voteResult = {executed: data.executed, role: data.executed_role, tally: data.tally, nekomataVictim: data.nekomata_victim, voteReasons: data.vote_reasons || {}};
       O.winner = data.winner;
       if (data.players && data.players.length > 0) {
         O.finalPlayers = data.players.map(p => ({
@@ -4437,9 +4836,7 @@ function renderODiscuss() {
     const av = getAvatar(m.name, O.players);
     const isMe = m.name === O.playerName;
     const claim = O.roleClaims[m.name];
-    const claimBadge = claim ? `<span class="claim-badge claim-unverified">${
-      claim==='SEER'?'🔮? 占い師CO':claim==='DOCTOR'?'💊? 騎士CO':claim==='MEDIUM'?'👁️? 霊媒師CO':'🐱? 猫又CO'
-    }</span>` : '';
+    const claimBadge = claim ? roleClaimBadge(claim) : '';
     // クイック同調ボタン（自分のターンで他人のメッセージのとき）
     const agreeBtn = (O.isMyDiscTurn && !isMe)
       ? `<button class="quick-agree" data-agree-name="${esc(m.name)}">👍 同調</button>` : '';
@@ -4490,9 +4887,7 @@ function renderODiscuss() {
   const aliveChips = O.alive.map(p => {
     const av = getAvatar(p.name, O.players);
     const claim = O.roleClaims[p.name];
-    const badge = claim ? `<span class="claim-badge claim-unverified">${
-      claim==='SEER'?'🔮?':claim==='DOCTOR'?'💊?':claim==='MEDIUM'?'👁️?':'🐱?'
-    }</span>` : '';
+    const badge = claim ? roleClaimBadge(claim, true) : '';
     return `<span class="chip" style="display:inline-flex;align-items:center;">${avatarFace(av, 'portrait-chip')} ${esc(p.name)}${badge}</span>`;
   }).join('');
 
@@ -4565,10 +4960,12 @@ function renderODiscuss() {
   return `
     ${ph('☀️', `第${O.day}日`, '村人会議 ─ 人狼を探し出せ！', '#fbbf24')}
     ${victimCard}
+    ${renderDawnIntel()}
     ${musicIndicator}
     <p class="sec-label" style="margin:.6rem 0 .2rem;">🧑 生存者 (${O.alive.length}人)</p>
     <div class="chips" style="margin-bottom:.4rem;">${aliveChips}</div>
     ${renderNotebook()}
+    ${renderCaseFile()}
     ${deadListHtml}
     <hr class="div" style="margin:.4rem 0;">
     ${myRoleReminder()}
@@ -4581,6 +4978,7 @@ function renderODiscuss() {
       </button>
     </div>
     ${voteReadySection}
+    ${renderCoChat()}
     <div class="chat-feed" id="discFeed">${msgs}${typingHtml}${waitHtml}</div>
     ${freeInput}
     ${O.isMyDiscTurn ? renderTplPicker() : ''}
@@ -4926,6 +5324,7 @@ function renderODay() {
     <hr class="div">
     <p class="sec-label">🧑 生存者 (${O.alive.length}人)</p>
     <div class="chips">${chips}</div>
+    ${renderCaseFile()}
     <div class="card" style="text-align:center; margin-top:0.8rem;">
       <p style="color:#94a3b8; font-size:0.9rem;">💬 議論の時間です！</p>
     </div>
@@ -4978,9 +5377,7 @@ function renderOVote() {
       ${targets.map(p => {
         const av = getAvatar(p.name, O.players);
         const claim = O.roleClaims[p.name];
-        const badge = claim ? `<span style="font-size:.6rem;color:#fbbf24;display:block;">${
-          claim==='SEER'?'🔮?':claim==='DOCTOR'?'💊?':claim==='MEDIUM'?'👁️?':'🐱?'
-        }</span>` : '';
+        const badge = claim ? `<span style="display:block;margin-top:.12rem;">${roleClaimBadge(claim, true)}</span>` : '';
         return `<button class="vote-avatar-btn" data-name="${esc(p.name)}"
           style="display:flex;flex-direction:column;align-items:center;min-width:68px;padding:.5rem .4rem;
                  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;
@@ -4996,11 +5393,16 @@ function renderOVote() {
   return `
     ${ph('🗳️',`第 ${O.day} 日 投票`,'誰を処刑しますか？','#fbbf24')}
     ${deadListHtml}
+    ${renderCaseFile()}
     <div class="card" style="padding:.8rem;">
       <p style="color:#fbbf24;font-size:.85rem;font-weight:700;margin:0 0 .4rem;">⚖️ 処刑する人を選んでください</p>
       <p style="color:#64748b;font-size:.75rem;margin:0 0 .5rem;">👆 アバターをタップすると自動選択されます</p>
       ${voteGrid}
       ${mkSelect('oVoteTgt', targets)}
+      <div class="vote-reason-box">
+        <label for="oVoteReason">投票理由（結果画面に残ります）</label>
+        <textarea id="oVoteReason" maxlength="120" placeholder="例：発言が少なく、占い師COへの反応も遅かったため"></textarea>
+      </div>
       <button class="btn btn-primary" id="oVoteSend" style="margin-top:0.6rem;">🗳️　投票する</button>
     </div>
   `;
@@ -5026,6 +5428,7 @@ function renderOVoteResult() {
   return `
     ${ph('⚖️',`第${O.day}日 処刑結果`,'村人会議の結論が出ました','#f87171')}
     <div class="card"><p class="sec-label" style="margin-top:0;">📊 得票数</p>${bars}</div>
+    ${renderVoteReasons(r.voteReasons)}
     <div class="vote-drama" style="text-align:center; padding:1.5rem; border-radius:16px;
          border:2px solid #ef4444; background:linear-gradient(135deg,#1a0505,#2d0a0a); margin:.6rem 0;">
       <p style="color:#f87171; font-size:.78rem; font-weight:700; letter-spacing:.12em; margin:0 0 .5rem;">⚖️ 処刑決定</p>
@@ -5034,6 +5437,7 @@ function renderOVoteResult() {
       <div style="font-size:.88rem; color:#64748b; margin-bottom:.8rem;">役職は…ゲーム終了時に公開</div>
     </div>
     ${nekHtml}
+    ${renderCaseFile()}
     ${nextBtn}
   `;
 }
@@ -5150,12 +5554,19 @@ function renderCodex() {
 // ========== P2P SETUP SCREEN ==========
 function renderP2PSetup() {
   const sub = O.p2pSub || 'choose';
+  const peerUnavailable = (typeof Peer === 'undefined') || window._peerJsFailed;
+  const peerWarn = peerUnavailable ? `
+    <div class="card" style="border:1px solid #f59e0b;background:rgba(245,158,11,.08);">
+      <p style="color:#fbbf24;font-size:.84rem;font-weight:800;margin:0 0 .25rem;">⚠️ P2P通信ライブラリを読み込めません</p>
+      <p style="color:#94a3b8;font-size:.78rem;line-height:1.55;margin:0;">P2PオンラインはPeerJSの読み込みが必要です。接続できない場合は、ソロデモかローカルモードで遊べます。</p>
+    </div>` : '';
   if (sub === 'host_wait') {
     const pRows = (O.players||[]).map(p=>`<span class="chip">${esc(p.name)}</span>`).join('');
     const total = (O.players||[]).length + (O.cpuCount||0);
     const canStart = total >= 4;
     return `
       ${ph('🌐','ホスト待機中','部屋コードを仲間に伝えてください','#34d399')}
+      ${peerWarn}
       <div class="card" style="text-align:center;border:2px solid #059669;padding:1.5rem;">
         <p style="color:#64748b;font-size:.85rem;margin-bottom:.4rem;">🔑 部屋コード（仲間に伝える）</p>
         <div style="font-size:3rem;font-weight:900;letter-spacing:.3em;color:#34d399;">${O.roomCode||'----'}</div>
@@ -5179,6 +5590,7 @@ function renderP2PSetup() {
   if (sub === 'guest_wait') {
     return `
       ${ph('🌐','P2P接続中','ホストへ接続しています...','#34d399')}
+      ${peerWarn}
       <div class="card" style="text-align:center;">
         <div style="font-size:2.5rem;margin-bottom:.5rem;">⏳</div>
         <p style="color:#64748b;">ホストへの接続を待っています</p>
@@ -5189,6 +5601,7 @@ function renderP2PSetup() {
   const isJoin = sub === 'join';
   return `
     ${ph('🌐','P2Pオンライン','サーバー不要でどこからでも対戦！','#34d399')}
+    ${peerWarn}
     <div class="card">
       <label>あなたの名前</label>
       <input type="text" id="p2pName" value="${esc(O.playerName||'')}" placeholder="名前を入力">
@@ -5287,7 +5700,7 @@ function render() {
   bindEvents();
   // チャットフィードを末尾にスクロール
   setTimeout(() => {
-    ['discFeed','wolfFeed'].forEach(id => {
+    ['discFeed','wolfFeed','coFeed'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.scrollTop = el.scrollHeight;
     });
