@@ -890,6 +890,8 @@ const CPU_PERSONALITIES = ['logical','aggressive','cautious','talkative','quiet'
 const CPU_PERSONA_PROFILES = {
   'ボブ': {
     personality:'talkative', thought:'空気の変化と笑顔の裏を読む陽気な観察者',
+    signature:['OK、僕の勘で言うよ。','ちょっと空気、変わったね。'],
+    action:{ mode:'mood', pushProb:0.72, voteProb:0.68, nightProb:0.62, bump:0.9, chaos:0.7 },
     neutral:['えっとね、僕はまず空気の変化を見たい。焦って決めるのは危ないよ。','この村、笑ってる人ほど目を見た方がいいね。誰が一番無理してるかな。'],
     accuse:['{n}さん、さっきから笑顔だけで中身が少ない。そこが気になるよ。','{n}さんは話を丸くしすぎ。人狼が隠れる動きに見えるね。'],
     defend:['待って待って、僕を吊るなら理由をもう少し出して。雑な疑いは村が損するよ。'],
@@ -898,6 +900,8 @@ const CPU_PERSONA_PROFILES = {
   },
   '井沢': {
     personality:'analytical', thought:'発言順・矛盾・投票筋を表で考える分析役',
+    signature:['前提を分解します。','ログで見ると、ここです。'],
+    action:{ mode:'audit', pushProb:0.82, voteProb:0.86, nightProb:0.72, bump:1.2, chaos:0.2 },
     neutral:['いったん発言順で整理します。誰が最初に疑いを出したかが大事です。','印象ではなく、前の発言との整合性で見ましょう。'],
     accuse:['{n}さん、前半と後半で疑い先が変わっています。理由の接続が弱いです。','{n}さんの主張は結論が先で、根拠が後付けに見えます。'],
     defend:['私を疑うなら、どの発言が矛盾しているか番号で示してください。そこから反証します。'],
@@ -906,6 +910,8 @@ const CPU_PERSONA_PROFILES = {
   },
   '工場長': {
     personality:'aggressive', thought:'現場の違和感と作業手順で白黒を切る指揮役',
+    signature:['現場判断でいくぞ。','段取りが悪い、そこを見る。'],
+    action:{ mode:'quiet_hunt', pushProb:0.86, voteProb:0.78, nightProb:0.65, bump:1.25, chaos:0.35 },
     neutral:['現場で大事なのは段取りだ。今日は疑い先を一つずつ潰していくぞ。','声の大きさじゃなく、動きが現場に合ってるかで見る。'],
     accuse:['{n}さん、作業の手順が飛んでる。結論だけ急ぐやつは信用できない。','{n}さんは報告が薄い。現場感覚ではそこが一番怪しい。'],
     defend:['俺を吊るなら現場が止まるぞ。理由を出せ、理由を。'],
@@ -914,6 +920,8 @@ const CPU_PERSONA_PROFILES = {
   },
   '狩野英孝': {
     personality:'bluffer', thought:'派手な言葉で空気を揺らし、反応の速さを見る祈祷師風',
+    signature:['ちょっと儀式入ります。','今、変なサイン出ました。'],
+    action:{ mode:'chaos', pushProb:0.9, voteProb:0.74, nightProb:0.78, bump:1.0, chaos:2.5 },
     neutral:['神社の鈴が鳴ってる気がしますね。今、空気が少し変わりました。','ちょっと待ってください、今の沈黙、僕にはサインに見えます。'],
     accuse:['{n}さん、その反応はお祓い案件です。目線が逃げました。','{n}さん、今のかわし方は逆に目立ちました。ここ見たいです。'],
     defend:['僕を疑うのは早いです。まだ儀式の途中です、ちゃんと理由を聞いてください。'],
@@ -922,6 +930,8 @@ const CPU_PERSONA_PROFILES = {
   },
   'マリック': {
     personality:'quiet', thought:'寡黙に観察し、手元を隠したまま核心だけを突く奇術師',
+    signature:['種は見えています。','手元ではなく、視線を見てください。'],
+    action:{ mode:'trusted_hunt', pushProb:0.62, voteProb:0.7, nightProb:0.9, bump:0.8, chaos:0.45 },
     neutral:['見えているものだけを信じると、簡単に騙されます。','今は種を探しています。焦って手を開く必要はありません。'],
     accuse:['{n}さんの言葉には、見せたい面と隠したい面があります。そこが気になります。','{n}さん、今の発言は煙幕です。視線を逸らしていますね。'],
     defend:['私を疑うなら、まず種明かしをしてください。根拠のない手品には乗りません。'],
@@ -930,6 +940,8 @@ const CPU_PERSONA_PROFILES = {
   },
   'キングカズ': {
     personality:'cautious', thought:'最後まで走り切る粘りとチームの士気を重視するベテラン',
+    signature:['まだ走れる。','勝ち筋を捨てないでいきましょう。'],
+    action:{ mode:'captain', pushProb:0.58, voteProb:0.82, nightProb:0.7, bump:0.75, chaos:0.25 },
     neutral:['まだ試合は終わっていません。焦らず、最後まで走り切りましょう。','大事なのはチームで同じ絵を見ることです。票をばらけさせない。'],
     accuse:['{n}さんは守備の戻りが遅い。村目線のカバーが足りません。','{n}さん、今の動きは味方を助けるより自分を守っていました。'],
     defend:['私を疑うのは構いません。ただ、村の勝ち筋まで一緒に考えてください。'],
@@ -938,6 +950,8 @@ const CPU_PERSONA_PROFILES = {
   },
   'カズレーザー': {
     personality:'analytical', thought:'にこやかに前提を分解し、矛盾だけを淡々と刺す切れ者',
+    signature:['面白いですね、でも。','その前提、壊れています。'],
+    action:{ mode:'logic_trap', pushProb:0.88, voteProb:0.9, nightProb:0.8, bump:1.25, chaos:0.15 },
     neutral:['前提を分けましょう。事実、推測、願望が混ざっています。','その理屈、面白いですね。ただ成立条件が一つ足りません。'],
     accuse:['{n}さんの話は、途中から結論を守るための説明になっています。','{n}さん、それは村の推理ではなく、自分を白く見せる文章です。'],
     defend:['僕を疑うのは全然ありです。ただ、その仮説だと他の行動が説明できません。'],
@@ -946,6 +960,8 @@ const CPU_PERSONA_PROFILES = {
   },
   'リンゴちゃん': {
     personality:'talkative', thought:'声色とテンションの揺れで嘘を感じ取る舞台型',
+    signature:['声、聞こえました。','今のトーン、変わりましたね。'],
+    action:{ mode:'tone', pushProb:0.76, voteProb:0.7, nightProb:0.72, bump:1.0, chaos:0.9 },
     neutral:['今の村、声のトーンが少し重いですね。誰かが隠してます。','言葉の中身だけじゃなくて、出すタイミングも見たいです。'],
     accuse:['{n}さん、急に声色が変わりましたね。そこ、私は聞き逃しません。','{n}さんの返事、綺麗すぎます。舞台なら作り声に見えます。'],
     defend:['私を疑うなら、声じゃなくて発言の中身で見てください。そこは負けません。'],
@@ -954,6 +970,8 @@ const CPU_PERSONA_PROFILES = {
   },
   '柳沢': {
     personality:'follower', thought:'流れとポジション取りを重視し、素早く疑い先へ走るスポーツマン',
+    signature:['今、スペース空きました。','流れに合わせて走ります。'],
+    action:{ mode:'bandwagon', pushProb:0.7, voteProb:0.88, nightProb:0.64, bump:0.9, chaos:0.2 },
     neutral:['流れを見ましょう。今、ボールを持っているのは誰かです。','無理に決めに行くより、空いたスペースを見たいですね。'],
     accuse:['{n}さん、今のポジション取りが不自然です。安全地帯に逃げています。','{n}さんは決定機で踏み込まなかった。そこが気になります。'],
     defend:['僕は逃げてません。流れを見てから動いただけです。'],
@@ -962,6 +980,8 @@ const CPU_PERSONA_PROFILES = {
   },
   '武藤': {
     personality:'aggressive', thought:'沈黙の圧と一撃の指摘で相手を追い込む格闘家肌',
+    signature:['正面から言う。','逃げ道は塞ぐ。'],
+    action:{ mode:'duel', pushProb:0.92, voteProb:0.84, nightProb:0.75, bump:1.35, chaos:0.25 },
     neutral:['黙って見ていたが、そろそろ踏み込む。','リングに上がった以上、曖昧な返事では逃げられない。'],
     accuse:['{n}さん、受け身ばかりだな。自分から攻める気がない。','{n}さんの防御は固いが、村を勝たせる攻めがない。'],
     defend:['俺を倒したいなら正面から来い。根拠の薄い打撃は効かない。'],
@@ -970,6 +990,8 @@ const CPU_PERSONA_PROFILES = {
   },
   'イッコー': {
     personality:'analytical', thought:'細部の乱れと美意識のズレから嘘を見抜く審美眼',
+    signature:['細部、見ています。','その仕上げ、少し荒いです。'],
+    action:{ mode:'detail', pushProb:0.84, voteProb:0.83, nightProb:0.72, bump:1.15, chaos:0.25 },
     neutral:['発言の並び、少し整っていませんね。そこに違和感があります。','細部に本音は出ます。言葉尻まで見ています。'],
     accuse:['{n}さん、その説明は飾りが多いです。芯が見えません。','{n}さんの発言、最後だけ急に整えましたね。そこが不自然です。'],
     defend:['私を疑うなら、雑に塗らないで。ちゃんと筋を整えて持ってきてください。'],
@@ -978,6 +1000,8 @@ const CPU_PERSONA_PROFILES = {
   },
   'マツコ': {
     personality:'logical', thought:'場全体の薄さと違和感を太くまとめる重厚な観察者',
+    signature:['はっきり言うわ。','そこ、嫌な感じがするのよ。'],
+    action:{ mode:'air', pushProb:0.8, voteProb:0.8, nightProb:0.76, bump:1.1, chaos:0.55 },
     neutral:['ちょっと全体的に薄いのよ。誰も傷つかない話ばかりしてる。','今の村、正しいことを言う人より、損をしない人が目立つわね。'],
     accuse:['{n}さん、ずっと安全圏から眺めてるだけなのよ。そこが嫌。','{n}さんの言葉、綺麗だけど体温がないのよね。'],
     defend:['私を疑うのはいいけど、それで誰が得するのかまで言いなさい。'],
@@ -986,6 +1010,8 @@ const CPU_PERSONA_PROFILES = {
   },
   'アンジャッシュ渡部': {
     personality:'logical', thought:'情報の出どころと会話の噛み合わせを気にする上品な情報通',
+    signature:['情報の出どころから見ます。','会話の噛み合わせが悪いですね。'],
+    action:{ mode:'source', pushProb:0.78, voteProb:0.82, nightProb:0.82, bump:1.0, chaos:0.35 },
     neutral:['情報の出どころを確認しましょう。噂だけで票を動かすのは危険です。','今の会話、少し噛み合っていません。そこにヒントがあります。'],
     accuse:['{n}さん、その情報はどこから出ました？出どころが曖昧です。','{n}さんは会話の噛み合わせをわざと外しているように見えます。'],
     defend:['私を疑うなら、どの情報が誤りかを確認しましょう。印象だけでは弱いです。'],
@@ -994,6 +1020,8 @@ const CPU_PERSONA_PROFILES = {
   },
   'ピコ太郎': {
     personality:'bluffer', thought:'リズムと奇抜さで場を崩し、隙を作る吟遊詩人',
+    signature:['リズムで見ます。','テンポがズレました。'],
+    action:{ mode:'rhythm', pushProb:0.88, voteProb:0.72, nightProb:0.78, bump:0.95, chaos:2.0 },
     neutral:['リズムがずれてますね。村の拍が一つ足りません。','言葉と言葉をつなげると、隠れてる音が聞こえます。'],
     accuse:['{n}さん、発言のリズムが急に変わりました。そこ、怪しいです。','{n}さんは軽く見せてますが、疑いをかわす拍だけは正確です。'],
     defend:['私を吊る前に、疑いのリズムをもう一回聞いてください。今の流れは雑です。'],
@@ -1027,6 +1055,58 @@ function personaTargetFromText(R, cpu, text) {
   return found ? found.name : '';
 }
 
+function personaActionChance(cpu, key, fallback) {
+  const value = getCpuPersona(cpu?.name)?.action?.[key];
+  return typeof value === 'number' ? value : fallback;
+}
+
+function personaChooseTarget(R, cpu, candidates, context='vote') {
+  const profile = getCpuPersona(cpu?.name);
+  const action = profile?.action;
+  const pool = (candidates || []).filter(p => p && p.name !== cpu?.name);
+  if (!action || !pool.length) return null;
+  const jitter = typeof action.chaos === 'number' ? action.chaos : 0.4;
+  const scoreOf = p => {
+    const susp = R.suspicion?.[p.name] || 0;
+    const cover = R.coverCount?.[p.name] || 0;
+    const speak = R.speakCount?.[p.name] || 0;
+    const claimed = R.claims?.[p.name] ? 1 : 0;
+    const lowTalk = Math.max(0, 2 - speak);
+    let score = susp + Math.random() * jitter;
+    switch (action.mode) {
+      case 'mood': score = cover * 0.7 + speak * 0.3 + susp * 0.8; break;
+      case 'audit': score = susp * 1.45 + claimed * 1.0 + speak * 0.18; break;
+      case 'quiet_hunt': score = lowTalk * 1.4 + susp * 0.75; break;
+      case 'chaos': score = Math.random() * 4.5 + (susp < 1 ? 1.2 : 0); break;
+      case 'trusted_hunt': score = cover * 1.7 + claimed * 0.9 - susp * 0.35; break;
+      case 'captain': score = susp * 1.25 - cover * 0.45 + claimed * 0.25; break;
+      case 'logic_trap': score = susp * 1.55 + claimed * 1.35 + speak * 0.15; break;
+      case 'tone': score = susp * 0.95 + Math.abs(speak - 1) * 0.7 + cover * 0.25; break;
+      case 'bandwagon': score = susp * 1.85 + cover * 0.1; break;
+      case 'duel': score = susp * 1.65 + (speak > 0 ? 0.35 : 0); break;
+      case 'detail': score = susp * 1.25 + lowTalk * 0.7 + claimed * 0.65; break;
+      case 'air': score = lowTalk * 1.1 + cover * 0.8 + susp * 0.7; break;
+      case 'source': score = claimed * 1.5 + cover * 0.75 + susp * 0.85; break;
+      case 'rhythm': score = Math.random() * 3.2 + (speak % 2 ? 1.0 : 0) + susp * 0.55; break;
+      default: score = susp + cover * 0.2;
+    }
+    if (context === 'wolf_night') score += cover * 0.65 + claimed * 0.85 - susp * 0.2;
+    if (context === 'speak') score += lowTalk * 0.25;
+    return score + Math.random() * jitter;
+  };
+  let best = null;
+  pool.forEach(p => {
+    const score = scoreOf(p);
+    if (!best || score > best.score) best = { player:p, score };
+  });
+  return best?.player || null;
+}
+
+function personaWithSignature(profile, line) {
+  if (!profile?.signature?.length || Math.random() > 0.52) return line;
+  return `${pickCpuPersonaLine(profile.signature)} ${line}`;
+}
+
 function personaSpeechKind(text, targetName) {
   if (/無実|信じて|疑うなら|吊っても|誤解|根拠/.test(text)) return 'defend';
   if (targetName && /怪しくない|信頼|白|かば|反対|村目線|吊りたくない|安全/.test(text)) return 'neutral';
@@ -1043,9 +1123,9 @@ function personagizeSpeech(R, cpu, text) {
   const kind = personaSpeechKind(text, targetName);
   const pool = profile[kind] || profile.neutral;
   if (!pool || !pool.length) return text;
-  const replaceProb = kind === 'neutral' ? 0.58 : 0.88;
+  const replaceProb = kind === 'neutral' ? 0.72 : 0.94;
   if (Math.random() > replaceProb) return text;
-  return tplFill(pickCpuPersonaLine(pool), targetName || 'その人');
+  return personaWithSignature(profile, tplFill(pickCpuPersonaLine(pool), targetName || 'その人'));
 }
 
 function personagizeVoteReason(cpu, targetName, baseReason) {
@@ -1056,7 +1136,7 @@ function personagizeVoteReason(cpu, targetName, baseReason) {
 
 function personagizeWolfNight(cpu, targetName) {
   const profile = getCpuPersona(cpu.name);
-  if (profile?.wolfNight?.length) return tplFill(pickCpuPersonaLine(profile.wolfNight), targetName);
+  if (profile?.wolfNight?.length) return personaWithSignature(profile, tplFill(pickCpuPersonaLine(profile.wolfNight), targetName));
   return tplFill(pickCpuPersonaLine(TPL.wolf_night), targetName);
 }
 
@@ -2853,6 +2933,17 @@ const BRAIN = (function(){
   function topAccLow(R, pls){ // 疑われていない順
     let m=Infinity,b=null; pls.forEach(p=>{const c=R.suspicion?.[p.name]||0;if(c<m){m=c;b=p;}}); return b;
   }
+  function applyPersonaQuirk(R, cpu, candidates){
+    const target = personaChooseTarget(R, cpu, candidates, 'speak');
+    if (!target) return null;
+    const chance = personaActionChance(cpu, 'pushProb', 0.38);
+    if (Math.random() <= chance) {
+      const bump = getCpuPersona(cpu.name)?.action?.bump || 0.7;
+      bumpSuspicion(R, target.name, bump);
+      return target;
+    }
+    return null;
+  }
 
   // ── R 初期化（メモリ追加） ─────────────────────────────
   function initR(R){
@@ -2970,7 +3061,7 @@ const BRAIN = (function(){
     // 偽占い対象は村人寄りの一人
     const vill = alive(R).filter(p=>p.role!=='WEREWOLF' && p.name!==faker.name);
     if (!vill.length) return;
-    const fakeTarget = rand(vill);
+    const fakeTarget = personaChooseTarget(R, faker, vill, 'fake_claim') || rand(vill);
     R.wolfFakeSeerPlan = { fakerName: faker.name, fakeTarget: fakeTarget.name };
   }
 
@@ -2984,6 +3075,7 @@ const BRAIN = (function(){
     const wasAcc = acc > 0;
     const ot = others(R, cpu);
     const al = alive(R);
+    applyPersonaQuirk(R, cpu, ot);
 
     // 寡黙キャラはたまに沈黙風（中立寄り）
     if (pers==='quiet' && Math.random()<0.45) return personagizeSpeech(R, cpu, rand(TPL.neutral));
@@ -3359,6 +3451,8 @@ const BRAIN = (function(){
         return vill.find(p=>p.name===plan.fakeTarget);
       }
       // それ以外は最も疑われている村人へ
+      const personaTgt = personaChooseTarget(R, cpu, vill, 'wolf_vote');
+      if (personaTgt && Math.random()<personaActionChance(cpu, 'voteProb', 0.62)) return personaTgt;
       return topAcc(R, vill) || rand(vill);
     }
 
@@ -3398,6 +3492,8 @@ const BRAIN = (function(){
     }
     // 2) 霊媒師の結果（前日処刑者が白だった場合は次日に占い対立してる人を吊る → 上記で対応）
     // 3) 最も疑われている人へ投票
+    const personaTgt = personaChooseTarget(R, cpu, ot, 'vote');
+    if (personaTgt && Math.random()<personaActionChance(cpu, 'voteProb', 0.58)) return personaTgt;
     const susp = topAcc(R, ot);
     if (susp && (R.suspicion[susp.name]||0) >= 1) return susp;
     return rand(ot);
@@ -3425,11 +3521,12 @@ const BRAIN = (function(){
   }
 
   // ── 人狼の夜の襲撃対象（智略つき） ─────────────────────
-  function wolfNightTarget(R){
+  function wolfNightTarget(R, hunter=null){
     initR(R);
     const al = alive(R);
     const wolves = al.filter(p=>p.role==='WEREWOLF');
     if (!wolves.length) return null;
+    const leadWolf = hunter || wolves.find(p=>p.isCpu && getCpuPersona(p.name)) || wolves[0];
     const vill = al.filter(p=>p.role!=='WEREWOLF');
     if (!vill.length) return null;
 
@@ -3463,6 +3560,8 @@ const BRAIN = (function(){
     // 4) 一切COしてない村人で発言力ある人（疑い役の少ない＝信頼されてそうな村人）を狙う
     const noClaim = vill.filter(p=>!R.claims[p.name]);
     if (noClaim.length) {
+      const personaNight = personaChooseTarget(R, leadWolf, noClaim, 'wolf_night');
+      if (personaNight && Math.random()<personaActionChance(leadWolf, 'nightProb', 0.68)) return personaNight;
       // かばわれてる（信頼されてる）人を優先的に狩る
       let best = null, bestScore = -Infinity;
       noClaim.forEach(p=>{
@@ -3473,6 +3572,8 @@ const BRAIN = (function(){
       });
       if (best) return best;
     }
+    const personaFallback = personaChooseTarget(R, leadWolf, vill, 'wolf_night');
+    if (personaFallback && Math.random()<personaActionChance(leadWolf, 'nightProb', 0.55)) return personaFallback;
     return rand(vill);
   }
 
