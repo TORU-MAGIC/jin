@@ -254,7 +254,8 @@ details summary:hover { color: #94a3b8; }
   border-radius: 8px;
   padding: 0.75rem;
   margin: 0.5rem 0;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+  overflow-anchor: none;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 44px rgba(0,0,0,.22);
   backdrop-filter: blur(10px);
 }
@@ -326,7 +327,7 @@ details summary:hover { color: #94a3b8; }
 .co-chat-panel{background:rgba(7,11,18,.72);border:1px solid rgba(251,191,36,.26);border-radius:8px;margin:.45rem 0;padding:.65rem;box-shadow:0 14px 34px rgba(0,0,0,.22);backdrop-filter:blur(12px);}
 .co-chat-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;color:#fbbf24;font-size:.82rem;font-weight:900;margin-bottom:.45rem;}
 .co-chat-count{color:#94a3b8;font-size:.72rem;font-weight:700;}
-.co-chat-feed{display:flex;flex-direction:column;gap:.38rem;max-height:170px;overflow-y:auto;scroll-behavior:smooth;}
+.co-chat-feed{display:flex;flex-direction:column;gap:.38rem;max-height:170px;overflow-y:auto;scroll-behavior:auto;overflow-anchor:none;}
 .co-chat-empty{color:#64748b;font-size:.8rem;line-height:1.6;padding:.25rem .35rem;}
 .co-msg{display:flex;gap:.5rem;align-items:flex-start;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.16);border-radius:8px;padding:.5rem .55rem;}
 .co-msg-name{display:flex;align-items:center;gap:.25rem;flex-wrap:wrap;color:#f8fafc;font-size:.82rem;font-weight:900;margin-bottom:.12rem;}
@@ -350,7 +351,7 @@ details summary:hover { color: #94a3b8; }
 .wolf-msg .cm-name{color:#f87171;}
 .seer-claim-msg{background:rgba(129,140,248,.1);border-left:3px solid #818cf888;}
 .my-msg{background:rgba(99,102,241,.12);border-left:3px solid #6b21a8;}
-.portrait{display:inline-block;background-image:url("assets/werewolf-solo-portraits-izawa.png");background-size:400% 400%;background-repeat:no-repeat;background-color:#111827;border:1px solid rgba(255,255,255,.18);box-shadow:0 6px 18px rgba(0,0,0,.35);overflow:hidden;vertical-align:middle;}
+.portrait{display:inline-block;background-image:url("assets/werewolf-solo-portraits-bob-izawa.png");background-size:400% 400%;background-repeat:no-repeat;background-color:#111827;border:1px solid rgba(255,255,255,.18);box-shadow:0 6px 18px rgba(0,0,0,.35);overflow:hidden;vertical-align:middle;}
 .portrait-chat{width:38px;height:38px;border-radius:50%;}
 .portrait-chip{width:22px;height:22px;border-radius:50%;margin-right:.25rem;flex-shrink:0;}
 .portrait-lg{width:76px;height:76px;border-radius:8px;}
@@ -447,7 +448,7 @@ details summary:hover { color: #94a3b8; }
 <script>
 // ========== CHARACTER AVATARS ==========
 const CHARACTER_AVATARS = [
-  { emoji:'🌍', label:'ボブ',             hint:'陽気な異国の村人。笑顔の奥に秘密を隠す', pos:'0% 0%' },
+  { emoji:'⚙️', label:'ボブ',             hint:'悲観的な工場の裏切り者。トンチンカンな発言で村を揺らす', pos:'0% 0%' },
   { emoji:'📚', label:'井沢',             hint:'冷静な分析役。発言の矛盾を細かく拾う', pos:'33.333% 0%' },
   { emoji:'🏭', label:'工場長',           hint:'現場を仕切る頑固者。頼れるが押しが強い', pos:'66.667% 0%' },
   { emoji:'⛩️', label:'狩野英孝',         hint:'派手な祈祷師風の芸人肌。場の空気をかき回す', pos:'100% 0%' },
@@ -693,27 +694,56 @@ function myRoleReminder() {
 
 // ========== チャット速度設定 ==========
 // 議論チャットの表示速度。大きいほどゆっくり。プレイヤーが画面から変更可能。
-let chatSpeedMult = 1.55; // 既定はゆっくりめ（初心者が読みやすい速度）
+const CHAT_SPEED_KEY = 'jinrou_chatSpeed_v2';
+let chatSpeedMult = 1.75; // 既定をかなりゆっくりめに調整
 function cycleChatSpeed() {
-  // 熟読(1.9) → ゆっくり(1.55) → 標準(1.15) → はやい(0.85) → 熟読 …
-  chatSpeedMult = chatSpeedMult >= 1.85 ? 1.55 : (chatSpeedMult >= 1.45 ? 1.15 : (chatSpeedMult >= 1.0 ? 0.85 : 1.9));
-  try { localStorage.setItem('jinrou_chatSpeed', String(chatSpeedMult)); } catch(e){}
+  // 超熟読(2.25) → 熟読(1.75) → ゆっくり(1.35) → 標準(1.05) → 超熟読 …
+  chatSpeedMult = chatSpeedMult >= 2.15 ? 1.75 : (chatSpeedMult >= 1.65 ? 1.35 : (chatSpeedMult >= 1.25 ? 1.05 : 2.25));
+  try { localStorage.setItem(CHAT_SPEED_KEY, String(chatSpeedMult)); } catch(e){}
 }
 function chatSpeedLabel() {
-  return chatSpeedMult >= 1.85 ? '📖 熟読' : chatSpeedMult >= 1.45 ? '🐢 ゆっくり' : chatSpeedMult >= 1.0 ? '🚶 標準' : '🐇 はやい';
+  return chatSpeedMult >= 2.15 ? '📖 超熟読' : chatSpeedMult >= 1.65 ? '📖 熟読' : chatSpeedMult >= 1.25 ? 'ゆっくり' : '標準';
 }
 // 起動時に保存済み速度を復元
-try { const _s = parseFloat(localStorage.getItem('jinrou_chatSpeed')); if (_s>0) chatSpeedMult = _s; } catch(e){}
+try { const _s = parseFloat(localStorage.getItem(CHAT_SPEED_KEY)); if (_s>0) chatSpeedMult = _s; } catch(e){}
 // CPUが「考え中」になる時間。速度設定の影響は控えめ（主な調整は readPause 側で行う）
 function typingDelay(personality) {
-  const base = personality==='aggressive' ? (800+Math.random()*700) : (1000+Math.random()*1100);
-  return Math.round(base * (0.8 + 0.25*chatSpeedMult)); // mult 0.85→×1.01, 1.15→×1.09, 1.6→×1.2
+  const base = personality==='aggressive' ? (1400+Math.random()*900) : (1700+Math.random()*1300);
+  return Math.round(base * (0.85 + 0.18*chatSpeedMult));
 }
 // 発言を読む間（テキスト長に比例。速度設定をそのまま反映する主レバー）
 function readPause(text) {
   const len = text ? text.length : 12;
-  const raw = 950 + len * 78;
-  return Math.round(Math.max(1700, Math.min(5600, raw)) * chatSpeedMult);
+  const raw = 1700 + len * 112;
+  return Math.round(Math.max(3200, Math.min(12000, raw * chatSpeedMult)));
+}
+
+let _chatVoiceEnabled = true;
+let _lastSpokenChatKey = '';
+let _lastSpokenChatAt = 0;
+function cleanSpeechText(text) {
+  return String(text || '')
+    .replace(/[🐺🔍👁🗳❓⚠️👀🔴🧐😤🃏✋👻🤫😶🚨🛡🔄🧮🎭⏱📋🎤👁️🙏😊📝🔮⏳⚪🧊🧭📈🔁🧠✅💙😡🤷⚖️🌟🚫🪤✨👍🤝💯🎯🙋🙌⚡💥🖤💊🐱🛑💔🌙]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+function speakChatMessage(name, text) {
+  if (!_chatVoiceEnabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  const clean = cleanSpeechText(text);
+  if (!clean) return;
+  const key = `${name}\n${clean}`;
+  const now = Date.now();
+  if (_lastSpokenChatKey === key && now - _lastSpokenChatAt < 2500) return;
+  _lastSpokenChatKey = key;
+  _lastSpokenChatAt = now;
+  try {
+    const utter = new SpeechSynthesisUtterance(`${name}。${clean}`);
+    utter.lang = 'ja-JP';
+    utter.rate = 0.82;
+    utter.pitch = 0.9;
+    utter.volume = 0.9;
+    window.speechSynthesis.speak(utter);
+  } catch(e) {}
 }
 
 function quickChatPanel(inputId='discFreeInput', targetId='quickChatTarget') {
@@ -889,14 +919,14 @@ const CPU_PERSONALITIES = ['logical','aggressive','cautious','talkative','quiet'
 // 実在人物の口真似ではなく、名前から連想した「人狼ゲーム用の架空キャラ」プロフィール。
 const CPU_PERSONA_PROFILES = {
   'ボブ': {
-    personality:'talkative', thought:'空気の変化と笑顔の裏を読む陽気な観察者',
-    signature:['OK、僕の勘で言うよ。','ちょっと空気、変わったね。'],
-    action:{ mode:'mood', pushProb:0.72, voteProb:0.68, nightProb:0.62, bump:0.9, chaos:0.7 },
-    neutral:['えっとね、僕はまず空気の変化を見たい。焦って決めるのは危ないよ。','この村、笑ってる人ほど目を見た方がいいね。誰が一番無理してるかな。'],
-    accuse:['{n}さん、さっきから笑顔だけで中身が少ない。そこが気になるよ。','{n}さんは話を丸くしすぎ。人狼が隠れる動きに見えるね。'],
-    defend:['待って待って、僕を吊るなら理由をもう少し出して。雑な疑いは村が損するよ。'],
-    voteReason:['{n}さんは場をなだめすぎていて、疑いを避ける動きに見えました。','{n}さんの発言は柔らかいけど核心がなく、潜伏を疑いました。'],
-    wolfNight:['{n}さんは場を明るくしながら情報を集めてる。今夜は先に消したいね。']
+    personality:'bluffer', thought:'悲観的でトンチンカンな裏切り者気質。根拠は薄いが妙に自信だけある',
+    signature:['俺はユダだから裏切るよ。','どうせ村は終わりだよ。','もう駄目だ、たぶん全部逆だ。'],
+    action:{ mode:'betray', pushProb:0.92, voteProb:0.78, nightProb:0.76, bump:1.05, chaos:2.6 },
+    neutral:['俺はユダだから裏切るよ。だから先に言っとく、俺の推理はだいたい外れる。','どうせ村は終わりだよ。でも終わる前に変なところ押しとく。','悲しい話だけど、全員ちょっと怪しい。俺も含めて。'],
+    accuse:['俺はユダだから裏切るよ。{n}さん、なんか違う気がする。理由は今から考える。','{n}さんが怪しい。いや、怪しくないかもしれないけど、俺の中ではもう駄目だ。','{n}さん、発言が普通すぎる。普通ってことは逆に終わってる。'],
+    defend:['俺を信じるな。俺はユダだから裏切るよ。でも吊ったらもっと終わる気がする。','俺はバカだから難しいことは分からない。でも今の疑いはたぶん方向が逆だ。'],
+    voteReason:['俺はユダだから裏切るよ。{n}さんに入れるけど、外したら世界のせいです。','{n}さんが怪しい気がしました。根拠は薄いですが、村はもう駄目そうなので押します。','{n}さんは普通すぎます。普通な人ほど最後に裏切ると思いました。'],
+    wolfNight:['俺はユダだから裏切るよ。今夜は{n}さんで、たぶん間違ってるけど行く。','どうせ終わるなら{n}さんを噛もう。理由は暗い気持ちになったから。']
   },
   '井沢': {
     personality:'analytical', thought:'発言順・矛盾・投票筋を表で考える分析役',
@@ -1088,6 +1118,7 @@ function personaChooseTarget(R, cpu, candidates, context='vote') {
       case 'air': score = lowTalk * 1.1 + cover * 0.8 + susp * 0.7; break;
       case 'source': score = claimed * 1.5 + cover * 0.75 + susp * 0.85; break;
       case 'rhythm': score = Math.random() * 3.2 + (speak % 2 ? 1.0 : 0) + susp * 0.55; break;
+      case 'betray': score = Math.random() * 4.0 + (cover > 0 ? 1.2 : 0) + (susp < 1 ? 1.0 : -0.2); break;
       default: score = susp + cover * 0.2;
     }
     if (context === 'wolf_night') score += cover * 0.65 + claimed * 0.85 - susp * 0.2;
@@ -1218,10 +1249,10 @@ function nightSteps() {
   return steps;
 }
 
-function mkSelect(id, players) {
+function mkSelect(id, players, selected='') {
   const opts = players.map(p => {
     const n = typeof p === 'string' ? p : (p.name || '');
-    return `<option value="${esc(n)}">${esc(n)}</option>`;
+    return `<option value="${esc(n)}" ${n===selected?'selected':''}>${esc(n)}</option>`;
   }).join('');
   return `<select id="${id}">${opts}</select>`;
 }
@@ -2035,21 +2066,39 @@ function bindEvents() {
   });
 
   // VOTE - アバターグリッドボタンで投票先を選択
+  const defaultVoteReason = name => `${name}さんの発言と立ち位置が気になっています。`;
+  const isAutoVoteReason = text => /さんの発言と立ち位置が気になっています。$/.test((text || '').trim());
+  const syncVoteTarget = name => {
+    if (!name) return;
+    O.voteTarget = name;
+    const sel = document.getElementById('oVoteTgt');
+    if (sel) sel.value = name;
+    const reason = document.getElementById('oVoteReason');
+    if (reason && (!reason.value.trim() || isAutoVoteReason(reason.value))) {
+      reason.value = defaultVoteReason(name);
+      O.voteReasonDraft = reason.value;
+    }
+    document.querySelectorAll('.vote-avatar-btn').forEach(b => {
+      const active = b.dataset.name === name;
+      b.style.background = active ? 'rgba(107,33,168,.3)' : 'rgba(255,255,255,.06)';
+      b.style.border = active ? '2px solid #6b21a8' : '1px solid rgba(255,255,255,.12)';
+    });
+  };
+
   document.querySelectorAll('.vote-avatar-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const name = btn.dataset.name;
-      const sel = document.getElementById('oVoteTgt');
-      if (sel) sel.value = name;
-      const reason = document.getElementById('oVoteReason');
-      if (reason && !reason.value.trim()) reason.value = `${name}さんの発言と立ち位置が気になっています。`;
-      document.querySelectorAll('.vote-avatar-btn').forEach(b => {
-        b.style.background = 'rgba(255,255,255,.06)';
-        b.style.border = '1px solid rgba(255,255,255,.12)';
-      });
-      btn.style.background = 'rgba(107,33,168,.3)';
-      btn.style.border = '2px solid #6b21a8';
+      syncVoteTarget(name);
     });
   });
+  {
+    const voteSelect = document.getElementById('oVoteTgt');
+    if (voteSelect) voteSelect.addEventListener('change', () => {
+      syncVoteTarget(voteSelect.value);
+    });
+    const voteReason = document.getElementById('oVoteReason');
+    if (voteReason) voteReason.addEventListener('input', () => { O.voteReasonDraft = voteReason.value; });
+  }
 
   // ONLINE NIGHT ACTION — wolf はアイコングリッドから選択
   document.querySelectorAll('[data-wolf-pick]').forEach(card => {
@@ -2077,9 +2126,9 @@ function bindEvents() {
   // ONLINE VOTE
   on('oVoteSend', () => {
     if (O.voteSubmitted) return; // 二重投票防止
-    const target = val('oVoteTgt');
+    const target = O.voteTarget || val('oVoteTgt');
     if (!target) return;
-    const reason = (val('oVoteReason') || '').trim() || `${target}さんの発言と投票の流れが気になりました。`;
+    const reason = (O.voteReasonDraft || val('oVoteReason') || '').trim() || `${target}さんの発言と投票の流れが気になりました。`;
     (O.myVotes = O.myVotes||[]).push(target); // 戦績スコア用（自分の投票履歴）
     wsSend({type:'vote', target, reason});
     O.voteSubmitted = true;
@@ -4703,7 +4752,9 @@ function handleServer(data) {
       if (!O.alive || !O.alive.length) O.alive = O.players.map(p=>({ name: p.name }));
       O.phase = 'wolf_chat'; break;
     case 'wolf_chat_msg':
-      O.wolfChatMsgs.push({name: data.name, text: data.text}); break;
+      O.wolfChatMsgs.push({name: data.name, text: data.text});
+      speakChatMessage(data.name, data.text);
+      break;
     case 'night_start':
       O.day = data.day; O.nightActionNeeded = null;
       O.nightActionDone = false; O.seerResult = null; O.wolfChosen = null;
@@ -4766,6 +4817,7 @@ function handleServer(data) {
       O.isMyDiscTurn = true; O.tplStep = 'cat'; O.tplTarget = null; break;
     case 'disc_message':
       O.discMsgs.push({name: data.name, text: data.text});
+      speakChatMessage(data.name, data.text);
       // カミングアウト自動検出（明示的に本人が名乗った場合のみ）
       if (!O.deadPlayers.find(d=>d.name===data.name)) {
         const explicitClaim = detectExplicitRoleClaim(data.text);
@@ -4785,6 +4837,8 @@ function handleServer(data) {
       stopMusic(); // 議論BGMを停止
       if (O._musicFailTimer) { clearTimeout(O._musicFailTimer); O._musicFailTimer = null; }
       O.alive = data.alive; O.voteSubmitted = false; O.voteReasons = {};
+      O.voteTarget = '';
+      O.voteReasonDraft = '';
       O.voteDone = 0; O.voteTotal = data.alive.length;
       O.voteResult = null; O.phase = 'vote'; break;
     case 'vote_progress':
@@ -5471,6 +5525,8 @@ function renderOVote() {
     `;
   }
   const targets = O.alive.filter(p => p.name !== O.playerName);
+  const selectedTarget = targets.some(p => p.name === O.voteTarget) ? O.voteTarget : '';
+  const voteReasonDraft = O.voteReasonDraft || '';
 
   // アバター付き投票先グリッド（選択補助）
   const voteGrid = `
@@ -5479,10 +5535,11 @@ function renderOVote() {
         const av = getAvatar(p.name, O.players);
         const claim = O.roleClaims[p.name];
         const badge = claim ? `<span style="display:block;margin-top:.12rem;">${roleClaimBadge(claim, true)}</span>` : '';
+        const selected = p.name === selectedTarget;
         return `<button class="vote-avatar-btn" data-name="${esc(p.name)}"
           style="display:flex;flex-direction:column;align-items:center;min-width:68px;padding:.5rem .4rem;
-                 background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;
-                 cursor:pointer;transition:background .15s;color:#e2e8f0;">
+                 background:${selected?'rgba(107,33,168,.32)':'rgba(255,255,255,.06)'};border:${selected?'2px solid #8b5cf6':'1px solid rgba(255,255,255,.12)'};border-radius:12px;
+                 cursor:pointer;color:#e2e8f0;">
           ${avatarFace(av, 'portrait-lg')}
           <span style="font-size:.75rem;font-weight:600;margin-top:.2rem;">${esc(p.name)}</span>
           ${(['solo','p2p','online'].includes(mode) && (O.notebook||{})[p.name]) ? `<span style="font-size:.58rem;display:block;color:${O.notebook[p.name]==='suspect'?'#f87171':'#4ade80'};">${O.notebook[p.name]==='suspect'?'🐺怪しい':'🤍信用'}</span>` : ''}
@@ -5499,10 +5556,10 @@ function renderOVote() {
       <p style="color:#fbbf24;font-size:.85rem;font-weight:700;margin:0 0 .4rem;">⚖️ 処刑する人を選んでください</p>
       <p style="color:#64748b;font-size:.75rem;margin:0 0 .5rem;">👆 アバターをタップすると自動選択されます</p>
       ${voteGrid}
-      ${mkSelect('oVoteTgt', targets)}
+      ${mkSelect('oVoteTgt', targets, selectedTarget)}
       <div class="vote-reason-box">
         <label for="oVoteReason">投票理由（結果画面に残ります）</label>
-        <textarea id="oVoteReason" maxlength="120" placeholder="例：発言が少なく、占い師COへの反応も遅かったため"></textarea>
+        <textarea id="oVoteReason" maxlength="120" placeholder="例：発言が少なく、占い師COへの反応も遅かったため">${esc(voteReasonDraft)}</textarea>
       </div>
       <button class="btn btn-primary" id="oVoteSend" style="margin-top:0.6rem;">🗳️　投票する</button>
     </div>
@@ -5774,11 +5831,35 @@ function renderSoloSetup() {
 }
 
 // ========== UPDATED RENDER ==========
+function scrollChatFeedsToLatest() {
+  ['discFeed', 'wolfFeed', 'coFeed'].forEach(id => {
+    const feed = document.getElementById(id);
+    if (feed) feed.scrollTop = feed.scrollHeight;
+  });
+}
+
+function scheduleChatLatestScroll() {
+  if (!['discuss', 'wolf_chat'].includes(O.phase)) return;
+  const run = () => scrollChatFeedsToLatest();
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(() => {
+      run();
+      setTimeout(run, 60);
+    });
+  } else {
+    setTimeout(run, 0);
+  }
+}
+
 function render() {
   const app = document.getElementById('app');
   // チャット入力中のテキストを保持（CPUターンで再描画されても消えないように）
   const _discVal  = document.getElementById('discFreeInput')?.value  || '';
   const _wolfVal  = document.getElementById('wolfFreeInput')?.value  || '';
+  const _voteTgt = document.getElementById('oVoteTgt')?.value || '';
+  const _voteReason = document.getElementById('oVoteReason')?.value || '';
+  if (_voteTgt) O.voteTarget = _voteTgt;
+  if (_voteReason) O.voteReasonDraft = _voteReason;
 
   if      (mode === 'pre_opening')                         app.innerHTML = renderPreOpening();
   else if (mode === 'opening')                             app.innerHTML = renderOpening();
@@ -5794,18 +5875,16 @@ function render() {
   if (discInput && _discVal) { discInput.value = _discVal; }
   const wolfInput = document.getElementById('wolfFreeInput');
   if (wolfInput && _wolfVal) { wolfInput.value = _wolfVal; }
+  const voteSelect = document.getElementById('oVoteTgt');
+  if (voteSelect && O.voteTarget) voteSelect.value = O.voteTarget;
+  const voteReason = document.getElementById('oVoteReason');
+  if (voteReason && O.voteReasonDraft) voteReason.value = O.voteReasonDraft;
 
   // 議論・チャット中は画面トップに飛ばさない（上下スクロール防止）
   const chatPhases = ['discuss','wolf_chat'];
   if (!chatPhases.includes(O.phase)) window.scrollTo(0, 0);
   bindEvents();
-  // チャットフィードを末尾にスクロール
-  setTimeout(() => {
-    ['discFeed','wolfFeed','coFeed'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.scrollTop = el.scrollHeight;
-    });
-  }, 30);
+  scheduleChatLatestScroll();
 }
 
 function renderPhase() {
@@ -5839,8 +5918,8 @@ function wolfSend(text) {
   wsSend({type:'wolf_chat_msg', text});
   // ローカルにも追加して即表示
   O.wolfChatMsgs.push({name: O.playerName, text});
+  speakChatMessage(O.playerName, text);
   render();
-  setTimeout(() => { const f = document.getElementById('wolfFeed'); if(f) f.scrollTop = f.scrollHeight; }, 50);
 }
 function wolfTplTarget(idx) {
   const t = TPL.wolf_night[idx];
