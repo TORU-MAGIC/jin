@@ -351,7 +351,7 @@ details summary:hover { color: #94a3b8; }
 .wolf-msg .cm-name{color:#f87171;}
 .seer-claim-msg{background:rgba(129,140,248,.1);border-left:3px solid #818cf888;}
 .my-msg{background:rgba(99,102,241,.12);border-left:3px solid #6b21a8;}
-.portrait{display:inline-block;background-image:url("assets/werewolf-solo-portraits-bob-izawa.png");background-size:400% 400%;background-repeat:no-repeat;background-color:#111827;border:1px solid rgba(255,255,255,.18);box-shadow:0 6px 18px rgba(0,0,0,.35);overflow:hidden;vertical-align:middle;}
+.portrait{display:inline-block;background-image:url("assets/werewolf-solo-portraits-sawada.png");background-size:400% 400%;background-repeat:no-repeat;background-color:#111827;border:1px solid rgba(255,255,255,.18);box-shadow:0 6px 18px rgba(0,0,0,.35);image-rendering:auto;overflow:hidden;vertical-align:middle;}
 .portrait-chat{width:38px;height:38px;border-radius:50%;}
 .portrait-chip{width:22px;height:22px;border-radius:50%;margin-right:.25rem;flex-shrink:0;}
 .portrait-lg{width:76px;height:76px;border-radius:8px;}
@@ -457,7 +457,7 @@ const CHARACTER_AVATARS = [
   { emoji:'🧠', label:'カズレーザー',     hint:'赤い服の切れ者。笑顔で核心を突く', pos:'66.667% 33.333%' },
   { emoji:'🍎', label:'リンゴちゃん',     hint:'華やかな歌い手。声色ひとつで空気を変える', pos:'100% 33.333%' },
   { emoji:'⚽', label:'柳沢',             hint:'俊敏な元スポーツマン。動きが読みにくい', pos:'0% 66.667%' },
-  { emoji:'🥋', label:'武藤',             hint:'威圧感ある格闘家肌。沈黙にも圧がある', pos:'33.333% 66.667%' },
+  { emoji:'📝', label:'沢枝',             hint:'回りくどいメモ魔。よく喋り、ボブ・工場長・井沢を強く疑う', pos:'33.333% 66.667%' },
   { emoji:'💄', label:'イッコー',         hint:'美意識の高い占い客。細部の違和感に鋭い、どんだけ～ぇ', pos:'66.667% 66.667%' },
   { emoji:'💬', label:'マツコ',           hint:'重厚な観察者。ひと言で議論の流れを変える', pos:'100% 66.667%' },
   { emoji:'🍷', label:'アンジャッシュ渡部', hint:'品の良い情報通。食卓の噂にやけに詳しい', pos:'0% 100%' },
@@ -721,6 +721,58 @@ function readPause(text) {
 let _chatVoiceEnabled = true;
 let _lastSpokenChatKey = '';
 let _lastSpokenChatAt = 0;
+let _chatVoiceUnlocked = false;
+let _chatVoiceUnlocking = false;
+let _pendingChatSpeech = [];
+
+function canUseChatVoice() {
+  return typeof window !== 'undefined'
+    && 'speechSynthesis' in window
+    && typeof SpeechSynthesisUtterance !== 'undefined';
+}
+
+function flushPendingChatSpeech() {
+  if (!_pendingChatSpeech.length || !_chatVoiceUnlocked) return;
+  const pending = _pendingChatSpeech.splice(-8);
+  pending.forEach((item, i) => {
+    setTimeout(() => speakChatMessage(item.name, item.text), i * 280);
+  });
+}
+
+function unlockChatVoice() {
+  if (!_chatVoiceEnabled || !canUseChatVoice() || _chatVoiceUnlocked || _chatVoiceUnlocking) return;
+  _chatVoiceUnlocking = true;
+  const finish = () => {
+    _chatVoiceUnlocked = true;
+    _chatVoiceUnlocking = false;
+    flushPendingChatSpeech();
+  };
+  try {
+    if (typeof window.speechSynthesis.resume === 'function') window.speechSynthesis.resume();
+    const utter = new SpeechSynthesisUtterance('。');
+    utter.lang = 'ja-JP';
+    utter.volume = 0;
+    utter.rate = 1;
+    utter.onend = finish;
+    utter.onerror = finish;
+    window.speechSynthesis.speak(utter);
+    setTimeout(finish, 260);
+  } catch(e) {
+    finish();
+  }
+}
+
+function installChatVoiceUnlock() {
+  if (typeof window === 'undefined') return;
+  ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(type => {
+    try {
+      window.addEventListener(type, unlockChatVoice, { capture:true, passive:true });
+    } catch(e) {
+      window.addEventListener(type, unlockChatVoice, true);
+    }
+  });
+}
+
 function cleanSpeechText(text) {
   return String(text || '')
     .replace(/[🐺🔍👁🗳❓⚠️👀🔴🧐😤🃏✋👻🤫😶🚨🛡🔄🧮🎭⏱📋🎤👁️🙏😊📝🔮⏳⚪🧊🧭📈🔁🧠✅💙😡🤷⚖️🌟🚫🪤✨👍🤝💯🎯🙋🙌⚡💥🖤💊🐱🛑💔🌙]/g, '')
@@ -728,15 +780,21 @@ function cleanSpeechText(text) {
     .trim();
 }
 function speakChatMessage(name, text) {
-  if (!_chatVoiceEnabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  if (!_chatVoiceEnabled || !canUseChatVoice()) return;
   const clean = cleanSpeechText(text);
   if (!clean) return;
   const key = `${name}\n${clean}`;
+  if (!_chatVoiceUnlocked) {
+    _pendingChatSpeech.push({ name, text });
+    if (_pendingChatSpeech.length > 12) _pendingChatSpeech.shift();
+    return;
+  }
   const now = Date.now();
   if (_lastSpokenChatKey === key && now - _lastSpokenChatAt < 2500) return;
   _lastSpokenChatKey = key;
   _lastSpokenChatAt = now;
   try {
+    if (typeof window.speechSynthesis.resume === 'function') window.speechSynthesis.resume();
     const utter = new SpeechSynthesisUtterance(`${name}。${clean}`);
     utter.lang = 'ja-JP';
     utter.rate = 0.82;
@@ -921,7 +979,7 @@ const CPU_PERSONA_PROFILES = {
   'ボブ': {
     personality:'bluffer', thought:'悲観的でトンチンカンな裏切り者気質。根拠は薄いが妙に自信だけある',
     signature:['俺はユダだから裏切るよ。','どうせ村は終わりだよ。','もう駄目だ、たぶん全部逆だ。'],
-    action:{ mode:'betray', pushProb:0.92, voteProb:0.78, nightProb:0.76, bump:1.05, chaos:2.6 },
+    action:{ mode:'betray', pushProb:0.92, voteProb:0.78, nightProb:0.76, bump:1.05, chaos:2.6, grudge:{'沢枝':2.15} },
     neutral:['俺はユダだから裏切るよ。だから先に言っとく、俺の推理はだいたい外れる。','どうせ村は終わりだよ。でも終わる前に変なところ押しとく。','悲しい話だけど、全員ちょっと怪しい。俺も含めて。'],
     accuse:['俺はユダだから裏切るよ。{n}さん、なんか違う気がする。理由は今から考える。','{n}さんが怪しい。いや、怪しくないかもしれないけど、俺の中ではもう駄目だ。','{n}さん、発言が普通すぎる。普通ってことは逆に終わってる。'],
     defend:['俺を信じるな。俺はユダだから裏切るよ。でも吊ったらもっと終わる気がする。','俺はバカだから難しいことは分からない。でも今の疑いはたぶん方向が逆だ。'],
@@ -941,7 +999,7 @@ const CPU_PERSONA_PROFILES = {
   '工場長': {
     personality:'aggressive', thought:'現場の違和感と作業手順で白黒を切る指揮役',
     signature:['現場判断でいくぞ。','段取りが悪い、そこを見る。'],
-    action:{ mode:'quiet_hunt', pushProb:0.86, voteProb:0.78, nightProb:0.65, bump:1.25, chaos:0.35 },
+    action:{ mode:'quiet_hunt', pushProb:0.86, voteProb:0.78, nightProb:0.65, bump:1.25, chaos:0.35, grudge:{'沢枝':2.45} },
     neutral:['現場で大事なのは段取りだ。今日は疑い先を一つずつ潰していくぞ。','声の大きさじゃなく、動きが現場に合ってるかで見る。仕事が遅いぞボブ。'],
     accuse:['{n}さん、作業の手順が飛んでる。結論だけ急ぐやつは信用できない。特にボブは最悪だ。','{n}さんは報告が薄い。ホウレンソウは大事だ、現場感覚ではそこが一番怪しい。'],
     defend:['俺を吊るなら現場が止まるぞ。理由を出せ、理由を。'],
@@ -1008,15 +1066,36 @@ const CPU_PERSONA_PROFILES = {
     voteReason:['{n}さんは安全な位置に逃げる動きが多く、潜伏役に見えました。','{n}さんは決める場面で踏み込まず、村の攻め筋をぼかしました。'],
     wolfNight:['{n}さんはスペースを見つけるのが早い。先にマークを外しましょう。']
   },
-  '武藤': {
-    personality:'aggressive', thought:'沈黙の圧と一撃の指摘で相手を追い込む格闘家肌',
-    signature:['正面から言う。','逃げ道は塞ぐ。'],
-    action:{ mode:'duel', pushProb:0.92, voteProb:0.84, nightProb:0.75, bump:1.35, chaos:0.25 },
-    neutral:['黙って見ていたが、そろそろ踏み込む。','リングに上がった以上、曖昧な返事では逃げられない。'],
-    accuse:['{n}さん、受け身ばかりだな。自分から攻める気がない。','{n}さんの防御は固いが、村を勝たせる攻めがない。'],
-    defend:['俺を倒したいなら正面から来い。根拠の薄い打撃は効かない。'],
-    voteReason:['{n}さんは防御姿勢が強く、村を前に進める発言が足りませんでした。','{n}さんは疑いを受け流すだけで、正面から答えていないと判断しました。'],
-    wolfNight:['{n}さんは踏み込むと強い。リングに上がる前に落とす。']
+  '沢枝': {
+    personality:'analytical', thought:'くどくて回りくどいメモ魔。疑い深く、ボブ・工場長・井沢とは露骨に相性が悪い',
+    signature:['僕はには良く分かりません。','メモを見る限りですね。','ちょっと待ってください、話が三段階あります。'],
+    action:{ mode:'note_grudge', pushProb:0.96, voteProb:0.9, nightProb:0.78, bump:1.45, chaos:0.6 },
+    neutral:[
+      '僕はには良く分かりません。良く分からないので、分からない部分をメモにしてから疑います。',
+      'まず前提を三つに分けます。一つ目は発言、二つ目は間、三つ目は僕のメモです。',
+      '僕のメモでは、今の流れはだいぶ怪しいです。何が怪しいかと言うと、説明すると長いです。'
+    ],
+    accuse:[
+      '僕はには良く分かりません。ですが{n}さんの発言は、メモ上かなり引っかかっています。',
+      '{n}さん、結論から言うと怪しいです。結論から言ったのに、ここから理由を長く話します。',
+      '{n}さんは話が短すぎます。短い話には、隠した長い事情があるとメモしました。',
+      '{n}さんの間の取り方、僕のメモでは赤丸です。赤丸ということは、つまり疑いです。'
+    ],
+    defend:[
+      '僕を疑うのは早いです。まだメモの一ページ目しか説明していません。',
+      '僕はには良く分かりません。だからこそ、分からないことを全部メモしているだけです。',
+      '回りくどいのは認めます。でも回り道にこそ証拠が落ちています。'
+    ],
+    voteReason:[
+      '僕はには良く分かりませんが、{n}さんの発言をメモで追うと矛盾が多く、疑いを外せませんでした。',
+      '{n}さんは説明が短く、逆に隠している情報が長そうなので投票します。',
+      'メモの量で判断すると、{n}さんだけ疑問点が多すぎました。回りくどいですが結論は投票です。'
+    ],
+    wolfNight:[
+      '僕はには良く分かりませんが、{n}さんはメモ上かなり邪魔です。先に消しておきます。',
+      '{n}さんを残すと話が短くまとまりすぎます。僕の回りくどい作戦に合いません。',
+      '{n}さんは僕のメモを読まれると困る相手です。先に静かにしてもらいましょう。'
+    ]
   },
   'イッコー': {
     personality:'analytical', thought:'細部の乱れと美意識のズレから嘘を見抜く審美眼',
@@ -1102,6 +1181,7 @@ function personaChooseTarget(R, cpu, candidates, context='vote') {
     const speak = R.speakCount?.[p.name] || 0;
     const claimed = R.claims?.[p.name] ? 1 : 0;
     const lowTalk = Math.max(0, 2 - speak);
+    const grudge = action.grudge?.[p.name] || 0;
     let score = susp + Math.random() * jitter;
     switch (action.mode) {
       case 'mood': score = cover * 0.7 + speak * 0.3 + susp * 0.8; break;
@@ -1114,6 +1194,7 @@ function personaChooseTarget(R, cpu, candidates, context='vote') {
       case 'tone': score = susp * 0.95 + Math.abs(speak - 1) * 0.7 + cover * 0.25; break;
       case 'bandwagon': score = susp * 1.85 + cover * 0.1; break;
       case 'duel': score = susp * 1.65 + (speak > 0 ? 0.35 : 0); break;
+      case 'note_grudge': score = susp * 1.55 + lowTalk * 0.55 + speak * 0.22 + ({'工場長':2.8,'ボブ':2.35,'井沢':2.15}[p.name] || 0); break;
       case 'detail': score = susp * 1.25 + lowTalk * 0.7 + claimed * 0.65; break;
       case 'air': score = lowTalk * 1.1 + cover * 0.8 + susp * 0.7; break;
       case 'source': score = claimed * 1.5 + cover * 0.75 + susp * 0.85; break;
@@ -1121,6 +1202,7 @@ function personaChooseTarget(R, cpu, candidates, context='vote') {
       case 'betray': score = Math.random() * 4.0 + (cover > 0 ? 1.2 : 0) + (susp < 1 ? 1.0 : -0.2); break;
       default: score = susp + cover * 0.2;
     }
+    score += grudge;
     if (context === 'wolf_night') score += cover * 0.65 + claimed * 0.85 - susp * 0.2;
     if (context === 'speak') score += lowTalk * 0.25;
     return score + Math.random() * jitter;
@@ -1152,6 +1234,30 @@ function personagizeSpeech(R, cpu, text) {
   if (detectExplicitRoleClaim(text) || /占い結果|霊媒結果|黒判定|白判定|占いました|霊視|騎士CO|猫又CO|占い師CO|霊媒師CO/.test(text)) return text;
   const targetName = personaTargetFromText(R, cpu, text);
   const kind = personaSpeechKind(text, targetName);
+  if (cpu.name === '沢枝' && kind === 'accuse' && targetName) {
+    const grudgeLines = {
+      '工場長': ['工場長さん、うるせーよ。僕のメモでは、その強引な仕切り方が一番怪しいです。', '工場長さん、うるせーよ。現場の声より僕のメモの方が今は大事です。'],
+      'ボブ': ['ボブさんはまた裏切る前提で話していますね。僕はには良く分かりませんが、だいぶ黒寄りです。', 'ボブさん、発言がトンチンカンすぎて逆に計算に見える、とメモしました。'],
+      '井沢': ['井沢さんの分析、細かすぎて逆に煙幕です。僕のメモにはそう書いてあります。', '井沢さん、理屈が整いすぎています。整いすぎた理屈ほど疑うべきです。']
+    };
+    if (grudgeLines[targetName] && Math.random() < 0.9) {
+      return personaWithSignature(profile, pickCpuPersonaLine(grudgeLines[targetName]));
+    }
+  }
+  if (targetName === '沢枝' && ['ボブ','工場長'].includes(cpu.name) && kind === 'accuse') {
+    const nasolabialLines = cpu.name === 'ボブ'
+      ? [
+          '沢枝さん、ほうれい線が深すぎてメモの罫線かと思いました。俺はユダだから裏切るよ。',
+          '沢枝さんのほうれい線、そこに全部の嘘が溜まってそうで怖いです。どうせ村は終わりだよ。',
+          '僕はには良く分かりませんって言うけど、沢枝さんのほうれい線だけは良く分かる。怪しいです。'
+        ]
+      : [
+          '沢枝、そのほうれい線に現場の不良品ぜんぶ挟んでるだろ。報告が長い、怪しい。',
+          '沢枝、ほうれい線が深いのはいいが話まで深掘りしすぎだ。現場が止まる。',
+          '沢枝のほうれい線、段取り表より目立ってるぞ。そこに隠し事を書いてないか？'
+        ];
+    if (Math.random() < 0.92) return personaWithSignature(profile, pickCpuPersonaLine(nasolabialLines));
+  }
   const pool = profile[kind] || profile.neutral;
   if (!pool || !pool.length) return text;
   const replaceProb = kind === 'neutral' ? 0.72 : 0.94;
@@ -1162,11 +1268,35 @@ function personagizeSpeech(R, cpu, text) {
 function personagizeVoteReason(cpu, targetName, baseReason) {
   const profile = getCpuPersona(cpu.name);
   if (!profile?.voteReason?.length) return baseReason;
+  if (targetName === '沢枝' && ['ボブ','工場長'].includes(cpu.name)) {
+    const lines = cpu.name === 'ボブ'
+      ? [
+          '沢枝さんは話が回りくどく、ほうれい線の奥に疑いを隠している気がしました。俺はユダだから裏切るよ。',
+          '沢枝さんのメモとほうれい線が深すぎて、どこまで本当か分からなくなりました。'
+        ]
+      : [
+          '沢枝は報告が長すぎるうえ、ほうれい線に隠し事まで挟んでいそうなので投票します。',
+          '沢枝の説明は現場を止めます。ほうれい線より深い話に付き合っていられません。'
+        ];
+    return pickCpuPersonaLine(lines);
+  }
   return tplFill(pickCpuPersonaLine(profile.voteReason), targetName);
 }
 
 function personagizeWolfNight(cpu, targetName) {
   const profile = getCpuPersona(cpu.name);
+  if (targetName === '沢枝' && ['ボブ','工場長'].includes(cpu.name)) {
+    const lines = cpu.name === 'ボブ'
+      ? [
+          '沢枝さんのほうれい線が深すぎて夜道でも目立つので、今夜いきます。',
+          '俺はユダだから裏切るよ。沢枝さんのメモとほうれい線は残すと危ないです。'
+        ]
+      : [
+          '沢枝は話もほうれい線も深すぎる。現場判断で今夜外す。',
+          '沢枝の長話で夜勤が終わらん。ほうれい線ごと静かにしてもらうぞ。'
+        ];
+    return pickCpuPersonaLine(lines);
+  }
   if (profile?.wolfNight?.length) return personaWithSignature(profile, tplFill(pickCpuPersonaLine(profile.wolfNight), targetName));
   return tplFill(pickCpuPersonaLine(TPL.wolf_night), targetName);
 }
@@ -5936,6 +6066,7 @@ function wolfTplTarget(idx) {
 // ========== START ==========
 let mode = 'pre_opening'; // pre_opening | opening | home | local | online | solo | p2p
 initState();
+installChatVoiceUnlock();
 render();
 </script>
 </body>
