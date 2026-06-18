@@ -11,10 +11,18 @@ CONFIGS = {
     6:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','VILLAGER','VILLAGER'],
     7:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN','VILLAGER','VILLAGER'],
     8:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
-    9:  ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
-    10: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+    9:  ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','MADMAN','VILLAGER','VILLAGER'],
+    10: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
+    11: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
+    12: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
+    13: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+    14: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+    15: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+    16: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+    17: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
 }
-CPU_NAMES = ['ハル','ユキ','アオイ','カイ','リン','ソラ','ナギ','ツバキ','コウ','アン']
+MAX_PLAYERS = 17
+CPU_NAMES = ['ハル','ユキ','アオイ','カイ','リン','ソラ','ナギ','ツバキ','コウ','アン','ミオ','レン','サクラ','リク','ミナト','ユウ']
 DISC_ROUNDS = 2
 READ_PAUSE_MIN = 1.4
 READ_PAUSE_MAX = 7.0
@@ -83,6 +91,7 @@ def new_room(code):
         'disc_msgs': [], 'disc_order': [], 'disc_step': 0, 'disc_round': 0,
         'wolf_chat': [], 'wolf_done': set(),
         'night_actions': {}, 'night_pending': set(),
+        'last_doctor_target': None,
         'votes': {}, 'vote_pending': set(), 'log': [],
         'vote_ready': set(),
         'desired_cpu': 0,
@@ -210,11 +219,14 @@ async def start_night_actions(room):
             if pid in room['cpu_pids']:
                 asyncio.create_task(_cpu_night(room, pid, 'seer', tgts))
         elif p['role'] == 'DOCTOR':
-            tgts = [{'name': q['name']} for q in room['players'].values() if q['alive']]
-            await send1(room, pid, {'type': 'action_needed', 'action': 'doctor', 'targets': tgts})
-            room['night_pending'].add(('doctor', pid))
-            if pid in room['cpu_pids']:
-                asyncio.create_task(_cpu_night(room, pid, 'doctor', tgts))
+            tgts = [{'name': q['name']} for qid, q in room['players'].items()
+                    if q['alive'] and qid != pid and q['name'] != room.get('last_doctor_target')]
+            if tgts:
+                await send1(room, pid, {'type': 'action_needed', 'action': 'doctor', 'targets': tgts,
+                                        'last_protected': room.get('last_doctor_target')})
+                room['night_pending'].add(('doctor', pid))
+                if pid in room['cpu_pids']:
+                    asyncio.create_task(_cpu_night(room, pid, 'doctor', tgts))
 
     wlist = wolf_list(room)
     if wlist:
@@ -242,6 +254,14 @@ async def _apply_night_action(room, pid, action, target):
         room['night_actions']['seer_target'] = target
         room['night_pending'].discard(('seer', pid))
     elif action == 'doctor':
+        actor = room['players'].get(pid)
+        target_player = next((p for p in room['players'].values() if p['name'] == target and p['alive']), None)
+        if not actor or not target_player or target == actor['name']:
+            await send1(room, pid, {'type': 'error', 'msg': '騎士は自分自身を護衛できません'})
+            return
+        if target == room.get('last_doctor_target'):
+            await send1(room, pid, {'type': 'error', 'msg': '同じ人を2夜連続で護衛することはできません'})
+            return
         room['night_actions']['doctor_target'] = target
         room['night_pending'].discard(('doctor', pid))
         await send1(room, pid, {'type': 'action_ack', 'action': 'doctor'})
@@ -257,6 +277,7 @@ async def _apply_night_action(room, pid, action, target):
 async def do_morning(room):
     wt = room['night_actions'].get('wolf_target')
     dt = room['night_actions'].get('doctor_target')
+    room['last_doctor_target'] = dt
     elim = None
     if wt and wt != dt:
         for p in room['players'].values():
@@ -401,7 +422,8 @@ async def handle(ws, pid, room, data):
 
     if t == 'set_cpu_count':
         if pid == room['host']:
-            room['desired_cpu'] = max(0, min(6, int(data.get('count', 0))))
+            humans = len([ppid for ppid in room['players'] if ppid not in room['cpu_pids']])
+            room['desired_cpu'] = max(0, min(MAX_PLAYERS - humans, int(data.get('count', 0))))
             await bcast(room, {'type': 'cpu_count_updated', 'count': room['desired_cpu']})
 
     elif t == 'start_game':
@@ -411,21 +433,29 @@ async def handle(ws, pid, room, data):
         n_total = n_human + n_cpu
         if n_total < 4:
             await send1(room, pid, {'type': 'error', 'msg': f'あと{4 - n_total}人必要です'}); return
+        if n_total > MAX_PLAYERS:
+            await send1(room, pid, {'type': 'error', 'msg': f'最大{MAX_PLAYERS}人までです'}); return
         names = random.sample(CPU_NAMES, min(n_cpu, len(CPU_NAMES)))
         for i in range(n_cpu):
             cpid = f'cpu{i}'
             room['players'][cpid] = {'name': names[i], 'ws': None, 'role': None, 'alive': True}
             room['cpu_pids'].add(cpid)
-        cfg = list(CONFIGS.get(min(n_total, 10), CONFIGS[10]))
+        cfg = list(CONFIGS.get(n_total, CONFIGS[6]))
         random.shuffle(cfg)
         for i, (ppid, p) in enumerate(room['players'].items()):
             p['role'] = cfg[i]; p['alive'] = True
         room['phase'] = 'role_reveal'; room['day'] = 1
+        room['last_doctor_target'] = None
+        room['night_actions'] = {}
+        room['night_pending'] = set()
+        room['votes'] = {}
+        room['vote_pending'] = set()
         for ppid, p in room['players'].items():
             if ppid in room['cpu_pids']: continue
             wp = [q['name'] for qid, q in room['players'].items() if q['role'] == 'WEREWOLF' and qid != ppid] if p['role'] == 'WEREWOLF' else []
+            sp = [q['name'] for qid, q in room['players'].items() if q['role'] == 'SHARED' and qid != ppid] if p['role'] == 'SHARED' else []
             await send1(room, ppid, {
-                'type': 'game_started', 'role': p['role'], 'wolf_partners': wp,
+                'type': 'game_started', 'role': p['role'], 'wolf_partners': wp, 'shared_partners': sp,
                 'players': [{'name': q['name']} for q in room['players'].values()],
                 'is_host': ppid == room['host'],
             })

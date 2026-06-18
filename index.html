@@ -433,6 +433,22 @@ details summary:hover { color: #94a3b8; }
 .case-empty{color:#64748b;font-size:.78rem;line-height:1.5;}
 .dawn-intel{background:rgba(15,23,42,.74);border:1px solid rgba(96,165,250,.22);border-radius:8px;padding:.65rem .75rem;margin:.45rem 0;color:#cbd5e1;font-size:.82rem;line-height:1.6;}
 .dawn-intel strong{color:#93c5fd;}
+.ai-intel-panel{background:rgba(15,23,42,.78);border:1px solid rgba(251,191,36,.24);border-radius:8px;padding:.65rem .72rem;margin:.45rem 0;color:#cbd5e1;}
+.ai-intel-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.45rem;color:#fbbf24;font-size:.82rem;font-weight:800;}
+.ai-intel-grid{display:grid;grid-template-columns:1fr;gap:.55rem;}
+.ai-summary{font-size:.78rem;line-height:1.65;color:#94a3b8;margin:0;}
+.ai-rank-list{display:grid;gap:.35rem;}
+.ai-rank-row{display:grid;grid-template-columns:auto 1fr auto;gap:.45rem;align-items:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:.38rem .45rem;}
+.ai-rank-num{color:#f87171;font-size:.72rem;font-weight:900;}
+.ai-rank-name{font-size:.82rem;font-weight:800;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ai-rank-score{font-size:.72rem;color:#fca5a5;font-weight:800;}
+.trust-gauge-list{display:grid;gap:.38rem;}
+.trust-gauge-row{display:grid;grid-template-columns:minmax(4.5rem,7rem) 1fr 2.5rem;gap:.45rem;align-items:center;font-size:.75rem;}
+.trust-name{color:#e2e8f0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.trust-bar{height:8px;border-radius:99px;background:linear-gradient(90deg,rgba(239,68,68,.35),rgba(251,191,36,.25));overflow:hidden;border:1px solid rgba(255,255,255,.08);}
+.trust-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#34d399,#60a5fa);}
+.trust-num{color:#86efac;text-align:right;font-weight:800;}
+@media (min-width:760px){.ai-intel-grid{grid-template-columns:1.1fr .9fr;}.trust-gauge-list{grid-template-columns:1fr 1fr;}}
 .vote-reason-box{margin-top:.65rem;}
 .vote-reason-box textarea{width:100%;min-height:74px;resize:vertical;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#f8fafc;font-size:.88rem;line-height:1.55;padding:.65rem .7rem;outline:none;}
 .vote-reason-box textarea:focus{border-color:#fbbf24;box-shadow:0 0 0 2px rgba(251,191,36,.12);}
@@ -638,6 +654,11 @@ const ROLES = {
     ability: '【夜の能力】毎晩1人を護衛する（自分は守れず、同じ人を連続では守れない）',
     winCon: '【勝利条件】人狼を全員処刑できれば勝ち（村人陣営）',
     tips: ['占い師がCOしたら最優先で護衛しよう。村の情報源を守るのが仕事。', '自分自身は守れない。同じ人も2夜連続では守れないので、役職COした人を軸に分散護衛を。', '自分の存在は基本秘密に。バレると人狼に先に襲われてしまう。', '護衛が成功して襲撃が防がれた夜は、人狼に騎士の存在を悟られる点に注意。', '偽占い師(狂人)を守ってしまわないよう、本物を見極める目も必要。', 'COは「占い師が複数出て本物を守りたい」など、必要な場面まで温存するのも手。'] },
+  SHARED:   { name: '共有者', icon: '🤝', team: 'village', color: '#38bdf8',
+    desc: '2人1組で互いが村人陣営だと知っている確定情報役。夜の能力はありませんが、相談役・進行役として村の推理をまとめます。',
+    ability: '【夜の能力】なし（相方の共有者だけを知っている）',
+    winCon: '【勝利条件】人狼を全員処刑できれば勝ち（村人陣営）',
+    tips: ['相方がいるため、村視点で信用されやすい進行役になれる。', '序盤にCOして議論をまとめるか、片方だけ潜伏して人狼の噛み先を迷わせるかが駆け引き。', '占い師や霊媒師の結果、投票理由、怪しいランキングを整理して村の票をまとめよう。', '偽共有が出たら相方と一緒に対抗し、村に確定情報を残そう。'] },
   MADMAN:   { name: '狂人',   icon: '🃏', team: 'wolf',    color: '#f59e0b',
     desc: '人狼陣営の協力者。ただし誰が人狼かは知らされず、夜の襲撃にも参加しません。村を混乱させ、人狼の勝利に貢献するのが役目です。',
     ability: '【夜の能力】なし（人狼が誰かも分からない）',
@@ -677,6 +698,8 @@ function myRoleReminder() {
   const isWolfTeam = info.team === 'wolf';
   const allies = (O.myRole==='WEREWOLF' && O.wolfPartnerNames && O.wolfPartnerNames.length)
     ? `<div style="margin-top:.35rem;font-size:.78rem;color:#fca5a5;">🐺 仲間の人狼: ${O.wolfPartnerNames.map(n=>esc(n)+(n===O.playerName?'（あなた）':'')).join('・')}</div>`
+    : (O.myRole==='SHARED' && O.sharedPartners && O.sharedPartners.length)
+    ? `<div style="margin-top:.35rem;font-size:.78rem;color:#7dd3fc;">🤝 共有相方: ${O.sharedPartners.map(n=>esc(n)).join('・')}</div>`
     : '';
   return `
     <details style="margin:.3rem 0;">
@@ -928,6 +951,13 @@ function detectExplicitRoleClaim(text) {
       /猫又なので/,
       /(?:CO|カミングアウト)(?:します|する|しました)?(?:。|、)?猫又(?:です|として|だ|。|、|!|！|$)/
     ],
+    SHARED: [
+      /(?:私|わたし|自分|僕|俺|うち)(?:が|は|の役職は)?共有者?(?:です|だ|でした|である)?(?:。|、|!|！|$)/,
+      /共有者?(?:として)?(?:CO|カミングアウト)(?:します|する|しました|です|だ|。|、|!|！|$)/,
+      /共有者?として(?:名乗|宣言|報告|出ます|出る)/,
+      /共有(?:です|CO|者CO)(?:。|、|!|！|$)/,
+      /(?:CO|カミングアウト)(?:します|する|しました)?(?:。|、)?共有者?(?:です|として|だ|。|、|!|！|$)/
+    ],
   };
   for (const [role, patterns] of Object.entries(rolePatterns)) {
     if (patterns.some(re => re.test(t))) return role;
@@ -1005,6 +1035,110 @@ function renderCaseFile() {
     </details>`;
 }
 
+function clampNum(v, min, max) {
+  return Math.max(min, Math.min(max, Number.isFinite(v) ? v : min));
+}
+
+function analyzeDiscussionIntel() {
+  const aliveList = O.alive || [];
+  const aliveNames = aliveList.map(p => p.name);
+  const scores = {};
+  aliveNames.forEach(name => {
+    scores[name] = { name, suspicion: 0, trust: 0, reasons: [] };
+  });
+  const add = (name, kind, amount, reason) => {
+    const s = scores[name];
+    if (!s) return;
+    if (kind === 'trust') s.trust += amount;
+    else s.suspicion += amount;
+    if (reason && s.reasons.length < 3) s.reasons.push(reason);
+  };
+  const suspectRe = /怪しい|疑|黒|人狼|投票|処刑|吊|矛盾|嘘|騙|不自然|沈黙|発言少な|隠|違和感|怪し/;
+  const trustRe = /信頼|信用|白|村人|安全|守って|かば|反対|村目線|無実|怪しくない|白確|仲間/;
+  const intelMsgs = (O.intelMsgs && O.intelMsgs.length) ? O.intelMsgs : (O.discMsgs || []);
+  intelMsgs.forEach(m => {
+    const text = String(m.text || '');
+    const claim = detectExplicitRoleClaim(text);
+    if (claim) add(m.name, 'trust', 8, `${ROLES[claim]?.name || '役職'}CO`);
+    aliveNames.forEach(name => {
+      if (name === m.name || !text.includes(name)) return;
+      if (suspectRe.test(text)) add(name, 'suspicion', 12, `${m.name}が疑い`);
+      if (trustRe.test(text)) add(name, 'trust', 11, `${m.name}が信用`);
+    });
+  });
+  Object.entries(O.notebook || {}).forEach(([name, mark]) => {
+    if (mark === 'suspect') add(name, 'suspicion', 16, 'あなたの疑惑メモ');
+    if (mark === 'trust') add(name, 'trust', 16, 'あなたの信用メモ');
+  });
+  const claimsByRole = {};
+  Object.entries(O.roleClaims || {}).forEach(([name, role]) => {
+    if (!aliveNames.includes(name)) return;
+    if (!claimsByRole[role]) claimsByRole[role] = [];
+    claimsByRole[role].push(name);
+    add(name, 'trust', role === 'SHARED' ? 12 : 6, `${ROLES[role]?.name || '役職'}CO`);
+  });
+  Object.entries(claimsByRole).forEach(([role, names]) => {
+    if (names.length <= 1) return;
+    const penalty = role === 'SHARED' ? 16 : 12;
+    names.forEach(name => add(name, 'suspicion', penalty, '対抗COあり'));
+  });
+  const rows = Object.values(scores).map(s => {
+    const suspicionScore = clampNum(Math.round(34 + s.suspicion - s.trust * 0.42), 0, 100);
+    const trustScore = clampNum(Math.round(58 + s.trust - s.suspicion * 0.48), 0, 100);
+    return {
+      name: s.name,
+      suspicionScore,
+      trustScore,
+      reason: s.reasons[0] || '発言待ち',
+    };
+  });
+  const ranking = [...rows].sort((a,b)=>b.suspicionScore-a.suspicionScore).slice(0, 5);
+  const trusted = [...rows].sort((a,b)=>b.trustScore-a.trustScore)[0];
+  const coCount = Object.keys(O.roleClaims || {}).filter(n => aliveNames.includes(n)).length;
+  const msgCount = intelMsgs.length;
+  const top = ranking[0];
+  const summary = msgCount
+    ? `発言${msgCount}件、CO${coCount}件。現在は${top ? `${top.name}さんへの疑い` : '疑い先'}が最も強く、${trusted ? `${trusted.name}さんが信用寄り` : '信用位置は未確定'}です。`
+    : 'まだ議論データがありません。発言が増えると、疑惑と信用が蓄積されます。';
+  return { ranking, rows, summary, msgCount };
+}
+
+function renderAiIntelPanel() {
+  const intel = analyzeDiscussionIntel();
+  if (!(O.alive || []).length) return '';
+  const rankRows = intel.ranking.slice(0,3).map((r, i) => `
+    <div class="ai-rank-row">
+      <div class="ai-rank-num">#${i+1}</div>
+      <div>
+        <div class="ai-rank-name">${esc(r.name)}</div>
+        <div style="font-size:.68rem;color:#64748b;line-height:1.35;">${esc(r.reason)}</div>
+      </div>
+      <div class="ai-rank-score">${r.suspicionScore}</div>
+    </div>`).join('');
+  const gaugeRows = intel.rows.map(r => `
+    <div class="trust-gauge-row" title="疑惑 ${r.suspicionScore}">
+      <div class="trust-name">${esc(r.name)}</div>
+      <div class="trust-bar"><div class="trust-fill" style="width:${r.trustScore}%;"></div></div>
+      <div class="trust-num">${r.trustScore}</div>
+    </div>`).join('');
+  return `
+    <div class="ai-intel-panel">
+      <div class="ai-intel-head"><span>🧠 AI推理</span><span style="color:#64748b;font-size:.72rem;">信頼度ゲージ</span></div>
+      <div class="ai-intel-grid">
+        <div>
+          <div class="case-mini-title">議論要約</div>
+          <p class="ai-summary">${esc(intel.summary)}</p>
+          <div class="case-mini-title" style="margin-top:.55rem;">怪しいランキング</div>
+          <div class="ai-rank-list">${rankRows}</div>
+        </div>
+        <div>
+          <div class="case-mini-title">各プレイヤーの信頼度</div>
+          <div class="trust-gauge-list">${gaugeRows}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
 function renderVoteReasons(reasons) {
   const entries = Object.entries(reasons || {}).filter(([, r]) => r && String(r).trim());
   if (!entries.length) return '';
@@ -1014,6 +1148,7 @@ function renderVoteReasons(reasons) {
   </div>`;
 }
 
+const MAX_PLAYERS = 17;
 const CONFIGS = {
   4:  ['WEREWOLF','SEER','VILLAGER','VILLAGER'],
   5:  ['WEREWOLF','SEER','DOCTOR','VILLAGER','VILLAGER'],
@@ -1026,7 +1161,9 @@ const CONFIGS = {
   12: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
   13: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
   14: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
-  15: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+  15: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+  16: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+  17: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
 };
 
 // ========== CPU PERSONALITIES ==========
@@ -1292,7 +1429,7 @@ function personagizeSpeech(R, cpu, text) {
   const profile = getCpuPersona(cpu.name);
   if (!profile || !text) return text;
   // 役職COや占い/霊媒結果はゲーム解析に関わるため、内容を崩さずそのまま出す。
-  if (detectExplicitRoleClaim(text) || /占い結果|霊媒結果|黒判定|白判定|占いました|霊視|騎士CO|猫又CO|占い師CO|霊媒師CO/.test(text)) return text;
+  if (detectExplicitRoleClaim(text) || /占い結果|霊媒結果|黒判定|白判定|占いました|霊視|騎士CO|猫又CO|共有者CO|共有CO|占い師CO|霊媒師CO/.test(text)) return text;
   const targetName = personaTargetFromText(R, cpu, text);
   const kind = personaSpeechKind(text, targetName);
   if (cpu.name === '沢枝' && kind === 'accuse' && targetName) {
@@ -1369,7 +1506,7 @@ function initState() {
   S = {
     phase: 'setup',          // setup | role_reveal | night | day | vote | vote_result | game_over
     playerCount: 6,
-    playerNames: Array.from({length:15}, (_,i) => `プレイヤー${i+1}`),
+    playerNames: Array.from({length:MAX_PLAYERS}, (_,i) => `プレイヤー${i+1}`),
     players: [],             // [{name, role, alive}]
     day: 0,
     // role reveal
@@ -1464,6 +1601,7 @@ function roleClaimInfo(role) {
     DOCTOR:   { icon:'💊', label:'騎士CO',   short:'騎', color:'#34d399' },
     MEDIUM:   { icon:'👁️', label:'霊媒師CO', short:'霊', color:'#a78bfa' },
     NEKOMATA: { icon:'🐱', label:'猫又CO',   short:'猫', color:'#fb923c' },
+    SHARED:   { icon:'🤝', label:'共有者CO', short:'共', color:'#38bdf8' },
   };
   return map[role] || { icon:'❔', label:'役職CO', short:'CO', color:'#fbbf24' };
 }
@@ -1555,6 +1693,12 @@ function renderRoleReveal() {
   const info = ROLES[player.role];
   const teamLabel = info.team === 'wolf' ? '人狼チーム' : '村人チーム';
   const isLast = idx === total - 1;
+  const sharedNames = player.role === 'SHARED'
+    ? S.players.filter(p => p.role === 'SHARED' && p.name !== player.name).map(p => p.name)
+    : [];
+  const sharedHtml = sharedNames.length
+    ? `<div style="margin-top:.7rem;padding:.65rem;background:rgba(56,189,248,.11);border:1px solid #38bdf844;border-radius:10px;color:#7dd3fc;font-size:.82rem;font-weight:700;">🤝 共有相方：${sharedNames.map(esc).join('・')}</div>`
+    : '';
   return `
     <p class="progress" style="margin-top:1.5rem;">役職確認 ${idx+1} / ${total}</p>
     <div class="role-reveal-card" style="border-color:${info.color}; background:${info.color}14;">
@@ -1563,6 +1707,7 @@ function renderRoleReveal() {
       <div class="rrc-name" style="color:${info.color};">${info.name}</div>
       <div class="rrc-team">【${teamLabel}】</div>
       <div class="rrc-desc">${info.desc}</div>
+      ${sharedHtml}
       ${roleGuideHtml(info)}
     </div>
     <button class="btn btn-primary" id="nextReveal">${isLast ? '🌙　ゲーム開始！' : '次の人へ ▶'}</button>
@@ -1818,7 +1963,7 @@ function renderGameOver() {
 
 // ========== EVENTS ==========
 function saveNames() {
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < MAX_PLAYERS; i++) {
     const e = document.getElementById(`pn${i}`);
     if (e) S.playerNames[i] = e.value;
   }
@@ -1827,7 +1972,7 @@ function saveNames() {
 function bindEvents() {
   // SETUP
   on('dec', () => { if (S.playerCount > 4) { saveNames(); S.playerCount--; render(); } });
-  on('inc', () => { if (S.playerCount < 15) { saveNames(); S.playerCount++; render(); } });
+  on('inc', () => { if (S.playerCount < MAX_PLAYERS) { saveNames(); S.playerCount++; render(); } });
   on('start', () => {
     saveNames();
     const names = S.playerNames.slice(0, S.playerCount).map(n => n.trim());
@@ -2069,9 +2214,9 @@ function bindEvents() {
     }
   });
   on('oCpuInc', () => {
-    // P2Pは人間プレイヤー含めた合計15まで。Onlineは単体CPU上限14
+    // P2Pは人間プレイヤー含めた合計17まで。Onlineは単体CPU上限16
     const humans = (O.players||[]).length;
-    const maxCpu = mode==='p2p' ? Math.max(0, 15 - humans) : 14;
+    const maxCpu = mode==='p2p' ? Math.max(0, MAX_PLAYERS - humans) : MAX_PLAYERS - 1;
     if ((O.cpuCount||0) < maxCpu) {
       O.cpuCount++;
       if (mode==='p2p') { render(); } else wsSend({type:'set_cpu_count',count:O.cpuCount});
@@ -2081,7 +2226,7 @@ function bindEvents() {
 
   // SOLO SETUP
   on('soloDec',   () => { if ((O.soloTotal||5) > 4) { O.soloTotal--; render(); } });
-  on('soloInc',   () => { if ((O.soloTotal||5) < 15) { O.soloTotal++; render(); } });
+  on('soloInc',   () => { if ((O.soloTotal||5) < MAX_PLAYERS) { O.soloTotal++; render(); } });
   on('soloDiff_easy',   () => { O.soloDiff='easy';   render(); });
   on('soloDiff_normal', () => { O.soloDiff='normal'; render(); });
   on('soloDiff_hard',   () => { O.soloDiff='hard';   render(); });
@@ -2141,11 +2286,13 @@ function bindEvents() {
   on('tCatMedium',    () => { O.tplStep = 'tgt_medium';    render(); });
   on('tCatDoctor',    () => { O.tplStep = 'msg_doctor';    render(); });
   on('tCatNeko',      () => { O.tplStep = 'msg_neko';      render(); });
+  on('tCatShared',    () => { O.tplStep = 'msg_shared';    render(); });
   on('tCatFakeCO',    () => { O.tplStep = 'fake_co_pick';  render(); });
   on('fakeSeerCO',    () => { O.tplStep = 'tgt_seer';      render(); });
   on('fakeMediumCO',  () => { O.tplStep = 'tgt_medium';    render(); });
   on('fakeDoctorCO',  () => { O.tplStep = 'msg_doctor';    render(); });
   on('fakeNekoCO',    () => { O.tplStep = 'msg_neko';      render(); });
+  on('fakeSharedCO',  () => { O.tplStep = 'msg_shared';    render(); });
   on('tCatQuestion',  () => { O.tplStep = 'msg_question';  render(); });
   on('tCatPressure',  () => { O.tplStep = 'msg_pressure';  render(); });
   on('tCatBack',      () => { O.tplStep = 'cat'; O.tplTarget = null; render(); });
@@ -2173,6 +2320,7 @@ function bindEvents() {
       else if (O.tplStep === 'msg_medium')  O.roleClaims[O.playerName] = 'MEDIUM';
       else if (O.tplStep === 'msg_doctor')  O.roleClaims[O.playerName] = 'DOCTOR';
       else if (O.tplStep === 'msg_neko')    O.roleClaims[O.playerName] = 'NEKOMATA';
+      else if (O.tplStep === 'msg_shared')  O.roleClaims[O.playerName] = 'SHARED';
       wsSend({type:'disc_message', text: msg});
       O.isMyDiscTurn = false; O.tplStep = null;
       render();
@@ -2370,7 +2518,7 @@ function bindEvents() {
 
 // ========== SOLO ENGINE (サーバー不要 / GitHub Pages 対応) ==========
 const SoloEngine = (() => {
-  const CPU_NAMES = CHARACTER_AVATARS.slice(0, 14).map(a => a.label);
+  const CPU_NAMES = CHARACTER_AVATARS.slice(0, MAX_PLAYERS - 1).map(a => a.label);
   let R = {};
 
   let _timers = [];
@@ -2391,7 +2539,7 @@ const SoloEngine = (() => {
   // ── 初期化 ────────────────────────────────────────────
   function init(humanName, total) {
     resetTimers(); // 前ゲームのタイマーを掃除してからR を作り直す
-    total = Math.max(4, Math.min(15, total));
+    total = Math.max(4, Math.min(MAX_PLAYERS, total));
     const cpuPool = shuffle(CPU_NAMES.filter(n=>n!==humanName));
     const players = [{ name: humanName, isCpu: false, alive: true, role: '' }];
     for (let i=1; i<total; i++)
@@ -2419,11 +2567,14 @@ const SoloEngine = (() => {
     const wolves = players.filter(p=>p.role==='WEREWOLF');
     const wolfPartners = human.role==='WEREWOLF'
       ? wolves.filter(p=>p!==human).map(p=>p.name) : [];
+    const sharedPartners = human.role==='SHARED'
+      ? players.filter(p=>p.role==='SHARED' && p!==human).map(p=>p.name) : [];
 
     emit({
       type: 'game_started',
       role: human.role,
       wolf_partners: wolfPartners,
+      shared_partners: sharedPartners,
       players: players.map(p=>({ pid: players.indexOf(p), name: p.name })),
       is_host: true,
     });
@@ -2476,7 +2627,11 @@ const SoloEngine = (() => {
       } else if (human.role==='DOCTOR') {
         // 自分自身と前夜に守った人は選択肢から除外（自衛・連続護衛禁止）
         const docTargets = al.filter(p=>p.name!==human.name && p.name!==R.lastDoctorTarget);
-        emit({ type:'action_needed', action:'doctor', targets:docTargets.map(p=>({name:p.name})), last_protected:R.lastDoctorTarget });
+        if (docTargets.length) {
+          emit({ type:'action_needed', action:'doctor', targets:docTargets.map(p=>({name:p.name})), last_protected:R.lastDoctorTarget });
+        } else {
+          R.humanNightDone = true;
+        }
       } else {
         R.humanNightDone = true;
       }
@@ -3098,6 +3253,12 @@ const TPL = {
     '猫又です！処刑は慎重に考えてください 🐱',
     '猫又なので処刑コストが高いですよ 🐱🛑',
   ],
+  co_shared: [
+    '共有者COします。村の進行を整理します 🤝',
+    '共有者です。相方と視点を合わせて、投票先をまとめます 🤝',
+    '共有者として出ます。占い・霊媒の結果を軸に整理しましょう 🤝',
+    '共有COします。今日は怪しい位置と信用できる位置を分けます 🤝',
+  ],
   // 霊媒結果
   medium_result_wolf: [
     '霊媒結果：{n}さんは人狼でした、処刑成功！ 👁🐺',
@@ -3308,6 +3469,8 @@ const BRAIN = (function(){
       if (!R.mediumCOs.find(c=>c.name===name)) R.mediumCOs.push({name, day:R.day, results:[]});
     } else if (explicitClaim === 'NEKOMATA') {
       if (!R.claims[name]) R.claims[name] = 'NEKOMATA';
+    } else if (explicitClaim === 'SHARED') {
+      if (!R.claims[name]) R.claims[name] = 'SHARED';
     }
 
     // 占い結果は CO 済 or 「占い」キーワード含むときだけ解析（否定文除外）
@@ -3413,6 +3576,10 @@ const BRAIN = (function(){
     // ── 騎士ロジック ──
     else if (cpu.role==='DOCTOR') {
       text = speakDoctor(R, cpu, pers, day, round, wasAcc, ot);
+    }
+    // ── 共有者ロジック ──
+    else if (cpu.role==='SHARED') {
+      text = speakShared(R, cpu, pers, day, round, wasAcc, ot);
     }
     // ── 猫又ロジック ──
     else if (cpu.role==='NEKOMATA') {
@@ -3650,6 +3817,34 @@ const BRAIN = (function(){
       return tplFill(rand(TPL.accuse), tgt.name);
     }
     return rand([...TPL.neutral, ...TPL.question]);
+  }
+
+  // === 共有者 ===
+  function speakShared(R, cpu, pers, day, round, wasAcc, ot){
+    const alreadyCO = R.claims[cpu.name]==='SHARED';
+    const shouldCO = !alreadyCO && (wasAcc || day>=2 || round>=2 || Math.random()<0.42);
+    if (shouldCO) {
+      R.claims[cpu.name] = 'SHARED';
+      return rand(TPL.co_shared);
+    }
+    const ranked = [...ot].sort((a,b)=>(R.suspicion?.[b.name]||0)-(R.suspicion?.[a.name]||0));
+    const top = ranked.find(p=>(R.suspicion?.[p.name]||0)>0);
+    if (top && Math.random()<0.55) {
+      bumpSuspicion(R, top.name, 0.5);
+      return `${top.name}さんを第一候補で見ています。理由をもう一度整理して投票先を合わせたいです 🤝`;
+    }
+    const trusted = [...ot].sort((a,b)=>(R.coverCount?.[b.name]||0)-(R.coverCount?.[a.name]||0))[0];
+    if (trusted && (R.coverCount?.[trusted.name]||0)>0 && Math.random()<0.38) {
+      bumpCover(R, trusted.name, 0.7);
+      return `${trusted.name}さんは今のところ信用寄りです。ここを軸に議論を組み立てたいです 🤝`;
+    }
+    if (wasAcc) return rand(TPL.defend);
+    return rand([
+      '共有視点では、疑い先を広げすぎず上位候補を絞りたいです 🤝',
+      '今日は発言量より、誰が誰を疑ったかの流れを重視します 🤝',
+      '投票前に、怪しい位置と信用できる位置を分けて整理しましょう 🤝',
+      ...TPL.question
+    ]);
   }
 
   // === 猫又 ===
@@ -4325,7 +4520,7 @@ function spawnConfetti(color1, color2) {
 
 // ========== P2P ENGINE (PeerJS サーバーレスオンライン) ==========
 const P2PEngine = (() => {
-  const CPU_NAMES = CHARACTER_AVATARS.slice(0, 14).map(a => a.label);
+  const CPU_NAMES = CHARACTER_AVATARS.slice(0, MAX_PLAYERS - 1).map(a => a.label);
   let peer = null;
   let guestConn = null;   // guest→host接続
   let hostConns = {};     // host: { connId: DataConnection }
@@ -4519,9 +4714,10 @@ const P2PEngine = (() => {
       if (player.isCpu) return;
       const wolves = R.players.filter(p=>p.role==='WEREWOLF');
       const partners = player.role==='WEREWOLF' ? wolves.filter(p=>p!==player).map(p=>p.name) : [];
+      const sharedPartners = player.role==='SHARED' ? R.players.filter(p=>p.role==='SHARED' && p!==player).map(p=>p.name) : [];
       const isH = player.name === R.hostName;
       const msg = {
-        type:'game_started', role:player.role, wolf_partners:partners,
+        type:'game_started', role:player.role, wolf_partners:partners, shared_partners:sharedPartners,
         players:R.players.map((p,i)=>({pid:i,name:p.name})), is_host:isH,
       };
       sendTo(player.name, msg);
@@ -4570,7 +4766,11 @@ const P2PEngine = (() => {
         sendTo(p.name,{type:'action_needed',action:'seer',targets:others.map(x=>({name:x.name}))});
       } else if (p.role==='DOCTOR') {
         const docTargets = al.filter(x=>x.name!==p.name && x.name!==R.lastDoctorTarget);
-        sendTo(p.name,{type:'action_needed',action:'doctor',targets:docTargets.map(x=>({name:x.name})),last_protected:R.lastDoctorTarget});
+        if (docTargets.length) {
+          sendTo(p.name,{type:'action_needed',action:'doctor',targets:docTargets.map(x=>({name:x.name})),last_protected:R.lastDoctorTarget});
+        } else {
+          R.humanActionDone[p.name] = true;
+        }
       } else {
         R.humanActionDone[p.name] = true;
       }
@@ -4938,7 +5138,7 @@ function initOnline() {
     roomCode: null, playerName: '', serverAddr: 'localhost:8765',
     setupSub: 'choose',
     players: [], cpuCount: 0,
-    myRole: null, wolfPartners: [],
+    myRole: null, wolfPartners: [], sharedPartners: [],
     phase: 'setup',
     day: 0, alive: [], eliminatedLastNight: null, nightReport: null,
     nightActionNeeded: null, nightActionDone: false,
@@ -4946,7 +5146,7 @@ function initOnline() {
     // Wolf chat
     wolfChatMsgs: [], wolfChatReady: false, wolfPartnerNames: [],
     // Discussion
-    discMsgs: [], discRound: 1, discTotalRounds: 2,
+    discMsgs: [], intelMsgs: [], discRound: 1, discTotalRounds: 2,
     currentSpeaker: null, isMyDiscTurn: false,
     tplStep: null,   // null|'cat'|'tgt_accuse'|'tgt_agree'|'tgt_seer'|'msg_neutral'|'msg_accuse'|'msg_defend'|'msg_agree'|'msg_seer'
     tplTarget: null,
@@ -5012,12 +5212,13 @@ function handleServer(data) {
     case 'cpu_count_updated':
       O.cpuCount = data.count; break;
     case 'game_started':
-      O.myRole = data.role; O.wolfPartners = data.wolf_partners || [];
+      O.myRole = data.role; O.wolfPartners = data.wolf_partners || []; O.sharedPartners = data.shared_partners || [];
       O.players = data.players; O.isHost = data.is_host || O.isHost;
       O.phase = 'role';
       if (['solo','p2p','online'].includes(mode)) {
         O.notebook = {}; O._scored = false; O.gameRecap = null;
         O.myVotes = []; O.mySeerHits = 0; O.myGuardSuccess = 0; O._myLastGuard = null;
+        O.intelMsgs = [];
       }
       break;
     case 'wolf_chat_start':
@@ -5092,6 +5293,8 @@ function handleServer(data) {
       O.isMyDiscTurn = true; O.tplStep = 'cat'; O.tplTarget = null; break;
     case 'disc_message':
       O.discMsgs.push({name: data.name, text: data.text});
+      if (!O.intelMsgs) O.intelMsgs = [];
+      O.intelMsgs.push({name: data.name, text: data.text, day: O.day});
       speakChatMessage(data.name, data.text);
       // カミングアウト自動検出（明示的に本人が名乗った場合のみ）
       if (!O.deadPlayers.find(d=>d.name===data.name)) {
@@ -5401,6 +5604,7 @@ function renderODiscuss() {
     <div class="chips" style="margin-bottom:.4rem;">${aliveChips}</div>
     ${renderNotebook()}
     ${renderCaseFile()}
+    ${renderAiIntelPanel()}
     ${deadListHtml}
     <hr class="div" style="margin:.4rem 0;">
     ${myRoleReminder()}
@@ -5432,6 +5636,7 @@ function renderTplPicker() {
     const isMedium = O.myRole === 'MEDIUM';
     const isDoctor = O.myRole === 'DOCTOR';
     const isNeko   = O.myRole === 'NEKOMATA';
+    const isShared = O.myRole === 'SHARED';
     const isWolf   = O.myRole === 'WEREWOLF' || O.myRole === 'MADMAN';
     const coBtn = isSeer
       ? `<div style="grid-column:span 2;"><button class="tpl-cat" id="tCatSeer" style="width:100%;">🔮 占い情報を公開（CO）▶</button><p style="color:#475569;font-size:.7rem;text-align:center;margin:.2rem 0 0;">占い師として名乗り出て占い結果を伝える</p></div>`
@@ -5441,8 +5646,10 @@ function renderTplPicker() {
       ? `<div style="grid-column:span 2;"><button class="tpl-cat" id="tCatDoctor" style="width:100%;">💊 騎士としてCOする</button><p style="color:#475569;font-size:.7rem;text-align:center;margin:.2rem 0 0;">護衛役としてカミングアウトする</p></div>`
       : isNeko
       ? `<div style="grid-column:span 2;"><button class="tpl-cat" id="tCatNeko" style="width:100%;">🐱 猫又としてCOする</button><p style="color:#475569;font-size:.7rem;text-align:center;margin:.2rem 0 0;">道連れ能力をアピールしてCOする</p></div>`
+      : isShared
+      ? `<div style="grid-column:span 2;"><button class="tpl-cat" id="tCatShared" style="width:100%;">🤝 共有者としてCOする</button><p style="color:#475569;font-size:.7rem;text-align:center;margin:.2rem 0 0;">確定情報役として議論を整理する</p></div>`
       : isWolf
-      ? `<div style="grid-column:span 2;"><button class="tpl-cat" id="tCatFakeCO" style="width:100%;border-color:#7c3aed55;background:rgba(124,58,237,.13);">🎭 役職を騙る（偽CO）▶</button><p style="color:#475569;font-size:.7rem;text-align:center;margin:.2rem 0 0;">占い師・霊媒師・騎士・猫又として偽りのCOをする</p></div>`
+      ? `<div style="grid-column:span 2;"><button class="tpl-cat" id="tCatFakeCO" style="width:100%;border-color:#7c3aed55;background:rgba(124,58,237,.13);">🎭 役職を騙る（偽CO）▶</button><p style="color:#475569;font-size:.7rem;text-align:center;margin:.2rem 0 0;">占い師・霊媒師・騎士・猫又・共有者として偽りのCOをする</p></div>`
       : '';
     return `
       <div style="background:rgba(251,191,36,0.08); border:1px solid #fbbf2444; border-radius:12px; padding:1rem; margin-top:0.5rem;">
@@ -5466,6 +5673,7 @@ function renderTplPicker() {
         <button class="tpl-btn" id="fakeMediumCO" style="border-left:3px solid #a78bfa;">👁️ 霊媒師として偽CO ▶（処刑者を選ぶ）</button>
         <button class="tpl-btn" id="fakeDoctorCO" style="border-left:3px solid #34d399;">💊 騎士として偽CO</button>
         <button class="tpl-btn" id="fakeNekoCO"   style="border-left:3px solid #fb923c;">🐱 猫又として偽CO</button>
+        <button class="tpl-btn" id="fakeSharedCO" style="border-left:3px solid #38bdf8;">🤝 共有者として偽CO</button>
         <button class="tpl-btn" id="tCatBack" style="color:#64748b; margin-top:0.5rem;">← 戻る</button>
       </div>`;
   }
@@ -5516,6 +5724,9 @@ function renderTplPicker() {
   } else if (step === 'msg_neko') {
     heading = '🐱 猫又COの発言を選んでください';
     templates = TPL.co_neko;
+  } else if (step === 'msg_shared') {
+    heading = '🤝 共有者COの発言を選んでください';
+    templates = TPL.co_shared;
   }
   const btns = templates.map(t =>
     `<button class="tpl-btn tpl-send" data-msg="${esc(t)}">${t}</button>`
@@ -5606,6 +5817,20 @@ function renderORole() {
           }).join('')}
         </div>
       </div>` : '';
+  const sharedHtml = O.sharedPartners.length
+    ? `<div style="margin-top:.9rem;padding:.8rem;background:rgba(56,189,248,.11);border-radius:12px;border:1px solid #38bdf844;">
+        <p style="color:#7dd3fc;font-size:.8rem;font-weight:700;margin:0 0 .6rem;text-align:center;">🤝 共有相方（あなただけに見えています）</p>
+        <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;">
+          ${O.sharedPartners.map(name => {
+            const pav = getAvatar(name, O.players);
+            return `<div style="text-align:center;">
+              <div style="margin-bottom:.35rem;">${avatarFace(pav, 'portrait-lg')}</div>
+              <div style="font-size:.8rem;color:#7dd3fc;font-weight:700;margin-top:.2rem;">${esc(name)}</div>
+              <div style="font-size:.68rem;color:#475569;">${pav.label}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>` : '';
 
   const hostBtn = O.isHost
     ? `<hr class="div"><button class="btn btn-night" id="oStartNight">🌙　夜フェーズへ進む（ホスト）</button>` : '';
@@ -5622,6 +5847,7 @@ function renderORole() {
       <div class="rrc-team">【${teamLabel}】</div>
       <div class="rrc-desc">${info.desc}</div>
       ${wpHtml}
+      ${sharedHtml}
       ${roleGuideHtml(info)}
     </div>
     <div class="card" style="text-align:center;">
