@@ -635,9 +635,9 @@ const ROLES = {
     tips: ['初日から毎晩占い、人狼の情報をどんどん集めよう。', '人狼を見つけたら、タイミングを見てCO（正体公開）して村に伝えよう。', '偽占い師(狂人)が現れたら、占い実績と発言の一貫性で信頼を勝ち取れ。', '早すぎるCOは人狼に夜襲われる危険大。騎士の護衛とセットが理想。', '占い結果は具体的に伝えると信用されやすい（誰をいつ占って何だったか）。', '自分が吊られそうな時は迷わずCO。情報を残すことが村の勝利に繋がる。'] },
   DOCTOR:   { name: '騎士',   icon: '💊', team: 'village', color: '#34d399',
     desc: '毎晩1人を選んで人狼の襲撃から守る護衛役。占い師を守り切れば村は一気に有利に。縁の下から村を支える重要な役職です。',
-    ability: '【夜の能力】毎晩1人を護衛する（同じ人を連続では守れない）',
+    ability: '【夜の能力】毎晩1人を護衛する（自分は守れず、同じ人を連続では守れない）',
     winCon: '【勝利条件】人狼を全員処刑できれば勝ち（村人陣営）',
-    tips: ['占い師がCOしたら最優先で護衛しよう。村の情報源を守るのが仕事。', '同じ人を2夜連続では守れない。狙われそうな人を読んで分散護衛を。', '自分の存在は基本秘密に。バレると人狼に先に襲われてしまう。', '護衛が成功して襲撃が防がれた夜は、人狼に騎士の存在を悟られる点に注意。', '偽占い師(狂人)を守ってしまわないよう、本物を見極める目も必要。', 'COは「占い師が複数出て本物を守りたい」など、必要な場面まで温存するのも手。'] },
+    tips: ['占い師がCOしたら最優先で護衛しよう。村の情報源を守るのが仕事。', '自分自身は守れない。同じ人も2夜連続では守れないので、役職COした人を軸に分散護衛を。', '自分の存在は基本秘密に。バレると人狼に先に襲われてしまう。', '護衛が成功して襲撃が防がれた夜は、人狼に騎士の存在を悟られる点に注意。', '偽占い師(狂人)を守ってしまわないよう、本物を見極める目も必要。', 'COは「占い師が複数出て本物を守りたい」など、必要な場面まで温存するのも手。'] },
   MADMAN:   { name: '狂人',   icon: '🃏', team: 'wolf',    color: '#f59e0b',
     desc: '人狼陣営の協力者。ただし誰が人狼かは知らされず、夜の襲撃にも参加しません。村を混乱させ、人狼の勝利に貢献するのが役目です。',
     ability: '【夜の能力】なし（人狼が誰かも分からない）',
@@ -1640,18 +1640,19 @@ function renderDoctor(actor) {
   const hdr = ph('🌙',`第 ${S.day} 夜`,'村は静まり返っています...','#60a5fa');
   if (S.nightSub === 'pass') return hdr + passScreen(actor.name,'騎士','docReady','💊　護衛を行う','#34d399');
 
-  // 前夜に守った人は選択不可（連続護衛禁止）
-  const targets = alive().filter(p => p.name !== S.lastDoctorTarget);
+  // 自分自身と前夜に守った人は選択不可（自衛・連続護衛禁止）
+  const targets = alive().filter(p => p.name !== actor.name && p.name !== S.lastDoctorTarget);
   const note = S.lastDoctorTarget
-    ? `<p style="color:#64748b;font-size:.78rem;margin:.1rem 0 .6rem;">※ ${esc(S.lastDoctorTarget)} は昨夜守ったため今夜は選べません</p>`
+    ? `<p style="color:#64748b;font-size:.78rem;margin:.1rem 0 .25rem;">※ ${esc(S.lastDoctorTarget)} は昨夜守ったため今夜は選べません</p>`
     : '';
   return `${hdr}
     <div class="card">
       <h3 style="color:#34d399; margin-bottom:0.4rem;">💊 ${esc(actor.name)} さん、誰を護衛しますか？</h3>
+      <p style="color:#64748b;font-size:.78rem;margin:.1rem 0 .25rem;">※ 自分自身は護衛できません。占い師や霊媒師など役職COした人が基本の護衛候補です。</p>
       ${note}
       <label>守る相手</label>
       ${mkSelect('docTgt', targets)}
-      <button class="btn btn-primary" id="docConfirm" style="margin-top:0.5rem;">🛡️　護衛する</button>
+      <button class="btn btn-primary" id="docConfirm" ${targets.length?'':'disabled'} style="margin-top:0.5rem;">${targets.length?'🛡️　護衛する':'護衛候補がいません'}</button>
     </div>`;
 }
 
@@ -1880,7 +1881,13 @@ function bindEvents() {
   // NIGHT - doctor（連続護衛禁止）
   on('docReady',    () => { S.nightSub = 'select'; render(); });
   on('docConfirm',  () => {
-    S.doctorTarget = val('docTgt');
+    const step = S.nightSteps[S.nightStepIdx];
+    const actor = step?.actor;
+    const target = val('docTgt');
+    if (!actor || !target) return alert('護衛できる相手がいません');
+    if (target === actor.name) return alert('騎士は自分自身を護衛できません');
+    if (target === S.lastDoctorTarget) return alert('同じ人を2夜連続で護衛することはできません');
+    S.doctorTarget = target;
     S.nightStepIdx++;
     S.nightSub = 'pass';
     render();
@@ -2306,6 +2313,23 @@ function bindEvents() {
     // wolf: ステルスグリッドから選択、それ以外: ドロップダウン
     const target = (action === 'wolf') ? (O._wolfNightSel || '') : val('oNightTgt');
     if (!action || !target) return;
+    const needed = O.nightActionNeeded || {};
+    const allowedTargets = (needed.targets || []).map(t => t.name);
+    if (needed.action && needed.action !== action) return;
+    if (allowedTargets.length && !allowedTargets.includes(target)) {
+      alert('選択できる相手を選び直してください');
+      return;
+    }
+    if (action === 'doctor') {
+      if (target === O.playerName) {
+        alert('騎士は自分自身を護衛できません');
+        return;
+      }
+      if (needed.last_protected && target === needed.last_protected) {
+        alert('同じ人を2夜連続で護衛することはできません');
+        return;
+      }
+    }
     if (action === 'doctor') O._myLastGuard = target; // 戦績: 護衛成功判定用
     wsSend({type:'night_action', action, target});
     O.nightActionDone = true;
@@ -2450,8 +2474,8 @@ const SoloEngine = (() => {
       } else if (human.role==='SEER') {
         emit({ type:'action_needed', action:'seer', targets:others.map(p=>({name:p.name})) });
       } else if (human.role==='DOCTOR') {
-        // 前夜に守った人は選択肢から除外（連続護衛禁止）
-        const docTargets = al.filter(p=>p.name!==R.lastDoctorTarget);
+        // 自分自身と前夜に守った人は選択肢から除外（自衛・連続護衛禁止）
+        const docTargets = al.filter(p=>p.name!==human.name && p.name!==R.lastDoctorTarget);
         emit({ type:'action_needed', action:'doctor', targets:docTargets.map(p=>({name:p.name})), last_protected:R.lastDoctorTarget });
       } else {
         R.humanNightDone = true;
@@ -2470,19 +2494,10 @@ const SoloEngine = (() => {
   function doCpuNight() {
     BRAIN.initR(R);
     const al = alive();
-    // 占い師CPU（毎夜）: 既に黒を出してない、かばわれてない（怪しい）人を優先
+    // 占い師CPU（毎夜）: 怪しい人・役職CO・発言の薄い人を積極的に占う
     const cpuSeer = al.find(p=>p.isCpu && p.role==='SEER');
     if (cpuSeer) {
-      const unknowns = al.filter(p=>p!==cpuSeer && R.seerKnown[p.name]===undefined);
-      // 疑われ度の高い未占い者を優先
-      let tgt = null;
-      if (unknowns.length) {
-        let best=-1, b=null;
-        unknowns.forEach(p=>{ const s=(R.suspicion?.[p.name]||0); if(s>best){best=s;b=p;} });
-        tgt = b || rand(unknowns);
-      } else {
-        tgt = rand(al.filter(p=>p!==cpuSeer));
-      }
+      const tgt = BRAIN.chooseSeerNightTarget(R, cpuSeer, al);
       if (tgt) R.seerKnown[tgt.name] = (tgt.role==='WEREWOLF');
     }
     // 人狼CPU標的（BRAIN による戦略的選択）
@@ -2492,25 +2507,10 @@ const SoloEngine = (() => {
       const target = BRAIN.wolfNightTarget(R) || topAcc(vill) || rand(vill);
       if (target) R.wolfTarget = target.name;
     }
-    // 騎士CPU: CO占い師がいれば優先的に守る。なければ最も疑われていない=信頼度高い人
+    // 騎士CPU: 自衛・連続護衛を避け、役職COした情報源を優先して守る
     const cpuDoc = al.find(p=>p.isCpu && p.role==='DOCTOR');
     if (cpuDoc) {
-      const baseCandidates = (vill.length ? vill : al).filter(p=>p.name!==R.lastDoctorTarget && p.name!==cpuDoc.name);
-      let tgt = null;
-      // 1) 真の占い師COを守る
-      const trueSeerCO = (R.seerCOs||[]).find(c=>{ const p=R.players.find(x=>x.name===c.name); return p && p.alive && p.role==='SEER'; });
-      if (trueSeerCO) tgt = baseCandidates.find(p=>p.name===trueSeerCO.name);
-      // 2) 真の霊媒師
-      if (!tgt) {
-        const trueMedCO = (R.mediumCOs||[]).find(c=>{ const p=R.players.find(x=>x.name===c.name); return p && p.alive && p.role==='MEDIUM'; });
-        if (trueMedCO) tgt = baseCandidates.find(p=>p.name===trueMedCO.name);
-      }
-      // 3) なければかばわれ度が高い（信頼されてそう＝狙われやすい）人
-      if (!tgt && baseCandidates.length) {
-        let best=-Infinity, b=null;
-        baseCandidates.forEach(p=>{ const sc=(R.coverCount?.[p.name]||0)-(R.suspicion?.[p.name]||0)*0.5; if(sc>best){best=sc;b=p;} });
-        tgt = b || rand(baseCandidates);
-      }
+      const tgt = BRAIN.chooseDoctorGuardTarget(R, cpuDoc, al);
       if (tgt) R.doctorTarget = tgt.name;
     }
   }
@@ -2808,10 +2808,23 @@ const SoloEngine = (() => {
           emit({ type:'action_ack' });
         } else if (human.role==='SEER') {
           const tgt = byName(data.target);
+          if (!tgt || !tgt.alive || tgt.name===human.name) {
+            emit({ type:'error', msg:'占える相手を選び直してください' });
+            break;
+          }
           const isWolf = tgt ? tgt.role==='WEREWOLF' : false;
           R.seerKnown[data.target] = isWolf;
           emit({ type:'seer_result', target:data.target, is_wolf:isWolf });
         } else if (human.role==='DOCTOR') {
+          const tgt = byName(data.target);
+          if (!tgt || !tgt.alive || tgt.name===human.name) {
+            emit({ type:'error', msg:'騎士は自分自身を護衛できません' });
+            break;
+          }
+          if (tgt.name===R.lastDoctorTarget) {
+            emit({ type:'error', msg:'同じ人を2夜連続で護衛することはできません' });
+            break;
+          }
           R.doctorTarget = data.target;
           emit({ type:'action_ack' });
         }
@@ -3057,6 +3070,13 @@ const TPL = {
     '占い師COします。これから情報を集めます 🔮',
     '占い師として名乗り出ます。皆で人狼を炙り出しましょう 🔮',
   ],
+  // ── 占い師の情報伏せ（駆け引き） ──
+  seer_hold: [
+    '占い結果はありますが、今は伏せます。投票の流れを見ます 🔮',
+    '情報は持っています。ただ、今出すと噛まれ筋が見えるので一旦伏せます 🔮',
+    '占い先は言えますが、結果公開は少し待ちます。反応を見たいです 🔮',
+    '結果はあります。ここで急いで出すより、誰が焦るかを見ます 🔮',
+  ],
   // ── 騎士CO ──
   co_doctor: [
     '騎士COします、護衛中です 💊',
@@ -3184,6 +3204,61 @@ const BRAIN = (function(){
       return target;
     }
     return null;
+  }
+
+  function chooseSeerNightTarget(R, seer, al){
+    initR(R);
+    const pool = (al || alive(R)).filter(p=>p && p.alive && p.name!==seer.name);
+    if (!pool.length) return null;
+    const known = R.seerKnown || {};
+    const unknowns = pool.filter(p=>known[p.name]===undefined);
+    const candidates = unknowns.length ? unknowns : pool;
+    let best = null, bestScore = -Infinity;
+    candidates.forEach(p=>{
+      const claim = R.claims?.[p.name];
+      const claimBonus = claim==='SEER' ? 2.4 : claim==='MEDIUM' ? 1.6 : claim==='DOCTOR' ? 0.8 : claim==='NEKOMATA' ? 0.6 : 0;
+      const suspicion = R.suspicion?.[p.name] || 0;
+      const cover = R.coverCount?.[p.name] || 0;
+      const speak = R.speakCount?.[p.name] || 0;
+      const freshBonus = known[p.name]===undefined ? 1.2 : -1.4;
+      const quietBonus = Math.max(0, 2 - speak) * 0.35;
+      const score = freshBonus + suspicion*1.55 + claimBonus + quietBonus + cover*0.15 + Math.random()*0.45;
+      if (score > bestScore) { bestScore = score; best = p; }
+    });
+    return best || rand(candidates);
+  }
+
+  function chooseDoctorGuardTarget(R, doc, al){
+    initR(R);
+    const pool = (al || alive(R)).filter(p=>p && p.alive && p.name!==doc.name && p.name!==R.lastDoctorTarget);
+    if (!pool.length) return null;
+    const inPool = name => pool.find(p=>p.name===name);
+    const trueRoleCO = (list, role) => (list||[]).find(c=>{
+      const p = R.players.find(x=>x.name===c.name);
+      return p && p.alive && p.role===role && inPool(c.name);
+    });
+    const claimedRole = role => Object.entries(R.claims||{}).find(([name, claimed])=>claimed===role && inPool(name));
+
+    const trueSeerCO = trueRoleCO(R.seerCOs, 'SEER');
+    if (trueSeerCO) return inPool(trueSeerCO.name);
+    const claimedSeer = claimedRole('SEER');
+    if (claimedSeer) return inPool(claimedSeer[0]);
+    const trueMediumCO = trueRoleCO(R.mediumCOs, 'MEDIUM');
+    if (trueMediumCO) return inPool(trueMediumCO.name);
+    const claimedMedium = claimedRole('MEDIUM');
+    if (claimedMedium) return inPool(claimedMedium[0]);
+
+    let best = null, bestScore = -Infinity;
+    pool.forEach(p=>{
+      const claim = R.claims?.[p.name];
+      const roleBonus = claim==='SEER' ? 3.0 : claim==='MEDIUM' ? 2.2 : claim==='NEKOMATA' ? 1.1 : claim==='DOCTOR' ? 0.7 : 0;
+      const cover = R.coverCount?.[p.name] || 0;
+      const suspicion = R.suspicion?.[p.name] || 0;
+      const speak = R.speakCount?.[p.name] || 0;
+      const score = roleBonus + cover*1.15 + speak*0.12 - suspicion*0.55 + Math.random()*0.65;
+      if (score > bestScore) { bestScore = score; best = p; }
+    });
+    return best || rand(pool);
   }
 
   // ── R 初期化（メモリ追加） ─────────────────────────────
@@ -3444,12 +3519,19 @@ const BRAIN = (function(){
     // 既に自分でCO済か
     const alreadyCO = R.claims[cpu.name]==='SEER';
 
+    const known = Object.entries(R.seerKnown||{});
+    const wolfHit = known.find(([n,iw])=>iw===true);
+    const safeHit = known.find(([n,iw])=>iw===false);
+    const blackPressure = !!wolfHit && (
+      fakeSeerExists || wasAcc || day >= 2 || round >= 2 || Math.random() < 0.86
+    );
+
     // CO戦略
     const totalPlayers = R.players.length;
     const shouldCO = (
       fakeSeerExists ||                  // 騙り対抗COは即時
-      (R.seerKnown && Object.values(R.seerKnown).some(v=>v===true)) || // 黒を引いたら即時
-      (day >= 2) ||                       // 2日目以降は基本CO
+      blackPressure ||                    // 黒を引いたら基本CO。ただし少しだけ伏せる駆け引きあり
+      (day >= 2 && known.length) ||        // 2日目以降は基本CO
       (pers==='aggressive' && round===1) || // 攻撃型は初日CO
       (totalPlayers >= 10 && day >= 1)     // 大規模戦は初日CO推奨
     );
@@ -3458,16 +3540,16 @@ const BRAIN = (function(){
       R.claims[cpu.name] = 'SEER';
       if (!R.seerCOs.find(c=>c.name===cpu.name)) R.seerCOs.push({name:cpu.name, day, results:[]});
       // 結果がある場合
-      const known = Object.entries(R.seerKnown||{});
-      const wolfHit = known.find(([n,iw])=>iw===true);
-      if (wolfHit) {
+      if (wolfHit && blackPressure) {
         const co = R.seerCOs.find(c=>c.name===cpu.name);
         if (co) co.results.push({day, target:wolfHit[0], isWolf:true});
         bumpSuspicion(R, wolfHit[0], 4);
         return tplFill(rand(TPL.co_seer_wolf), wolfHit[0]);
       }
-      const safeHit = known.find(([n,iw])=>iw===false);
       if (safeHit) {
+        const safeUnderPressure = (R.suspicion?.[safeHit[0]]||0) >= 2;
+        const revealSafe = fakeSeerExists || day >= 2 || wasAcc || safeUnderPressure || Math.random() < 0.35;
+        if (!revealSafe) return rand(TPL.seer_hold);
         const co = R.seerCOs.find(c=>c.name===cpu.name);
         if (co) co.results.push({day, target:safeHit[0], isWolf:false});
         bumpCover(R, safeHit[0], 2);
@@ -3478,13 +3560,18 @@ const BRAIN = (function(){
 
     // CO済の場合は時々追加情報を出す
     if (alreadyCO) {
-      const known = Object.entries(R.seerKnown||{});
       // まだ公開していない結果があれば公開
       const myCO = R.seerCOs.find(c=>c.name===cpu.name);
       const reportedTargets = new Set((myCO?.results||[]).map(r=>r.target));
       const unreported = known.filter(([n])=>!reportedTargets.has(n));
-      if (unreported.length && Math.random()<0.6) {
-        const [tgt, iw] = rand(unreported);
+      if (unreported.length) {
+        const black = unreported.find(([,iw])=>iw);
+        const [tgt, iw] = black || rand(unreported);
+        const targetUnderPressure = (R.suspicion?.[tgt]||0) >= 2;
+        const reveal = iw
+          ? (day >= 2 || round >= 2 || wasAcc || Math.random() < 0.88)
+          : (targetUnderPressure || day >= 2 || Math.random() < 0.48);
+        if (!reveal) return rand(TPL.seer_hold);
         if (myCO) myCO.results.push({day, target:tgt, isWolf:iw});
         if (iw) { bumpSuspicion(R, tgt, 3); return tplFill(rand(TPL.co_seer_wolf), tgt); }
         bumpCover(R, tgt, 1.5); return tplFill(rand(TPL.co_seer_safe), tgt);
@@ -3492,6 +3579,7 @@ const BRAIN = (function(){
     }
 
     // CO してない or 報告すべき情報がない → 普通の村人ロール
+    if (known.length && !alreadyCO && Math.random()<0.25) return rand(TPL.seer_hold);
     if (wasAcc) return rand(TPL.defend);
     if (ot.length && Math.random()<0.35) {
       const tgt = topAcc(R, ot) || rand(ot);
@@ -3818,7 +3906,7 @@ const BRAIN = (function(){
     return rand(vill);
   }
 
-  return { initR, parseClaim, speak, vote, voteReason, wolfNightTarget, bumpSuspicion, bumpCover };
+  return { initR, parseClaim, speak, vote, voteReason, wolfNightTarget, chooseSeerNightTarget, chooseDoctorGuardTarget, bumpSuspicion, bumpCover };
 })();
 
 // ========== PROGRESSION & DETECTIVE SCORE（ソロの成長・中毒性レイヤー） ==========
@@ -4481,7 +4569,7 @@ const P2PEngine = (() => {
       } else if (p.role==='SEER') {
         sendTo(p.name,{type:'action_needed',action:'seer',targets:others.map(x=>({name:x.name}))});
       } else if (p.role==='DOCTOR') {
-        const docTargets = al.filter(x=>x.name!==R.lastDoctorTarget);
+        const docTargets = al.filter(x=>x.name!==p.name && x.name!==R.lastDoctorTarget);
         sendTo(p.name,{type:'action_needed',action:'doctor',targets:docTargets.map(x=>({name:x.name})),last_protected:R.lastDoctorTarget});
       } else {
         R.humanActionDone[p.name] = true;
@@ -4496,16 +4584,10 @@ const P2PEngine = (() => {
   function doCpuNight() {
     BRAIN.initR(R);
     const al = alive();
-    // 占い師CPU（毎夜）: 疑い度の高い未占い者を優先
+    // 占い師CPU（毎夜）: 怪しい人・役職CO・発言の薄い人を積極的に占う
     const cpuSeer = al.find(p=>p.isCpu&&p.role==='SEER');
     if (cpuSeer) {
-      const unk = al.filter(p=>p!==cpuSeer&&R.seerKnown[p.name]===undefined);
-      let t = null;
-      if (unk.length) {
-        let best=-1,b=null;
-        unk.forEach(p=>{const s=(R.suspicion?.[p.name]||0); if(s>best){best=s;b=p;}});
-        t = b || rand(unk);
-      } else { t = rand(al.filter(p=>p!==cpuSeer)); }
+      const t = BRAIN.chooseSeerNightTarget(R, cpuSeer, al);
       if (t) R.seerKnown[t.name]=(t.role==='WEREWOLF');
     }
     // 人狼CPU標的（BRAIN 戦略）
@@ -4515,22 +4597,10 @@ const P2PEngine = (() => {
       const tgt = BRAIN.wolfNightTarget(R) || topAcc(vill) || rand(vill);
       if (tgt) R.wolfTarget = tgt.name;
     }
-    // 騎士CPU: CO占い師>霊媒師>かばわれてる人 を護衛
+    // 騎士CPU: 自衛・連続護衛を避け、役職COした情報源を優先して守る
     const cpuDoc = al.find(p=>p.isCpu&&p.role==='DOCTOR');
     if (cpuDoc) {
-      const baseCands = (vill.length?vill:al).filter(p=>p.name!==R.lastDoctorTarget && p.name!==cpuDoc.name);
-      let t = null;
-      const trueSeerCO = (R.seerCOs||[]).find(c=>{const p=R.players.find(x=>x.name===c.name); return p&&p.alive&&p.role==='SEER';});
-      if (trueSeerCO) t = baseCands.find(p=>p.name===trueSeerCO.name);
-      if (!t) {
-        const trueMedCO = (R.mediumCOs||[]).find(c=>{const p=R.players.find(x=>x.name===c.name); return p&&p.alive&&p.role==='MEDIUM';});
-        if (trueMedCO) t = baseCands.find(p=>p.name===trueMedCO.name);
-      }
-      if (!t && baseCands.length) {
-        let best=-Infinity,b=null;
-        baseCands.forEach(p=>{const sc=(R.coverCount?.[p.name]||0)-(R.suspicion?.[p.name]||0)*0.5; if(sc>best){best=sc;b=p;}});
-        t = b || rand(baseCands);
-      }
+      const t = BRAIN.chooseDoctorGuardTarget(R, cpuDoc, al);
       if (t) R.doctorTarget = t.name;
     }
   }
@@ -4544,10 +4614,23 @@ const P2PEngine = (() => {
       sendTo(pname,{type:'action_ack'});
     } else if (player.role==='SEER') {
       const tgt=byName(data.target);
+      if (!tgt || !tgt.alive || tgt.name===player.name) {
+        sendTo(pname,{type:'error',msg:'占える相手を選び直してください'});
+        return;
+      }
       const iw=tgt?tgt.role==='WEREWOLF':false;
       R.seerKnown[data.target]=iw;
       sendTo(pname,{type:'seer_result',target:data.target,is_wolf:iw});
     } else if (player.role==='DOCTOR') {
+      const tgt=byName(data.target);
+      if (!tgt || !tgt.alive || tgt.name===player.name) {
+        sendTo(pname,{type:'error',msg:'騎士は自分自身を護衛できません'});
+        return;
+      }
+      if (tgt.name===R.lastDoctorTarget) {
+        sendTo(pname,{type:'error',msg:'同じ人を2夜連続で護衛することはできません'});
+        return;
+      }
       R.doctorTarget=data.target;
       sendTo(pname,{type:'action_ack'});
     }
@@ -5598,7 +5681,7 @@ function renderONight() {
       ${extra}
     `;
   }
-  const {action, targets, wolf_names} = an;
+  const {action, targets = [], wolf_names} = an;
   const tsel = mkSelect('oNightTgt', targets);
   if (action === 'seer') return `
     ${ph('🌙',`第 ${O.day} 夜`,'あなたは占い師です','#818cf8')}
@@ -5612,18 +5695,20 @@ function renderONight() {
     </div>`;
   if (action === 'doctor') {
     const lastNote = an.last_protected
-      ? `<p style="color:#64748b;font-size:.78rem;margin:.1rem 0 .5rem;">※ ${esc(an.last_protected)} は昨夜守ったため今夜は選べません</p>`
+      ? `<p style="color:#64748b;font-size:.78rem;margin:.1rem 0 .25rem;">※ ${esc(an.last_protected)} は昨夜守ったため今夜は選べません</p>`
       : '';
+    const disabled = targets.length ? '' : 'disabled';
     return `
       ${ph('🌙',`第 ${O.day} 夜`,'あなたは騎士です','#34d399')}
       <div style="background:rgba(52,211,153,.07); border:1px solid #34d39933; border-radius:14px; padding:1.2rem; margin:.5rem 0;">
-        <p style="color:#94a3b8; font-size:.83rem; line-height:1.7;">💊 今夜、あなたは1人を人狼の襲撃から守ります。<br>誰が狙われているか見極め、命を救いましょう。</p>
+        <p style="color:#94a3b8; font-size:.83rem; line-height:1.7;">💊 今夜、あなたは1人を人狼の襲撃から守ります。<br>自分自身は守れません。役職COした人を軸に、誰が狙われるか読んでください。</p>
       </div>
       <div class="card">
         <h3 style="color:#34d399; margin-bottom:.4rem;">💊 誰を護衛しますか？</h3>
+        <p style="color:#64748b;font-size:.78rem;margin:.1rem 0 .25rem;">※ 自分自身は護衛できません。占い師や霊媒師など役職COした人が基本の護衛候補です。</p>
         ${lastNote}
         <label>守る相手</label>${tsel}
-        <button class="btn btn-primary" id="oNightSend" data-action="doctor" style="margin-top:.6rem;">🛡️　護衛する</button>
+        <button class="btn btn-primary" id="oNightSend" data-action="doctor" ${disabled} style="margin-top:.6rem;">${targets.length?'🛡️　護衛する':'護衛候補がいません'}</button>
       </div>`;
   }
   if (action === 'wolf') {
