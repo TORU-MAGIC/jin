@@ -724,11 +724,47 @@ let _lastSpokenChatAt = 0;
 let _chatVoiceUnlocked = false;
 let _chatVoiceUnlocking = false;
 let _pendingChatSpeech = [];
+let _chatVoicePreferred = null;
+let _chatVoicesLoadedAt = 0;
 
 function canUseChatVoice() {
   return typeof window !== 'undefined'
     && 'speechSynthesis' in window
-    && typeof SpeechSynthesisUtterance !== 'undefined';
+    && typeof window.SpeechSynthesisUtterance !== 'undefined';
+}
+
+function scoreChatVoice(voice) {
+  const name = `${voice.name || ''} ${voice.voiceURI || ''}`;
+  const lang = (voice.lang || '').toLowerCase();
+  let score = lang.startsWith('ja') ? 100 : 0;
+  if (/google|microsoft|apple|siri|kyoko|otoya|nanami|sayaka|haruka|ichiro|premium|enhanced|natural|online/i.test(name)) score += 35;
+  if (/compact|eloquence|robot|default/i.test(name)) score -= 20;
+  if (voice.localService === false) score += 8;
+  return score;
+}
+
+function refreshChatVoices() {
+  if (!canUseChatVoice()) return [];
+  let voices = [];
+  try { voices = window.speechSynthesis.getVoices() || []; } catch(e) {}
+  if (voices.length) {
+    _chatVoicesLoadedAt = Date.now();
+    _chatVoicePreferred = voices
+      .filter(v => (v.lang || '').toLowerCase().startsWith('ja'))
+      .sort((a,b) => scoreChatVoice(b) - scoreChatVoice(a))[0] || null;
+  }
+  return voices;
+}
+
+function getChatVoice() {
+  if (!_chatVoicePreferred || Date.now() - _chatVoicesLoadedAt > 5000) refreshChatVoices();
+  return _chatVoicePreferred;
+}
+
+function chatVoiceLabel() {
+  if (!canUseChatVoice()) return '🔇 非対応';
+  if (!_chatVoiceUnlocked) return '🔊 音声ON';
+  return _chatVoicePreferred ? '🔊 自然音声' : '🔊 音声ON';
 }
 
 function flushPendingChatSpeech() {
@@ -749,7 +785,10 @@ function unlockChatVoice() {
   };
   try {
     if (typeof window.speechSynthesis.resume === 'function') window.speechSynthesis.resume();
-    const utter = new SpeechSynthesisUtterance('。');
+    refreshChatVoices();
+    const utter = new window.SpeechSynthesisUtterance('。');
+    const voice = getChatVoice();
+    if (voice) utter.voice = voice;
     utter.lang = 'ja-JP';
     utter.volume = 0;
     utter.rate = 1;
@@ -764,6 +803,12 @@ function unlockChatVoice() {
 
 function installChatVoiceUnlock() {
   if (typeof window === 'undefined') return;
+  refreshChatVoices();
+  if (canUseChatVoice()) {
+    try { window.speechSynthesis.addEventListener('voiceschanged', refreshChatVoices); } catch(e) {}
+    setTimeout(refreshChatVoices, 400);
+    setTimeout(refreshChatVoices, 1200);
+  }
   ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(type => {
     try {
       window.addEventListener(type, unlockChatVoice, { capture:true, passive:true });
@@ -795,13 +840,29 @@ function speakChatMessage(name, text) {
   _lastSpokenChatAt = now;
   try {
     if (typeof window.speechSynthesis.resume === 'function') window.speechSynthesis.resume();
-    const utter = new SpeechSynthesisUtterance(`${name}。${clean}`);
+    const utter = new window.SpeechSynthesisUtterance(`${name}。${clean}`);
+    const voice = getChatVoice();
+    if (voice) utter.voice = voice;
     utter.lang = 'ja-JP';
-    utter.rate = 0.82;
-    utter.pitch = 0.9;
-    utter.volume = 0.9;
+    utter.rate = 0.94;
+    utter.pitch = 1.0;
+    utter.volume = 1.0;
     window.speechSynthesis.speak(utter);
   } catch(e) {}
+}
+
+function testChatVoice() {
+  if (!canUseChatVoice()) {
+    alert('このブラウザは音声読み上げに対応していません。Chrome / Safari の最新版で試してください。');
+    return;
+  }
+  _chatVoiceEnabled = true;
+  unlockChatVoice();
+  setTimeout(() => {
+    _chatVoiceUnlocked = true;
+    speakChatMessage('音声テスト', 'チャット音声を再生します。聞こえたら準備完了です。');
+    render();
+  }, 320);
 }
 
 function quickChatPanel(inputId='discFreeInput', targetId='quickChatTarget') {
@@ -2131,6 +2192,7 @@ function bindEvents() {
 
   // DISCUSS - チャット速度切替（熟読/ゆっくり/標準/はやい）
   on('btnChatSpeed', () => { cycleChatSpeed(); render(); });
+  on('btnChatVoiceTest', () => { testChatVoice(); });
 
   // DISCUSS/WOLF - クイック入力（送信せず、編集できるよう入力欄へ入れる）
   document.querySelectorAll('[data-chat-template]').forEach(btn => {
@@ -5088,6 +5150,11 @@ function renderOWolfChat() {
 
   return `
     ${ph('🌙', `第${O.day}夜`, 'チームメモ', '#60a5fa')}
+    <div style="display:flex;justify-content:flex-end;margin:.2rem 0 .4rem;">
+      <button id="btnChatVoiceTest" title="スマホで音声を有効化してテスト再生" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#94a3b8;border-radius:8px;padding:.25rem .55rem;font-size:.76rem;cursor:pointer;white-space:nowrap;">
+        ${chatVoiceLabel()} テスト
+      </button>
+    </div>
     <div style="background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:12px;padding:.7rem .9rem;margin:.4rem 0 .6rem;">
       <p style="color:#64748b;font-size:.78rem;margin:0;line-height:1.6;">
         📋 このメモはあなたのチームにのみ表示されます
@@ -5258,9 +5325,14 @@ function renderODiscuss() {
       <p style="color:#fbbf24; font-size:.82rem; font-weight:700; margin:0;">
         💬 議論 ─ ラウンド ${O.discRound} / ${O.discTotalRounds}
       </p>
-      <button id="btnChatSpeed" title="チャットの流れる速さを変更" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#94a3b8;border-radius:8px;padding:.22rem .5rem;font-size:.74rem;cursor:pointer;white-space:nowrap;">
-        速度 ${chatSpeedLabel()}
-      </button>
+      <div style="display:flex;gap:.35rem;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+        <button id="btnChatVoiceTest" title="スマホで音声を有効化してテスト再生" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#94a3b8;border-radius:8px;padding:.22rem .5rem;font-size:.74rem;cursor:pointer;white-space:nowrap;">
+          ${chatVoiceLabel()}
+        </button>
+        <button id="btnChatSpeed" title="チャットの流れる速さを変更" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#94a3b8;border-radius:8px;padding:.22rem .5rem;font-size:.74rem;cursor:pointer;white-space:nowrap;">
+          速度 ${chatSpeedLabel()}
+        </button>
+      </div>
     </div>
     ${voteReadySection}
     ${renderCoChat()}
