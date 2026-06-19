@@ -84,6 +84,10 @@ def gen_code():
         c = str(random.randint(0, 999)).zfill(3)
         if c not in rooms: return c
 
+def normalize_code(value):
+    digits = ''.join(ch for ch in str(value or '') if ch.isdigit())
+    return digits[:3].zfill(3) if digits else ''
+
 def new_room(code):
     return {
         'code': code, 'players': {}, 'host': None,
@@ -92,7 +96,8 @@ def new_room(code):
         'wolf_chat': [], 'wolf_done': set(),
         'night_actions': {}, 'night_pending': set(),
         'last_doctor_target': None,
-        'votes': {}, 'vote_pending': set(), 'log': [],
+        'last_executed': None, 'last_executed_role': None,
+        'votes': {}, 'vote_reasons': {}, 'vote_pending': set(), 'log': [],
         'vote_ready': set(),
         'desired_cpu': 0,
     }
@@ -210,6 +215,13 @@ async def start_night_actions(room):
     room['night_pending'] = set()
     await bcast(room, {'type': 'night_start', 'day': room['day']})
 
+    if room.get('last_executed'):
+        for mid, mp in room['players'].items():
+            if mp['alive'] and mp['role'] == 'MEDIUM' and mid not in room['cpu_pids']:
+                await send1(room, mid, {'type': 'medium_reveal',
+                                        'target': room.get('last_executed'),
+                                        'role': room.get('last_executed_role')})
+
     for pid, p in room['players'].items():
         if not p['alive']: continue
         if p['role'] == 'SEER':
@@ -249,13 +261,25 @@ async def _cpu_night(room, cpu_pid, action, tgts):
 
 async def _apply_night_action(room, pid, action, target):
     if action == 'seer':
-        role = next((p['role'] for p in room['players'].values() if p['name'] == target), None)
+        actor = room['players'].get(pid)
+        target_player = next((p for p in room['players'].values() if p['name'] == target and p['alive']), None)
+        if ('seer', pid) not in room['night_pending']:
+            return
+        if not actor or not actor.get('alive') or actor.get('role') != 'SEER' or not target_player or target_player['name'] == actor['name']:
+            await send1(room, pid, {'type': 'error', 'msg': '占える相手を選び直してください'})
+            return
+        role = target_player['role']
         await send1(room, pid, {'type': 'seer_result', 'target': target, 'is_wolf': role == 'WEREWOLF'})
         room['night_actions']['seer_target'] = target
         room['night_pending'].discard(('seer', pid))
     elif action == 'doctor':
         actor = room['players'].get(pid)
         target_player = next((p for p in room['players'].values() if p['name'] == target and p['alive']), None)
+        if ('doctor', pid) not in room['night_pending']:
+            return
+        if not actor or not actor.get('alive') or actor.get('role') != 'DOCTOR':
+            await send1(room, pid, {'type': 'error', 'msg': 'invalid doctor action'})
+            return
         if not actor or not target_player or target == actor['name']:
             await send1(room, pid, {'type': 'error', 'msg': '騎士は自分自身を護衛できません'})
             return
@@ -266,6 +290,13 @@ async def _apply_night_action(room, pid, action, target):
         room['night_pending'].discard(('doctor', pid))
         await send1(room, pid, {'type': 'action_ack', 'action': 'doctor'})
     elif action == 'wolf':
+        actor = room['players'].get(pid)
+        target_player = next((p for p in room['players'].values() if p['name'] == target and p['alive']), None)
+        if not any(x[0] == 'wolf' for x in room['night_pending']):
+            return
+        if not actor or not actor.get('alive') or actor.get('role') != 'WEREWOLF' or not target_player or target_player['role'] == 'WEREWOLF':
+            await send1(room, pid, {'type': 'error', 'msg': 'invalid wolf target'})
+            return
         if 'wolf_target' not in room['night_actions']:
             room['night_actions']['wolf_target'] = target
             for wid in wolf_list(room):
@@ -278,27 +309,40 @@ async def do_morning(room):
     wt = room['night_actions'].get('wolf_target')
     dt = room['night_actions'].get('doctor_target')
     room['last_doctor_target'] = dt
+    night_report = {'day': room['day'], 'target': wt, 'protected': dt,
+                    'guarded': False, 'victim': None, 'dragged': None}
     elim = None
     if wt and wt != dt:
         for p in room['players'].values():
             if p['name'] == wt and p['alive']:
                 p['alive'] = False; elim = {'name': wt, 'role': p['role']}
+                night_report['victim'] = wt
                 room['log'].append(f"第{room['day']}夜: {wt} が人狼に襲われました")
+                if p['role'] == 'NEKOMATA':
+                    wolves = [(pid, q) for pid, q in room['players'].items()
+                              if q['alive'] and q['role'] == 'WEREWOLF']
+                    if wolves:
+                        dragged_pid, dragged = random.choice(wolves)
+                        dragged['alive'] = False
+                        night_report['dragged'] = dragged['name']
+                        room['log'].append(f"第{room['day']}夜: 猫又の道連れで {dragged['name']} も倒れました")
                 break
     elif wt and wt == dt:
+        night_report['guarded'] = True
         room['log'].append(f"第{room['day']}夜: 騎士が {wt} を護衛！")
 
     winner = check_win(room)
     if winner:
         room['phase'] = 'game_over'
         await bcast(room, {'type': 'game_over', 'winner': winner, 'eliminated': elim,
+            'night_report': night_report,
             'players': [{'name': p['name'], 'role': p['role'], 'alive': p['alive'], 'is_cpu': pid in room['cpu_pids']}
                         for pid, p in room['players'].items()], 'log': room['log']})
     else:
-        await start_discussion(room, elim)
+        await start_discussion(room, elim, night_report)
 
 # ── 議論フェーズ ──────────────────────────────────────────────
-async def start_discussion(room, elim=None):
+async def start_discussion(room, elim=None, night_report=None):
     room['phase'] = 'discuss'
     room['disc_msgs'] = []
     room['disc_round'] = 1
@@ -309,6 +353,7 @@ async def start_discussion(room, elim=None):
     room['disc_step'] = 0
     await bcast(room, {
         'type': 'discuss_start', 'day': room['day'], 'eliminated': elim,
+        'night_report': night_report,
         'alive': [{'name': p['name']} for p in room['players'].values() if p['alive']],
         'round': 1, 'total_rounds': DISC_ROUNDS,
     })
@@ -367,6 +412,7 @@ async def _post_disc_msg(room, pid, text, advance_turn=True):
 async def start_vote(room):
     room['phase'] = 'vote'
     room['votes'] = {}
+    room['vote_reasons'] = {}
     room['vote_pending'] = {pid for pid, p in room['players'].items() if p['alive']}
     await bcast(room, {'type': 'vote_start',
                        'alive': [{'name': p['name']} for p in room['players'].values() if p['alive']]})
@@ -392,6 +438,7 @@ async def _cpu_vote(room, cpu_pid):
         target = (max(accused, key=accused.get) if accused else None) or (random.choice(alive_others)[1]['name'] if alive_others else None)
     if target:
         room['votes'][p['name']] = target
+        room['vote_reasons'][p['name']] = f"{target}さんの発言と投票の流れが気になりました。"
         room['vote_pending'].discard(cpu_pid)
         await bcast(room, {'type': 'vote_progress', 'done': len(room['votes']),
                            'total': len(room['votes']) + len(room['vote_pending'])})
@@ -401,15 +448,35 @@ async def _cpu_vote(room, cpu_pid):
 async def _tally_votes(room):
     tally = {}
     for tn in room['votes'].values(): tally[tn] = tally.get(tn, 0) + 1
-    mv = max(tally.values()) if tally else 0
-    executed = random.choice([n for n, c in tally.items() if c == mv])
+    if tally:
+        mv = max(tally.values())
+        executed = random.choice([n for n, c in tally.items() if c == mv])
+    else:
+        candidates = [p['name'] for p in room['players'].values() if p.get('alive')]
+        if not candidates:
+            return
+        executed = random.choice(candidates)
+        tally = {executed: 0}
     erole = None
+    nekomata_victim = None
     for pid, p in room['players'].items():
         if p['name'] == executed:
             p['alive'] = False; erole = p['role']
-            room['log'].append(f"第{room['day']}日: {executed} が処刑されました"); break
+            room['last_executed'] = executed
+            room['last_executed_role'] = erole
+            room['log'].append(f"第{room['day']}日: {executed} が処刑されました")
+            break
+    if erole == 'NEKOMATA':
+        bystanders = [(pid, p) for pid, p in room['players'].items() if p['alive']]
+        if bystanders:
+            victim_pid, victim = random.choice(bystanders)
+            victim['alive'] = False
+            nekomata_victim = victim['name']
+            room['log'].append(f"第{room['day']}日: 猫又の道連れで {nekomata_victim} も倒れました")
     winner = check_win(room)
-    msg = {'type': 'vote_result', 'executed': executed, 'executed_role': erole, 'tally': tally, 'winner': winner}
+    msg = {'type': 'vote_result', 'executed': executed, 'executed_role': erole,
+           'tally': tally, 'winner': winner, 'nekomata_victim': nekomata_victim,
+           'vote_reasons': room.get('vote_reasons', {})}
     if winner:
         msg['players'] = [{'name': p['name'], 'role': p['role'], 'alive': p['alive'], 'is_cpu': pid in room['cpu_pids']}
                           for pid, p in room['players'].items()]
@@ -423,7 +490,11 @@ async def handle(ws, pid, room, data):
     if t == 'set_cpu_count':
         if pid == room['host']:
             humans = len([ppid for ppid in room['players'] if ppid not in room['cpu_pids']])
-            room['desired_cpu'] = max(0, min(MAX_PLAYERS - humans, int(data.get('count', 0))))
+            try:
+                requested_cpu = int(data.get('count', 0))
+            except (TypeError, ValueError):
+                requested_cpu = 0
+            room['desired_cpu'] = max(0, min(MAX_PLAYERS - humans, requested_cpu))
             await bcast(room, {'type': 'cpu_count_updated', 'count': room['desired_cpu']})
 
     elif t == 'start_game':
@@ -446,9 +517,12 @@ async def handle(ws, pid, room, data):
             p['role'] = cfg[i]; p['alive'] = True
         room['phase'] = 'role_reveal'; room['day'] = 1
         room['last_doctor_target'] = None
+        room['last_executed'] = None
+        room['last_executed_role'] = None
         room['night_actions'] = {}
         room['night_pending'] = set()
         room['votes'] = {}
+        room['vote_reasons'] = {}
         room['vote_pending'] = set()
         for ppid, p in room['players'].items():
             if ppid in room['cpu_pids']: continue
@@ -481,6 +555,7 @@ async def handle(ws, pid, room, data):
             await start_night_actions(room)
 
     elif t == 'night_action':
+        if room['phase'] != 'night': return
         await _apply_night_action(room, pid, data.get('action'), data.get('target'))
 
     elif t == 'disc_message':
@@ -508,8 +583,14 @@ async def handle(ws, pid, room, data):
 
     elif t == 'vote':
         p = room['players'].get(pid)
-        if not p or not p['alive'] or pid not in room['vote_pending']: return
+        target = data.get('target')
+        valid_targets = {q['name'] for q in room['players'].values() if q.get('alive')}
+        if p and p.get('name') in valid_targets:
+            valid_targets.discard(p['name'])
+        if room['phase'] != 'vote' or not p or not p['alive'] or pid not in room['vote_pending'] or target not in valid_targets: return
+        data['target'] = target
         room['votes'][p['name']] = data.get('target')
+        room['vote_reasons'][p['name']] = str(data.get('reason') or f"{data.get('target')}さんの発言と投票の流れが気になりました。")[:160]
         room['vote_pending'].discard(pid)
         await bcast(room, {'type': 'vote_progress', 'done': len(room['votes']),
                            'total': len(room['votes']) + len(room['vote_pending'])})
@@ -537,7 +618,7 @@ async def ws_handler(ws):
                 await ws.send(json.dumps({'type': 'room_created', 'code': code, 'pid': pid,
                                           'is_host': True, 'players': plist(room)}))
             elif t == 'join_room':
-                code = data.get('code', '').strip()
+                code = normalize_code(data.get('code', ''))
                 if code not in rooms:
                     await ws.send(json.dumps({'type': 'error', 'msg': '部屋が見つかりません'})); continue
                 room = rooms[code]

@@ -874,6 +874,13 @@ function speakChatMessage(name, text) {
   } catch(e) {}
 }
 
+function appendIncomingChatOnce(list, msg) {
+  const last = list[list.length - 1];
+  if (last && last.name === msg.name && last.text === msg.text) return false;
+  list.push(msg);
+  return true;
+}
+
 function testChatVoice() {
   if (!canUseChatVoice()) {
     alert('このブラウザは音声読み上げに対応していません。Chrome / Safari の最新版で試してください。');
@@ -994,6 +1001,8 @@ function renderDawnIntel() {
   if (!r || O.phase !== 'discuss') return '';
   const clue = r.guarded
     ? `騎士の気配が残っています。<strong>${esc(r.protected || '誰か')}</strong> の周辺で争った跡だけが見つかりました。`
+    : r.dragged
+      ? `<strong>${esc(r.victim || '犠牲者')}</strong> の周辺で激しい争いがあり、猫又の道連れで <strong>${esc(r.dragged)}</strong> も倒れました。`
     : r.victim
       ? `現場には足跡が二方向に分かれていました。<strong>${esc(r.victim)}</strong> は発言力か役職COを警戒された可能性があります。`
       : '夜は不気味なほど静かでした。人狼が襲撃先を読まれたか、狙いを外した可能性があります。';
@@ -1577,12 +1586,13 @@ function nightSteps() {
   return steps;
 }
 
-function mkSelect(id, players, selected='') {
+function mkSelect(id, players, selected='', placeholder='') {
   const opts = players.map(p => {
     const n = typeof p === 'string' ? p : (p.name || '');
     return `<option value="${esc(n)}" ${n===selected?'selected':''}>${esc(n)}</option>`;
   }).join('');
-  return `<select id="${id}">${opts}</select>`;
+  const blank = placeholder ? `<option value="" ${selected ? '' : 'selected'} disabled>${esc(placeholder)}</option>` : '';
+  return `<select id="${id}">${blank}${opts}</select>`;
 }
 
 function esc(s) {
@@ -1615,6 +1625,10 @@ function roleClaimBadge(role, compact=false) {
 
 function val(id) { const e = document.getElementById(id); return e ? e.value : ''; }
 function on(id, fn) { const e = document.getElementById(id); if (e) e.addEventListener('click', fn); }
+function normalizeRoomCode(raw) {
+  const digits = String(raw ?? '').replace(/\D/g, '');
+  return digits ? digits.slice(0, 3).padStart(3, '0') : '';
+}
 
 // ========== RENDER HELPERS ==========
 function ph(icon, title, subtitle, color='#a78bfa') {
@@ -2196,7 +2210,7 @@ function bindEvents() {
   });
   on('p2pJoin', () => {
     const name = (val('p2pName')||'').trim();
-    const code = (val('p2pCode')||'').trim();
+    const code = normalizeRoomCode(val('p2pCode'));
     if (!name) { alert('名前を入力してください'); return; }
     if (!code) { alert('部屋コードを入力してください'); return; }
     O.playerName = name; O.isHost = false; O.p2pSub = 'guest_wait'; render();
@@ -2256,7 +2270,7 @@ function bindEvents() {
   on('oJoin', () => {
     const name = (val('oName') || '').trim();
     const addr = (val('oAddr') || '').trim();
-    const code = (val('oCode') || '').trim().toUpperCase();
+    const code = normalizeRoomCode(val('oCode'));
     if (!name) { alert('名前を入力してください'); return; }
     if (!code) { alert('部屋コードを入力してください'); return; }
     O.playerName = name; O.serverAddr = addr;
@@ -2492,6 +2506,11 @@ function bindEvents() {
     if (O.voteSubmitted) return; // 二重投票防止
     const target = O.voteTarget || val('oVoteTgt');
     if (!target) return;
+    const validTargets = (O.alive || []).filter(p => p.name !== O.playerName).map(p => p.name);
+    if (!validTargets.includes(target)) {
+      alert('投票先を選び直してください');
+      return;
+    }
     const reason = (O.voteReasonDraft || val('oVoteReason') || '').trim() || `${target}さんの発言と投票の流れが気になりました。`;
     (O.myVotes = O.myVotes||[]).push(target); // 戦績スコア用（自分の投票履歴）
     wsSend({type:'vote', target, reason});
@@ -2872,6 +2891,7 @@ const SoloEngine = (() => {
       type: 'game_over', winner,
       players: R.players.map(p=>({name:p.name,role:p.role,alive:p.alive})),
       log: R.log,
+      night_report: R.nightReport || null,
       eliminated: victim ? {name:victim.name,role:victim.role} : null,
     });
   }
@@ -4558,6 +4578,57 @@ const P2PEngine = (() => {
   function sendToWolves(msg) {
     R.players.filter(p=>p.role==='WEREWOLF').forEach(p=>sendTo(p.name, msg));
   }
+  function sendToConn(connId, msg) {
+    const conn = hostConns[connId];
+    if (conn) { try { conn.send(JSON.stringify(msg)); } catch(e){} }
+  }
+  function beginNightFlow() {
+    alive().some(p=>p.role==='WEREWOLF'&&!p.isCpu) ? startWolfChat() : startNight();
+  }
+  function handleP2PDisconnect(name) {
+    if (!name) return;
+    if (R.pendingPlayers) R.pendingPlayers = R.pendingPlayers.filter(p=>p.name!==name);
+    const inGame = Array.isArray(R.players) && R.players.length > 0;
+    if (!inGame) {
+      O.players = (O.players||[]).filter(p=>p.name!==name);
+      broadcast({ type:'player_left', players: O.players, name });
+      return;
+    }
+    const player = byName(name);
+    if (player) {
+      player.alive = false;
+      R.log = R.log || [];
+      R.log.push(`${name} left the P2P room`);
+    }
+    broadcast({ type:'player_left', players:R.players.map((p,i)=>({pid:i,name:p.name,alive:p.alive})), name });
+    const win = checkWinP2P();
+    if (win) { doGameOver(win, null); return; }
+    if (R.phase === 'night') {
+      R.humanActionDone[name] = true;
+      checkNightDone();
+    } else if (R.phase === 'wolf_chat') {
+      if (!R.wolfDoneSet) R.wolfDoneSet = new Set();
+      R.wolfDoneSet.add(name);
+      const humanWolves = alive().filter(p=>p.role==='WEREWOLF'&&!p.isCpu).map(p=>p.name);
+      if (humanWolves.every(n=>R.wolfDoneSet.has(n))) later(400, startNight);
+    } else if (R.phase === 'discuss') {
+      if (R.voteReadySet) R.voteReadySet.add(name);
+      if (R.waitingForHuman === name) {
+        R.waitingForHuman = null;
+        if (R._humanTurnTimer) { clearTimeout(R._humanTurnTimer); R._humanTurnTimer = null; }
+        later(200, advanceDisc);
+      }
+      _checkVoteReadyP2P();
+    } else if (R.phase === 'vote') {
+      if (!R.humanVotedSet) R.humanVotedSet = new Set();
+      R.humanVotedSet.add(name);
+      const al = alive();
+      broadcast({type:'vote_progress',done:Object.keys(R.votes||{}).length,total:al.length});
+      const humansAlive = al.filter(p=>!p.isCpu);
+      if (R.humanVotedSet.size>=humansAlive.length && Object.keys(R.votes||{}).length>=al.length)
+        later(500,tallyVotes);
+    }
+  }
 
   // ── ホスト: 部屋作成 ──────────────────────────────────
   function createRoom(hostName, onCode) {
@@ -4565,14 +4636,16 @@ const P2PEngine = (() => {
       alert('P2P機能の読み込みに失敗しました。インターネット接続を確認するか、ソロデモ/ローカルモードで遊んでください。');
       return;
     }
+    destroy();
     isHost = true;
     R.hostName = hostName;
     R.pendingPlayers = [{ name: hostName, isCpu: false }];
-    const code = String(Math.floor(10000 + Math.random() * 89999));
+    R.phase = 'lobby';
+    const code = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
     const pid  = 'WLF' + code;
     peer = new Peer(pid, { debug: 0 });
     peer.on('open', id => {
-      const roomCode = id.startsWith('WLF') ? id.slice(3) : id.slice(0,5).toUpperCase();
+      const roomCode = id.startsWith('WLF') ? id.slice(3, 6) : normalizeRoomCode(id);
       onCode(roomCode);
     });
     peer.on('connection', conn => {
@@ -4585,11 +4658,7 @@ const P2PEngine = (() => {
           const name = connNames[conn.peer];
           delete hostConns[conn.peer];
           delete connNames[conn.peer];
-          if (name && R.pendingPlayers) {
-            R.pendingPlayers = R.pendingPlayers.filter(p=>p.name!==name);
-            O.players = O.players.filter(p=>p.name!==name);
-            broadcast({ type:'player_left', players: O.players });
-          }
+          handleP2PDisconnect(name);
         });
       });
     });
@@ -4605,15 +4674,18 @@ const P2PEngine = (() => {
       onError(new Error('P2P機能の読み込みに失敗しました。インターネット接続を確認してください。'));
       return;
     }
+    const roomCode = normalizeRoomCode(code);
+    if (!roomCode) { onError(new Error('room code is empty')); return; }
+    destroy();
     isHost = false;
     peer = new Peer({ debug: 0 });
     peer.on('open', () => {
-      guestConn = peer.connect('WLF' + code, { reliable: true });
+      guestConn = peer.connect('WLF' + roomCode, { reliable: true });
       guestConn.on('open', () => {
-        guestConn.send(JSON.stringify({ type:'join_room', name: guestName }));
         guestConn.on('data', raw => {
           try { handleServer(JSON.parse(raw)); } catch(e){}
         });
+        guestConn.send(JSON.stringify({ type:'join_room', name: guestName }));
         onJoined();
       });
       guestConn.on('error', onError);
@@ -4630,26 +4702,53 @@ const P2PEngine = (() => {
         const name = (data.name||'ゲスト').trim();
         connNames[connId] = name;
         R.pendingPlayers = R.pendingPlayers||[];
-        if (!R.pendingPlayers.find(p=>p.name===name))
-          R.pendingPlayers.push({ name, isCpu: false });
+        if (R.phase && R.phase !== 'lobby') {
+          delete connNames[connId];
+          sendToConn(connId, {type:'error', msg:'game already started', fatal:true});
+          return;
+        }
+        if (!name || R.pendingPlayers.some(p=>p.name===name)) {
+          delete connNames[connId];
+          sendToConn(connId, {type:'error', msg:'duplicate player name', fatal:true});
+          return;
+        }
+        if (R.pendingPlayers.length >= MAX_PLAYERS) {
+          delete connNames[connId];
+          sendToConn(connId, {type:'error', msg:'room is full', fatal:true});
+          return;
+        }
+        R.pendingPlayers.push({ name, isCpu: false });
         O.players = O.players || [];
-        if (!O.players.find(p=>p.name===name))
-          O.players.push({ pid: O.players.length, name });
+        O.players.push({ pid: O.players.length, name });
         broadcast({ type:'player_joined', players: O.players });
         break;
       }
       case 'set_cpu_count':
-        O.cpuCount = data.count;
-        broadcast({ type:'cpu_count_updated', count: data.count });
+        if (connId !== '__host__' || (R.phase && R.phase !== 'lobby')) break;
+        {
+          const humans = (R.pendingPlayers||[]).length;
+          const maxCpu = Math.max(0, MAX_PLAYERS - humans);
+          const requested = Number.parseInt(data.count, 10);
+          O.cpuCount = Math.max(0, Math.min(maxCpu, Number.isFinite(requested) ? requested : 0));
+          broadcast({ type:'cpu_count_updated', count: O.cpuCount });
+        }
         break;
       case 'start_game':
+        if (connId !== '__host__' || (R.phase && R.phase !== 'lobby')) break;
         startGame();
         break;
       case 'start_night':
-        if (R.players[0]?.role==='WEREWOLF') startWolfChat(); else startNight();
+        if (connId !== '__host__') break;
+        beginNightFlow();
         break;
       case 'wolf_chat_done':
-        later(400, startNight);
+        if (R.phase !== 'wolf_chat' || !pname) break;
+        if (!R.wolfDoneSet) R.wolfDoneSet = new Set();
+        R.wolfDoneSet.add(pname);
+        {
+          const humanWolves = alive().filter(p=>p.role==='WEREWOLF'&&!p.isCpu).map(p=>p.name);
+          if (humanWolves.every(n=>R.wolfDoneSet.has(n))) later(400, startNight);
+        }
         break;
       case 'wolf_chat_msg':
         if (pname) sendToWolves({ type:'wolf_chat_msg', name:pname, text:data.text });
@@ -4664,7 +4763,7 @@ const P2PEngine = (() => {
         if (pname) handleVote(pname, data.target, data.reason);
         break;
       case 'music_ended':
-        if (isHost && R.phase === 'discuss') { R.phase = 'voting'; later(300, startVote); }
+        if (connId === '__host__' && R.phase === 'discuss') { R.phase = 'voting'; later(300, startVote); }
         break;
       case 'vote_ready':
         if (!isHost || R.phase !== 'discuss') break;
@@ -4674,7 +4773,8 @@ const P2PEngine = (() => {
         _checkVoteReadyP2P();
         break;
       case 'next_night':
-        later(300, () => alive().some(p=>p.role==='WEREWOLF'&&!p.isCpu) ? startWolfChat() : startNight());
+        if (connId !== '__host__') break;
+        later(300, beginNightFlow);
         break;
     }
   }
@@ -4690,7 +4790,11 @@ const P2PEngine = (() => {
       allPlayers.push({ name: cpuPool[i]||`CPU${i+1}`, isCpu: true });
 
     const total = allPlayers.length;
-    const roles = shuffle([...(CONFIGS[total]||CONFIGS[6])]);
+    if (total < 4 || total > MAX_PLAYERS || !CONFIGS[total]) {
+      alert(`ゲーム人数は4〜${MAX_PLAYERS}人にしてください`);
+      return;
+    }
+    const roles = shuffle([...CONFIGS[total]]);
     R = {
       ...R,
       players: allPlayers.map((p,i)=>({...p, role:roles[i], alive:true})),
@@ -4700,6 +4804,7 @@ const P2PEngine = (() => {
       nightReport:null,
       humanActionDone:{}, cpuNightDone:false,
       humanWolfChoice:null, resolveDone:false,
+      wolfDoneSet:new Set(),
       discMsgs:[], discOrder:[], discIdx:0, discRound:1,
       waitingForHuman: null, _discFallback: null,
       votes:{}, voteReasons:{}, humanVotedSet:new Set(), tallyDone:false,
@@ -4727,6 +4832,7 @@ const P2PEngine = (() => {
   // ── 夜 ──────────────────────────────────────────────
   function startWolfChat() {
     R.phase='wolf_chat';
+    R.wolfDoneSet = new Set();
     BRAIN.initR(R);
     const wolves = alive().filter(p=>p.role==='WEREWOLF');
     sendToWolves({ type:'wolf_chat_start', wolf_names:wolves.map(p=>p.name) });
@@ -4807,8 +4913,13 @@ const P2PEngine = (() => {
 
   function handleNightAction(pname, data) {
     const player = byName(pname);
-    if (!player) return;
+    if (R.phase !== 'night' || !player || !player.alive || R.humanActionDone[pname]) return;
     if (player.role==='WEREWOLF') {
+      const tgt=byName(data.target);
+      if (!tgt || !tgt.alive || tgt.role==='WEREWOLF') {
+        sendTo(pname,{type:'error',msg:'invalid wolf target'});
+        return;
+      }
       R.humanWolfChoice=data.target;
       sendToWolves({type:'wolf_chosen',target:data.target});
       sendTo(pname,{type:'action_ack'});
@@ -4982,6 +5093,9 @@ const P2PEngine = (() => {
   }
 
   function handleVote(pname, target, reason='') {
+    const voter = byName(pname);
+    const validTarget = alive().some(p=>p.name===target && p.name!==pname);
+    if (R.phase !== 'vote' || !voter || !voter.alive || !validTarget || R.humanVotedSet.has(pname)) return;
     R.votes[pname]=target;
     R.voteReasons[pname]=(reason || '').trim() || `${target}さんへの疑いを確認する投票です。`;
     R.humanVotedSet.add(pname);
@@ -5008,9 +5122,17 @@ const P2PEngine = (() => {
     if (R.tallyDone) return; R.tallyDone=true;
     const tally={};
     Object.values(R.votes).forEach(t=>tally[t]=(tally[t]||0)+1);
-    const maxV=Math.max(...Object.values(tally));
-    const top=Object.keys(tally).filter(n=>tally[n]===maxV);
-    const executed=top[Math.floor(Math.random()*top.length)];
+    let executed;
+    if (Object.keys(tally).length) {
+      const maxV=Math.max(...Object.values(tally));
+      const top=Object.keys(tally).filter(n=>tally[n]===maxV);
+      executed=top[Math.floor(Math.random()*top.length)];
+    } else {
+      const fallback = alive();
+      if (!fallback.length) return;
+      executed=rand(fallback).name;
+      tally[executed]=0;
+    }
     const execP=byName(executed);
     if (execP) execP.alive=false;
     R.log.push(`第${R.day}日:${executed}が処刑された`);
@@ -5050,6 +5172,7 @@ const P2PEngine = (() => {
       type:'game_over', winner,
       players:R.players.map(p=>({name:p.name,role:p.role,alive:p.alive})),
       log:R.log,
+      night_report:R.nightReport||null,
       eliminated:victim?{name:victim.name,role:victim.role}:null,
     });
   }
@@ -5228,8 +5351,9 @@ function handleServer(data) {
       if (!O.alive || !O.alive.length) O.alive = O.players.map(p=>({ name: p.name }));
       O.phase = 'wolf_chat'; break;
     case 'wolf_chat_msg':
-      O.wolfChatMsgs.push({name: data.name, text: data.text});
-      speakChatMessage(data.name, data.text);
+      if (appendIncomingChatOnce(O.wolfChatMsgs, {name: data.name, text: data.text})) {
+        speakChatMessage(data.name, data.text);
+      }
       break;
     case 'night_start':
       O.day = data.day; O.nightActionNeeded = null;
@@ -5260,6 +5384,13 @@ function handleServer(data) {
         if (!O.deadPlayers.find(d=>d.name===data.eliminated.name))
           O.deadPlayers.push({ name:data.eliminated.name, role:null, avatar:av, day:O.day, cause:'人狼' });
         delete O.roleClaims[data.eliminated.name];
+      }
+      if (data.night_report && data.night_report.dragged) {
+        const draggedName = data.night_report.dragged;
+        const av = getAvatar(draggedName, O.players);
+        if (!O.deadPlayers.find(d=>d.name===draggedName))
+          O.deadPlayers.push({ name:draggedName, role:null, avatar:av, day:O.day, cause:'猫又' });
+        delete O.roleClaims[draggedName];
       }
       O.phase = 'discuss';
       O._musicFailTimer = null;
@@ -5353,6 +5484,7 @@ function handleServer(data) {
       O.phase = 'vote_result'; break;
     case 'game_over':
       O.winner = data.winner;
+      O.nightReport = data.night_report || O.nightReport || null;
       // data.players が null/undefined の場合は既存の finalPlayers を保持（フォールバック）
       if (data.players && data.players.length > 0) {
         // role が欠落しているプレイヤーがいても表示が壊れないよう保護
@@ -5371,7 +5503,14 @@ function handleServer(data) {
       ), 300);
       break;
     case 'error':
-      alert(data.msg || data.message); return;
+      alert(data.msg || data.message);
+      if (data.fatal && mode === 'p2p') {
+        P2PEngine.destroy();
+        O.phase = 'p2p_setup';
+        O.p2pSub = 'choose';
+        render();
+      }
+      return;
   }
   render();
 }
@@ -5752,7 +5891,7 @@ function renderOSetup() {
     </div>
     ${isJoin ? `
       <div class="card">
-        <label>部屋コード（6文字）</label>
+        <label>部屋コード（3桁）</label>
         <input type="text" id="oCode" placeholder="例: 042" style="letter-spacing:0.3em; font-size:1.8rem; text-align:center;" maxlength="3" inputmode="numeric">
         <button class="btn btn-primary" id="oJoin" style="margin-top:0.5rem;">🚪　参加する</button>
       </div>
@@ -6069,7 +6208,7 @@ function renderOVote() {
       <p style="color:#fbbf24;font-size:.85rem;font-weight:700;margin:0 0 .4rem;">⚖️ 処刑する人を選んでください</p>
       <p style="color:#64748b;font-size:.75rem;margin:0 0 .5rem;">👆 アバターをタップすると自動選択されます</p>
       ${voteGrid}
-      ${mkSelect('oVoteTgt', targets, selectedTarget)}
+      ${mkSelect('oVoteTgt', targets, selectedTarget, '投票先を選択')}
       <div class="vote-reason-box">
         <label for="oVoteReason">投票理由（結果画面に残ります）</label>
         <textarea id="oVoteReason" maxlength="120" placeholder="例：発言が少なく、占い師COへの反応も遅かったため">${esc(voteReasonDraft)}</textarea>
@@ -6240,7 +6379,7 @@ function renderP2PSetup() {
       ${peerWarn}
       <div class="card" style="text-align:center;border:2px solid #059669;padding:1.5rem;">
         <p style="color:#64748b;font-size:.85rem;margin-bottom:.4rem;">🔑 部屋コード（仲間に伝える）</p>
-        <div style="font-size:3rem;font-weight:900;letter-spacing:.3em;color:#34d399;">${O.roomCode||'----'}</div>
+        <div style="font-size:3rem;font-weight:900;letter-spacing:.3em;color:#34d399;">${O.roomCode||'---'}</div>
         <p class="p2p-badge" style="justify-content:center;margin-top:.5rem;"><span class="p2p-dot"></span>接続待ち...</p>
       </div>
       <p class="sec-label">👥 参加中 (${(O.players||[]).length}人)</p>
@@ -6280,7 +6419,7 @@ function renderP2PSetup() {
     ${isJoin ? `
       <div class="card">
         <label>部屋コード（ホストに聞く）</label>
-        <input type="text" id="p2pCode" placeholder="例: 12345" style="letter-spacing:.25em;font-size:1.8rem;text-align:center;" maxlength="5" inputmode="numeric">
+        <input type="text" id="p2pCode" placeholder="例: 042" style="letter-spacing:.25em;font-size:1.8rem;text-align:center;" maxlength="3" inputmode="numeric">
         <button class="btn btn-success" id="p2pJoin" style="margin-top:.6rem;">🚪　参加する</button>
       </div>
       <button class="btn btn-ghost" id="p2pBackSetup">← 戻る</button>
@@ -6371,8 +6510,11 @@ function render() {
   const _wolfVal  = document.getElementById('wolfFreeInput')?.value  || '';
   const _voteTgt = document.getElementById('oVoteTgt')?.value || '';
   const _voteReason = document.getElementById('oVoteReason')?.value || '';
-  if (_voteTgt) O.voteTarget = _voteTgt;
-  if (_voteReason) O.voteReasonDraft = _voteReason;
+  if (O.phase === 'vote') {
+    const validVoteTarget = _voteTgt && (O.alive || []).some(p => p.name === _voteTgt && p.name !== O.playerName);
+    if (validVoteTarget) O.voteTarget = _voteTgt;
+    if (_voteReason) O.voteReasonDraft = _voteReason;
+  }
 
   if      (mode === 'pre_opening')                         app.innerHTML = renderPreOpening();
   else if (mode === 'opening')                             app.innerHTML = renderOpening();
