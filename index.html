@@ -4618,6 +4618,8 @@ const P2PEngine = (() => {
         if (R._humanTurnTimer) { clearTimeout(R._humanTurnTimer); R._humanTurnTimer = null; }
         later(200, advanceDisc);
       }
+      markP2PCpuReady();
+      broadcastVoteReadyP2P();
       _checkVoteReadyP2P();
     } else if (R.phase === 'vote') {
       if (!R.humanVotedSet) R.humanVotedSet = new Set();
@@ -4766,10 +4768,12 @@ const P2PEngine = (() => {
         if (connId === '__host__' && R.phase === 'discuss') { R.phase = 'voting'; later(300, startVote); }
         break;
       case 'vote_ready':
-        if (!isHost || R.phase !== 'discuss') break;
+        if (!isHost || R.phase !== 'discuss' || !pname) break;
+        if (!alive().some(p=>p.name===pname && !p.isCpu)) break;
         if (!R.voteReadySet) R.voteReadySet = new Set();
         R.voteReadySet.add(pname);
-        broadcast({ type:'vote_ready_upd', readyNames:[...R.voteReadySet] });
+        markP2PCpuReady();
+        broadcastVoteReadyP2P();
         _checkVoteReadyP2P();
         break;
       case 'next_night':
@@ -4984,9 +4988,29 @@ const P2PEngine = (() => {
   }
 
   // ── 議論 ────────────────────────────────────────────
+  function p2pAliveHumans() {
+    return alive().filter(p=>!p.isCpu);
+  }
+
+  function markP2PCpuReady() {
+    if (!R.voteReadySet) R.voteReadySet = new Set();
+    alive().filter(p=>p.isCpu).forEach(p=>R.voteReadySet.add(p.name));
+  }
+
+  function broadcastVoteReadyP2P() {
+    if (!R.voteReadySet) R.voteReadySet = new Set();
+    const humans = p2pAliveHumans();
+    const readyNames = humans.filter(p=>R.voteReadySet.has(p.name)).map(p=>p.name);
+    broadcast({ type:'vote_ready_upd', readyNames, readyTotal:humans.length });
+  }
+
   function _checkVoteReadyP2P() {
     if (R.phase !== 'discuss') return;
-    if (alive().every(p => R.voteReadySet.has(p.name))) {
+    if (R.voteReadyAll) return;
+    markP2PCpuReady();
+    const humans = p2pAliveHumans();
+    if (!humans.length || humans.every(p => R.voteReadySet.has(p.name))) {
+      R.voteReadyAll = true;
       if (R._discFallback) { clearTimeout(R._discFallback); R._discFallback = null; }
       broadcast({ type:'vote_ready_all' });
       later(1900, () => { if (R.phase === 'discuss') { R.phase='voting'; startVote(); } });
@@ -4997,13 +5021,14 @@ const P2PEngine = (() => {
     R.phase='discuss'; R.discRound=1; R.discMsgs=[];
     R.waitingForHuman=null;
     R.voteReadySet = new Set();
+    R.voteReadyAll = false;
     const elim=victim?{name:victim.name}:null;
     const al=alive();
     const song = _pickSong();
     const songStarted = Date.now() + 650;
     if (R._discFallback) clearTimeout(R._discFallback);
     R._discFallback = setTimeout(()=>{ if(R.phase==='discuss'){R.phase='voting';startVote();} }, 5*60*1000);
-    broadcast({type:'discuss_start',round:1,total_rounds:2,eliminated:elim,night_report:R.nightReport,alive:al.map(p=>({name:p.name})),song,songStarted});
+    broadcast({type:'discuss_start',round:1,total_rounds:2,eliminated:elim,night_report:R.nightReport,alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu})),readyTotal:al.filter(p=>!p.isCpu).length,song,songStarted});
     R.discOrder=shuffle([...al]);
     R.discIdx=0;
     later(600,advanceDisc);
@@ -5021,8 +5046,8 @@ const P2PEngine = (() => {
         alive().filter(p=>p.isCpu).forEach((p,i) => {
           later(600 + i*350, () => {
             if (R.phase !== 'discuss') return;
-            R.voteReadySet.add(p.name);
-            broadcast({ type:'vote_ready_upd', readyNames:[...R.voteReadySet] });
+            markP2PCpuReady();
+            broadcastVoteReadyP2P();
             _checkVoteReadyP2P();
           });
         });
@@ -5282,7 +5307,7 @@ function initOnline() {
     roleClaims: {},   // { playerName: 'SEER'|'DOCTOR' } — 宣言のみ、未確定
     deadPlayers: [],  // [{ name, role, avatar, day }]
     // 投票開始ボタン
-    voteReadyNames: [], voteReadyAll: false,
+    voteReadyNames: [], voteReadyAll: false, voteReadyTotal: 0,
     // 人狼夜選択（ステルス）
     _wolfNightSel: null,
     // 霊媒師
@@ -5378,6 +5403,7 @@ function handleServer(data) {
       }
       O.currentSpeaker = null; O.isMyDiscTurn = false; O.tplStep = null;
       O.voteReadyNames = []; O.voteReadyAll = false;
+      O.voteReadyTotal = data.readyTotal || (O.alive||[]).filter(p=>!p.isCpu).length || (O.alive||[]).length;
       // 夜に殺された人を死亡リストへ（役職確定）
       if (data.eliminated) {
         const av = getAvatar(data.eliminated.name, O.players);
@@ -5437,7 +5463,9 @@ function handleServer(data) {
       O.eliminatedLastNight = data.eliminated; O.alive = data.alive;
       O.phase = 'day'; break;
     case 'vote_ready_upd':
-      O.voteReadyNames = data.readyNames || []; break;
+      O.voteReadyNames = data.readyNames || [];
+      O.voteReadyTotal = data.readyTotal || O.voteReadyTotal || (O.alive||[]).filter(p=>!p.isCpu).length || (O.alive||[]).length;
+      break;
     case 'vote_ready_all':
       O.voteReadyAll = true;
       fadeOutMusic(1700);
@@ -5715,6 +5743,7 @@ function renderODiscuss() {
 
   // 投票開始ボタン
   const myReady = O.voteReadyNames.includes(O.playerName);
+  const readyTotal = O.voteReadyTotal || (O.alive||[]).filter(p=>!p.isCpu).length || (O.alive||[]).length;
   const voteReadySection = myAlive ? `
     <div class="vote-ready-bar${O.voteReadyAll?' all-ready':''}">
       ${O.voteReadyAll
@@ -5725,7 +5754,7 @@ function renderODiscuss() {
              <button id="btnVoteReady" class="vote-ready-btn ${myReady?'ready':'not-ready'}" ${myReady?'disabled':''}>
                ${myReady ? '✅ 投票待機中' : '⚡ 今すぐ投票へ'}
              </button>
-             <span style="color:#64748b;font-size:.8rem;white-space:nowrap;">${O.voteReadyNames.length}/${O.alive.length}人</span>
+             <span style="color:#64748b;font-size:.8rem;white-space:nowrap;">${O.voteReadyNames.length}/${readyTotal}人</span>
            </div>
            ${O.voteReadyNames.length ? `<div class="vote-ready-dots">
              ${O.voteReadyNames.map(n=>`<span style="font-size:.72rem;background:rgba(34,197,94,.15);border:1px solid #22c55e44;color:#4ade80;padding:.15rem .42rem;border-radius:7px;">${esc(n)}</span>`).join('')}
