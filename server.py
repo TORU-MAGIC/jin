@@ -1,7 +1,7 @@
 try:
     import websockets
 except ImportError:
-    print("pip install websockets"); exit(1)
+    websockets = None
 
 import asyncio, json, random, socket
 
@@ -22,7 +22,8 @@ CONFIGS = {
     17: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
 }
 MAX_PLAYERS = 17
-CPU_NAMES = ['ハル','ユキ','アオイ','カイ','リン','ソラ','ナギ','ツバキ','コウ','アン','ミオ','レン','サクラ','リク','ミナト','ユウ']
+CPU_NAMES = ['ボブ','井沢','工場長','狩野英孝','マリック','キングカズ','カズレーザー','リンゴちゃん','柳沢','沢枝','イッコー','マツコ','アンジャッシュ渡部','ピコ太郎','ハル','ユキ']
+CHARACTER_COUNT = 16
 DISC_ROUNDS = 2
 READ_PAUSE_MIN = 1.4
 READ_PAUSE_MAX = 7.0
@@ -128,9 +129,43 @@ def check_win(room):
     if w >= o: return 'wolf'
     return None
 
+def public_player(room, pid, p, include_role=False):
+    data = {
+        'name': p['name'],
+        'alive': p['alive'],
+        'is_cpu': pid in room['cpu_pids'],
+        'isCpu': pid in room['cpu_pids'],
+        'avatarIndex': p.get('avatarIndex'),
+    }
+    if include_role:
+        data['role'] = p.get('role')
+    return data
+
 def plist(room):
-    return [{'name': p['name'], 'alive': p['alive'], 'is_cpu': pid in room['cpu_pids']}
-            for pid, p in room['players'].items()]
+    return [public_player(room, pid, p) for pid, p in room['players'].items()]
+
+def assign_avatar_indexes(room):
+    order = list(range(CHARACTER_COUNT))
+    random.shuffle(order)
+    used = set()
+    name_to_idx = {name: i % CHARACTER_COUNT for i, name in enumerate(CPU_NAMES)}
+
+    def next_idx():
+        for idx in order:
+            if idx not in used:
+                used.add(idx)
+                return idx
+        idx = random.randrange(CHARACTER_COUNT)
+        used.add(idx)
+        return idx
+
+    for _, p in room['players'].items():
+        preferred = name_to_idx.get(p.get('name'))
+        if preferred is not None and preferred not in used:
+            p['avatarIndex'] = preferred
+            used.add(preferred)
+        else:
+            p['avatarIndex'] = next_idx()
 
 # ── CPU ロジック ──────────────────────────────────────────────
 def cpu_template(room, cpu_pid, ctx='discuss'):
@@ -336,7 +371,7 @@ async def do_morning(room):
         room['phase'] = 'game_over'
         await bcast(room, {'type': 'game_over', 'winner': winner, 'eliminated': elim,
             'night_report': night_report,
-            'players': [{'name': p['name'], 'role': p['role'], 'alive': p['alive'], 'is_cpu': pid in room['cpu_pids']}
+            'players': [public_player(room, pid, p, include_role=True)
                         for pid, p in room['players'].items()], 'log': room['log']})
     else:
         await start_discussion(room, elim, night_report)
@@ -348,14 +383,16 @@ async def start_discussion(room, elim=None, night_report=None):
     room['disc_round'] = 1
     room['vote_ready'] = set()
     alive_pids = [pid for pid, p in room['players'].items() if p['alive']]
+    alive_human_pids = [pid for pid in alive_pids if pid not in room['cpu_pids']]
     random.shuffle(alive_pids)
     room['disc_order'] = alive_pids
     room['disc_step'] = 0
     await bcast(room, {
         'type': 'discuss_start', 'day': room['day'], 'eliminated': elim,
         'night_report': night_report,
-        'alive': [{'name': p['name']} for p in room['players'].values() if p['alive']],
+        'alive': [public_player(room, pid, p) for pid, p in room['players'].items() if p['alive']],
         'round': 1, 'total_rounds': DISC_ROUNDS,
+        'readyTotal': len(alive_human_pids),
     })
     await _next_disc(room)
 
@@ -363,29 +400,33 @@ async def _check_vote_ready(room):
     if room['phase'] != 'discuss': return
     alive_human_pids = {pid for pid, p in room['players'].items() if p['alive'] and pid not in room['cpu_pids']}
     if alive_human_pids and room['vote_ready'].issuperset(alive_human_pids):
-        await bcast(room, {'type': 'vote_ready_all'})
+        await bcast(room, {'type': 'vote_ready_all', 'readyTotal': len(alive_human_pids)})
         await asyncio.sleep(1.7)
         if room['phase'] == 'discuss':
             await start_vote(room)
 
 async def _next_disc(room):
     if room['phase'] != 'discuss': return
-    order = room['disc_order']
-    step = room['disc_step']
-    if step >= len(order):
-        if room['disc_round'] < DISC_ROUNDS:
-            room['disc_round'] += 1
-            alive_pids = [pid for pid, p in room['players'].items() if p['alive']]
-            random.shuffle(alive_pids)
-            room['disc_order'] = alive_pids
-            room['disc_step'] = 0
-            await bcast(room, {'type': 'disc_new_round', 'round': room['disc_round']})
-            await _next_disc(room)
-        else:
+    while True:
+        order = room['disc_order']
+        step = room['disc_step']
+        if step >= len(order):
+            if room['disc_round'] < DISC_ROUNDS:
+                room['disc_round'] += 1
+                alive_pids = [pid for pid, p in room['players'].items() if p['alive']]
+                random.shuffle(alive_pids)
+                room['disc_order'] = alive_pids
+                room['disc_step'] = 0
+                await bcast(room, {'type': 'disc_new_round', 'round': room['disc_round']})
+                continue
             await start_vote(room)
-        return
-    cur_pid = order[step]
-    cur_name = room['players'][cur_pid]['name']
+            return
+        cur_pid = order[step]
+        cur = room['players'].get(cur_pid)
+        if cur and cur.get('alive'):
+            break
+        room['disc_step'] += 1
+    cur_name = cur['name']
     await bcast(room, {'type': 'disc_turn', 'name': cur_name})
     if cur_pid in room['cpu_pids']:
         asyncio.create_task(_cpu_discuss(room, cur_pid))
@@ -415,7 +456,7 @@ async def start_vote(room):
     room['vote_reasons'] = {}
     room['vote_pending'] = {pid for pid, p in room['players'].items() if p['alive']}
     await bcast(room, {'type': 'vote_start',
-                       'alive': [{'name': p['name']} for p in room['players'].values() if p['alive']]})
+                       'alive': [public_player(room, pid, p) for pid, p in room['players'].items() if p['alive']]})
     for pid in list(room['vote_pending']):
         if pid in room['cpu_pids']:
             asyncio.create_task(_cpu_vote(room, pid))
@@ -476,9 +517,10 @@ async def _tally_votes(room):
     winner = check_win(room)
     msg = {'type': 'vote_result', 'executed': executed, 'executed_role': erole,
            'tally': tally, 'winner': winner, 'nekomata_victim': nekomata_victim,
-           'vote_reasons': room.get('vote_reasons', {})}
+           'vote_reasons': room.get('vote_reasons', {}),
+           'votes': dict(room.get('votes', {}))}
     if winner:
-        msg['players'] = [{'name': p['name'], 'role': p['role'], 'alive': p['alive'], 'is_cpu': pid in room['cpu_pids']}
+        msg['players'] = [public_player(room, pid, p, include_role=True)
                           for pid, p in room['players'].items()]
         msg['log'] = room['log']
     await bcast(room, msg)
@@ -506,7 +548,11 @@ async def handle(ws, pid, room, data):
             await send1(room, pid, {'type': 'error', 'msg': f'あと{4 - n_total}人必要です'}); return
         if n_total > MAX_PLAYERS:
             await send1(room, pid, {'type': 'error', 'msg': f'最大{MAX_PLAYERS}人までです'}); return
-        names = random.sample(CPU_NAMES, min(n_cpu, len(CPU_NAMES)))
+        existing_names = {p['name'] for p in room['players'].values()}
+        cpu_pool = [n for n in CPU_NAMES if n not in existing_names]
+        while len(cpu_pool) < n_cpu:
+            cpu_pool.append(f'CPU{len(cpu_pool)+1}')
+        names = random.sample(cpu_pool, n_cpu)
         for i in range(n_cpu):
             cpid = f'cpu{i}'
             room['players'][cpid] = {'name': names[i], 'ws': None, 'role': None, 'alive': True}
@@ -515,6 +561,7 @@ async def handle(ws, pid, room, data):
         random.shuffle(cfg)
         for i, (ppid, p) in enumerate(room['players'].items()):
             p['role'] = cfg[i]; p['alive'] = True
+        assign_avatar_indexes(room)
         room['phase'] = 'role_reveal'; room['day'] = 1
         room['last_doctor_target'] = None
         room['last_executed'] = None
@@ -530,7 +577,7 @@ async def handle(ws, pid, room, data):
             sp = [q['name'] for qid, q in room['players'].items() if q['role'] == 'SHARED' and qid != ppid] if p['role'] == 'SHARED' else []
             await send1(room, ppid, {
                 'type': 'game_started', 'role': p['role'], 'wolf_partners': wp, 'shared_partners': sp,
-                'players': [{'name': q['name']} for q in room['players'].values()],
+                'players': [public_player(room, qid, q) for qid, q in room['players'].items()],
                 'is_host': ppid == room['host'],
             })
 
@@ -573,8 +620,9 @@ async def handle(ws, pid, room, data):
         p = room['players'].get(pid)
         if not p or not p.get('alive'): return
         room['vote_ready'].add(pid)
-        ready_names = [room['players'][rid]['name'] for rid in room['vote_ready'] if rid in room['players']]
-        await bcast(room, {'type': 'vote_ready_upd', 'readyNames': ready_names})
+        alive_human_pids = {rid for rid, rp in room['players'].items() if rp['alive'] and rid not in room['cpu_pids']}
+        ready_names = [room['players'][rid]['name'] for rid in room['vote_ready'] if rid in alive_human_pids]
+        await bcast(room, {'type': 'vote_ready_upd', 'readyNames': ready_names, 'readyTotal': len(alive_human_pids)})
         await _check_vote_ready(room)
 
     elif t == 'music_ended':
@@ -592,6 +640,7 @@ async def handle(ws, pid, room, data):
         room['votes'][p['name']] = data.get('target')
         room['vote_reasons'][p['name']] = str(data.get('reason') or f"{data.get('target')}さんの発言と投票の流れが気になりました。")[:160]
         room['vote_pending'].discard(pid)
+        await send1(room, pid, {'type': 'vote_ack'})
         await bcast(room, {'type': 'vote_progress', 'done': len(room['votes']),
                            'total': len(room['votes']) + len(room['vote_pending'])})
         if not room['vote_pending']:
@@ -637,7 +686,17 @@ async def ws_handler(ws):
     finally:
         if pid and room:
             name = room['players'].get(pid, {}).get('name', '?')
+            was_alive = room['players'].get(pid, {}).get('alive', False)
+            was_voting = room.get('phase') == 'vote'
+            was_discussing = room.get('phase') == 'discuss'
+            was_current_disc = False
+            if was_discussing:
+                step = room.get('disc_step', 0)
+                order = room.get('disc_order', [])
+                was_current_disc = step < len(order) and order[step] == pid
             room['players'].pop(pid, None)
+            if was_alive and was_voting:
+                room['vote_pending'].discard(pid)
             if room['players']:
                 if pid == room.get('host'):
                     nh = next((p for p in room['players'] if p not in room['cpu_pids']), None)
@@ -645,10 +704,24 @@ async def ws_handler(ws):
                         room['host'] = nh
                         await send1(room, nh, {'type': 'became_host'})
                 await bcast(room, {'type': 'player_left', 'players': plist(room), 'name': name})
+                if was_alive and was_discussing and room.get('phase') == 'discuss':
+                    if was_current_disc:
+                        room['disc_step'] += 1
+                        await _next_disc(room)
+                    else:
+                        await _check_vote_ready(room)
+                if was_alive and was_voting:
+                    await bcast(room, {'type': 'vote_progress', 'done': len(room.get('votes', {})),
+                                       'total': len(room.get('votes', {})) + len(room.get('vote_pending', set()))})
+                    if not room.get('vote_pending'):
+                        await _tally_votes(room)
             else:
                 rooms.pop(room['code'], None)
 
 async def main():
+    if websockets is None:
+        print("pip install websockets")
+        return
     try: ip = socket.gethostbyname(socket.gethostname())
     except: ip = 'localhost'
     print("=" * 45)
@@ -660,4 +733,5 @@ async def main():
     async with websockets.serve(ws_handler, "0.0.0.0", 8765):
         await asyncio.Future()
 
-asyncio.run(main())
+if __name__ == '__main__':
+    asyncio.run(main())

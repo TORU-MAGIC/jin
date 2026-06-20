@@ -448,7 +448,36 @@ details summary:hover { color: #94a3b8; }
 .trust-bar{height:8px;border-radius:99px;background:linear-gradient(90deg,rgba(239,68,68,.35),rgba(251,191,36,.25));overflow:hidden;border:1px solid rgba(255,255,255,.08);}
 .trust-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#34d399,#60a5fa);}
 .trust-num{color:#86efac;text-align:right;font-weight:800;}
+.heat-panel{background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(251,191,36,.07));border:1px solid rgba(251,146,60,.28);border-radius:8px;padding:.72rem .8rem;margin:.5rem 0;color:#cbd5e1;box-shadow:0 14px 34px rgba(0,0,0,.22);backdrop-filter:blur(12px);}
+.heat-head{display:flex;align-items:center;justify-content:space-between;gap:.55rem;color:#fed7aa;font-size:.82rem;font-weight:900;margin-bottom:.48rem;}
+.heat-meter{height:10px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.09);margin:.48rem 0 .42rem;}
+.heat-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#34d399,#fbbf24,#ef4444);box-shadow:0 0 16px rgba(251,191,36,.24);}
+.heat-grid{display:grid;gap:.42rem;margin-top:.45rem;}
+.heat-line{font-size:.76rem;color:#cbd5e1;line-height:1.5;border-top:1px solid rgba(255,255,255,.06);padding-top:.36rem;}
+.heat-line:first-child{border-top:none;padding-top:0;}
+.heat-question{background:rgba(15,23,42,.48);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.45rem .55rem;color:#f8fafc;font-size:.76rem;line-height:1.48;}
 @media (min-width:760px){.ai-intel-grid{grid-template-columns:1.1fr .9fr;}.trust-gauge-list{grid-template-columns:1fr 1fr;}}
+.power-panel{background:rgba(15,23,42,.78);border:1px solid rgba(96,165,250,.22);border-radius:8px;padding:.68rem .75rem;margin:.5rem 0;color:#cbd5e1;box-shadow:0 12px 28px rgba(0,0,0,.18);}
+.power-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;color:#93c5fd;font-size:.82rem;font-weight:900;margin-bottom:.42rem;}
+.power-line{font-size:.79rem;line-height:1.65;color:#b6c4d4;margin:.18rem 0;}
+.p2p-diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:.38rem;margin:.5rem 0;}
+.p2p-diag-cell{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:.4rem .46rem;font-size:.73rem;color:#94a3b8;line-height:1.35;}
+.p2p-diag-cell b{display:block;color:#f8fafc;font-size:.82rem;margin-bottom:.08rem;}
+.p2p-resync-btn{width:100%;border:none;border-radius:8px;background:linear-gradient(135deg,#065f46,#0369a1);color:#fff;font-size:.82rem;font-weight:800;padding:.56rem .65rem;margin-top:.45rem;cursor:pointer;}
+.p2p-resync-btn:active{opacity:.82;transform:scale(.98);}
+.rivalry-pair{display:flex;align-items:center;justify-content:space-between;gap:.55rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:7px;padding:.38rem .48rem;margin:.28rem 0;font-size:.76rem;}
+.rivalry-pair b{color:#fca5a5;}
+.vote-timeline{display:grid;gap:.36rem;margin:.5rem 0;}
+.vote-timeline-row{display:grid;grid-template-columns:minmax(4.2rem,6.8rem) auto 1fr;gap:.42rem;align-items:center;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:.4rem .48rem;font-size:.76rem;}
+.vote-arrow{color:#fbbf24;font-weight:900;text-align:center;}
+.replay-grid{display:grid;gap:.4rem;margin:.55rem 0;}
+.replay-row{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:.48rem .58rem;font-size:.78rem;line-height:1.55;color:#cbd5e1;}
+.mobile-action{margin:.55rem 0;}
+@media (max-width:640px){
+  .mobile-action{position:sticky;bottom:.55rem;z-index:30;background:linear-gradient(180deg,rgba(9,13,22,.76),rgba(9,13,22,.96));border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:.55rem;box-shadow:0 -10px 28px rgba(0,0,0,.34);backdrop-filter:blur(14px);}
+  .mobile-action .btn{margin:0;}
+  .vote-timeline-row{grid-template-columns:1fr auto 1fr;}
+}
 .vote-reason-box{margin-top:.65rem;}
 .vote-reason-box textarea{width:100%;min-height:74px;resize:vertical;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#f8fafc;font-size:.88rem;line-height:1.55;padding:.65rem .7rem;outline:none;}
 .vote-reason-box textarea:focus{border-color:#fbbf24;box-shadow:0 0 0 2px rgba(251,191,36,.12);}
@@ -483,12 +512,46 @@ const CHARACTER_AVATARS = [
 ];
 
 function getAvatar(name, players) {
+  const player = (players||[]).find(p => (p.name||p) === name);
+  if (player && typeof player.avatarIndex === 'number' && CHARACTER_AVATARS[player.avatarIndex]) {
+    return CHARACTER_AVATARS[player.avatarIndex];
+  }
+  if (player && player.avatarLabel) {
+    const assigned = CHARACTER_AVATARS.find(a => a.label === player.avatarLabel);
+    if (assigned) return assigned;
+  }
   const matched = CHARACTER_AVATARS.find(a => a.label === name);
   if (matched) return matched;
   const idx = (players||[]).findIndex(p=>(p.name||p)===name);
   const fallback = CHARACTER_AVATARS.slice(14);
   if (fallback.length) return fallback[(idx<0?0:idx) % fallback.length];
   return CHARACTER_AVATARS[(idx<0?0:idx) % CHARACTER_AVATARS.length];
+}
+
+function assignOnlineAvatars(players) {
+  const total = CHARACTER_AVATARS.length;
+  const used = new Set();
+  const shuffled = (() => {
+    const arr = Array.from({length: total}, (_, i) => i);
+    for (let i=arr.length-1;i>0;i--) {
+      const j = Math.floor(Math.random() * (i+1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  })();
+  const nextIndex = () => {
+    const fresh = shuffled.find(i => !used.has(i));
+    const idx = fresh ?? Math.floor(Math.random() * total);
+    used.add(idx);
+    return idx;
+  };
+  (players || []).forEach(p => {
+    const named = CHARACTER_AVATARS.findIndex(a => a.label === p.name);
+    const idx = named >= 0 && !used.has(named) ? named : nextIndex();
+    p.avatarIndex = idx;
+    p.avatarLabel = CHARACTER_AVATARS[idx]?.label || '';
+  });
+  return players;
 }
 
 // ========== AUDIO SYSTEM ==========
@@ -1156,6 +1219,31 @@ function analyzeDiscussionIntel() {
     const penalty = role === 'SHARED' ? 16 : 12;
     names.forEach(name => add(name, 'suspicion', penalty, '対抗COあり'));
   });
+  const voteMaps = [
+    ...(O.voteHistory || []).map(v => v.votes),
+    O.voteResult?.votes,
+  ].filter(Boolean);
+  voteMaps.forEach(votes => {
+    Object.entries(votes || {}).forEach(([voter, target]) => {
+      if (!aliveNames.includes(target)) return;
+      add(target, 'suspicion', 9, `${voter}の投票`);
+      const rb = rivalryBias(voter, target);
+      if (rb) add(target, 'suspicion', Math.round(5 + rb * 3), `${voter}との因縁票`);
+    });
+  });
+  Object.entries(O.voteResult?.voteReasons || {}).forEach(([voter, reason]) => {
+    const text = String(reason || '');
+    aliveNames.forEach(name => {
+      if (name === voter || !text.includes(name)) return;
+      if (suspectRe.test(text) || /怪しい|疑|投票|処刑|吊|矛盾|黒|人狼|不自然/.test(text)) {
+        add(name, 'suspicion', 7, `${voter}の投票理由`);
+      }
+    });
+  });
+  const rivalryPairs = activeRivalryPairs(aliveNames);
+  rivalryPairs.forEach(pair => {
+    add(pair.to, 'suspicion', Math.round(4 + pair.bias * 2), `${pair.from}との因縁`);
+  });
   const rows = Object.values(scores).map(s => {
     const suspicionScore = clampNum(Math.round(34 + s.suspicion - s.trust * 0.42), 0, 100);
     const trustScore = clampNum(Math.round(58 + s.trust - s.suspicion * 0.48), 0, 100);
@@ -1174,7 +1262,11 @@ function analyzeDiscussionIntel() {
   const summary = msgCount
     ? `発言${msgCount}件、CO${coCount}件。現在は${top ? `${top.name}さんへの疑い` : '疑い先'}が最も強く、${trusted ? `${trusted.name}さんが信用寄り` : '信用位置は未確定'}です。`
     : 'まだ議論データがありません。発言が増えると、疑惑と信用が蓄積されます。';
-  return { ranking, rows, summary, msgCount };
+  const highlights = [];
+  if (top) highlights.push(`最警戒: ${top.name}さん (${top.suspicionScore})`);
+  if (trusted) highlights.push(`信用軸: ${trusted.name}さん (${trusted.trustScore})`);
+  if (rivalryPairs[0]) highlights.push(`火種: ${rivalryPairs[0].from} → ${rivalryPairs[0].to}`);
+  return { ranking, rows, summary, msgCount, highlights, rivalryPairs };
 }
 
 function renderAiIntelPanel() {
@@ -1195,6 +1287,10 @@ function renderAiIntelPanel() {
       <div class="trust-bar"><div class="trust-fill" style="width:${r.trustScore}%;"></div></div>
       <div class="trust-num">${r.trustScore}</div>
     </div>`).join('');
+  const highlights = intel.highlights?.length
+    ? `<div style="display:flex;flex-wrap:wrap;gap:.28rem;margin:.45rem 0 0;">
+        ${intel.highlights.map(h=>`<span class="case-chip">${esc(h)}</span>`).join('')}
+      </div>` : '';
   return `
     <div class="ai-intel-panel">
       <div class="ai-intel-head"><span>🧠 AI推理</span><span style="color:#64748b;font-size:.72rem;">信頼度ゲージ</span></div>
@@ -1202,6 +1298,7 @@ function renderAiIntelPanel() {
         <div>
           <div class="case-mini-title">議論要約</div>
           <p class="ai-summary">${esc(intel.summary)}</p>
+          ${highlights}
           <div class="case-mini-title" style="margin-top:.55rem;">怪しいランキング</div>
           <div class="ai-rank-list">${rankRows}</div>
         </div>
@@ -1213,12 +1310,243 @@ function renderAiIntelPanel() {
     </div>`;
 }
 
+function analyzeDiscussionHeat() {
+  const aliveNames = (O.alive || []).map(p => p.name || p).filter(Boolean);
+  const msgs = ((O.intelMsgs && O.intelMsgs.length) ? O.intelMsgs : O.discMsgs) || [];
+  const intel = analyzeDiscussionIntel();
+  const top = intel.ranking?.[0];
+  const claimsByRole = {};
+  Object.entries(O.roleClaims || {}).forEach(([name, role]) => {
+    if (!aliveNames.includes(name)) return;
+    if (!claimsByRole[role]) claimsByRole[role] = [];
+    claimsByRole[role].push(name);
+  });
+  const conflictRoles = Object.entries(claimsByRole).filter(([, names]) => names.length > 1);
+  const lastVote = (O.voteHistory && O.voteHistory.length) ? O.voteHistory[O.voteHistory.length - 1] : O.voteResult;
+  const voteTargets = Object.values(lastVote?.votes || {}).filter(Boolean);
+  const uniqueVoteTargets = new Set(voteTargets).size;
+  const rivalryPairs = activeRivalryPairs(aliveNames);
+  const reasonCount = Object.keys(O.voteResult?.voteReasons || {}).filter(k => O.voteResult.voteReasons[k]).length;
+  let heat = 18;
+  heat += Math.min(28, msgs.length * 3);
+  heat += conflictRoles.length * 18;
+  heat += Math.min(18, uniqueVoteTargets * 4);
+  heat += Math.min(14, rivalryPairs.length * 4);
+  heat += top ? Math.max(0, top.suspicionScore - 55) * .45 : 0;
+  heat += Math.min(10, reasonCount * 2);
+  heat = clampNum(Math.round(heat), 0, 100);
+
+  const flashpoints = [];
+  if (top) flashpoints.push(`${top.name}さんに疑いが集中しています（疑惑${top.suspicionScore}）。`);
+  conflictRoles.forEach(([role, names]) => {
+    flashpoints.push(`${ROLES[role]?.name || role}COが${names.length}人で対立: ${names.join(' / ')}`);
+  });
+  if (uniqueVoteTargets >= 3) flashpoints.push(`前回投票が${uniqueVoteTargets}方向に割れ、便乗票や身内切りが疑われます。`);
+  if (rivalryPairs[0]) flashpoints.push(`${rivalryPairs[0].from}さんと${rivalryPairs[0].to}さんの因縁が議論を荒らしています。`);
+  if (!flashpoints.length && msgs.length) flashpoints.push('発言は増えていますが、まだ決定的な争点は薄めです。理由を深掘りすると場が動きます。');
+  if (!flashpoints.length) flashpoints.push('まだ静かな立ち上がりです。最初のCO、投票理由、沈黙位置を確認しましょう。');
+
+  const questions = [];
+  if (top) questions.push(`${top.name}さんへ: いま一番疑っている相手と、その理由を一文で言わせる。`);
+  if (conflictRoles[0]) questions.push(`${conflictRoles[0][1].join(' / ')}へ: COタイミングと結果を順番に確認する。`);
+  if (lastVote?.votes) questions.push('票が集まった人へ: 自分投票者の中で一番便乗に見える人を指名させる。');
+  if (rivalryPairs[0]) questions.push(`${rivalryPairs[0].from}さんへ: ${rivalryPairs[0].to}さん疑いが感情か推理かを切り分けさせる。`);
+  if (!questions.length) questions.push('全員へ: 今日の吊り候補を一人だけ挙げ、理由を短く言わせる。');
+
+  return { heat, flashpoints: flashpoints.slice(0, 4), questions: questions.slice(0, 4) };
+}
+
+function renderDiscussionHeatPanel() {
+  if (!(O.alive || []).length) return '';
+  const h = analyzeDiscussionHeat();
+  const label = h.heat >= 78 ? '炎上寸前' : h.heat >= 58 ? '白熱' : h.heat >= 36 ? '加熱中' : '静かな立ち上がり';
+  return `<div class="heat-panel">
+    <div class="heat-head"><span>議論ヒート ${label}</span><span>${h.heat}/100</span></div>
+    <div class="heat-meter"><div class="heat-fill" style="width:${h.heat}%;"></div></div>
+    <div class="case-mini-title">今の争点</div>
+    <div class="heat-grid">${h.flashpoints.map(l => `<div class="heat-line">${esc(l)}</div>`).join('')}</div>
+    <div class="case-mini-title" style="margin-top:.55rem;">次に詰める質問</div>
+    <div class="heat-grid">${h.questions.map(q => `<div class="heat-question">${esc(q)}</div>`).join('')}</div>
+  </div>`;
+}
+
+function analyzeLocalDiscussionHeat() {
+  const players = S.players || [];
+  const aliveNames = players.filter(p => p.alive).map(p => p.name);
+  const voteResult = S.voteResult || {};
+  const votes = voteResult.votes || S.votes || {};
+  const voteTargets = Object.values(votes).filter(Boolean);
+  const uniqueVoteTargets = new Set(voteTargets).size;
+  const tallyEntries = Object.entries(voteResult.tally || {}).sort(([, a], [, b]) => b - a);
+  const topVote = tallyEntries[0];
+  const seerHistory = S.seerHistory || [];
+  const wolfFinds = seerHistory.filter(r => r.isWolf);
+  const deadCount = players.filter(p => !p.alive).length;
+  const reasonCount = Object.keys(voteResult.voteReasons || S.voteReasons || {}).filter(Boolean).length;
+  let heat = 18 + Math.min(22, (S.day || 1) * 7) + Math.min(18, deadCount * 5);
+  heat += Math.min(18, uniqueVoteTargets * 5);
+  heat += Math.min(14, seerHistory.length * 6);
+  heat += Math.min(10, wolfFinds.length * 10);
+  heat += Math.min(10, reasonCount * 2);
+  heat = clampNum(Math.round(heat), 0, 100);
+
+  const flashpoints = [];
+  if (topVote) flashpoints.push(`${topVote[0]}さんに票が集まっています（${topVote[1]}票）。`);
+  if (uniqueVoteTargets >= 3) flashpoints.push(`投票が${uniqueVoteTargets}方向に割れています。便乗票と身内切りを確認しましょう。`);
+  if (wolfFinds[0]) flashpoints.push(`占いで${wolfFinds[0].target}さんに黒判定が出ています。対抗や反応が争点です。`);
+  if (S.lastExecuted) flashpoints.push(`直近の処刑者は${S.lastExecuted}さん。霊媒結果と投票理由の照合が重要です。`);
+  if (!flashpoints.length) flashpoints.push('まだ決め手は薄めです。発言量の少ない人と、投票理由が浅い人を確認しましょう。');
+
+  const questions = [];
+  if (topVote) questions.push(`${topVote[0]}さんへ: 自分に票を入れた人の中で一番怪しい人を言わせる。`);
+  if (wolfFinds[0]) questions.push(`${wolfFinds[0].target}さんへ: 黒判定への反論と、占い師をどう見ているかを聞く。`);
+  if (S.lastExecuted) questions.push(`霊媒師へ: ${S.lastExecuted}さんの結果を軸に、投票者をどう評価するか確認する。`);
+  if (aliveNames.length) questions.push('全員へ: 今日の吊り候補を一人だけ挙げ、理由を短く言わせる。');
+  return { heat, flashpoints: flashpoints.slice(0, 4), questions: questions.slice(0, 4) };
+}
+
+function renderLocalDiscussionHeatPanel() {
+  if (!(S.players || []).length) return '';
+  const h = analyzeLocalDiscussionHeat();
+  const label = h.heat >= 78 ? '炎上寸前' : h.heat >= 58 ? '白熱' : h.heat >= 36 ? '加熱中' : '静かな立ち上がり';
+  return `<div class="heat-panel">
+    <div class="heat-head"><span>議論ヒート ${label}</span><span>${h.heat}/100</span></div>
+    <div class="heat-meter"><div class="heat-fill" style="width:${h.heat}%;"></div></div>
+    <div class="case-mini-title">今の争点</div>
+    <div class="heat-grid">${h.flashpoints.map(l => `<div class="heat-line">${esc(l)}</div>`).join('')}</div>
+    <div class="case-mini-title" style="margin-top:.55rem;">次に詰める質問</div>
+    <div class="heat-grid">${h.questions.map(q => `<div class="heat-question">${esc(q)}</div>`).join('')}</div>
+  </div>`;
+}
+
 function renderVoteReasons(reasons) {
   const entries = Object.entries(reasons || {}).filter(([, r]) => r && String(r).trim());
   if (!entries.length) return '';
   return `<div class="vote-reasons">
     <div class="case-mini-title" style="margin-bottom:.4rem;">🧾 投票理由</div>
     ${entries.map(([name, reason]) => `<div class="vote-reason-item"><b>${esc(name)}</b>：${esc(reason)}</div>`).join('')}
+  </div>`;
+}
+
+function renderRivalryPanel() {
+  const names = (O.alive && O.alive.length ? O.alive : O.players || []).map(p => p.name);
+  const pairs = activeRivalryPairs(names).slice(0, 4);
+  if (!pairs.length) return '';
+  return `<div class="power-panel">
+    <div class="power-head"><span>🔥 キャラ因縁</span><span style="color:#64748b;font-size:.72rem;">発言・投票に影響</span></div>
+    ${pairs.map(p => `<div class="rivalry-pair"><span><b>${esc(p.from)}</b> → <b>${esc(p.to)}</b></span><span>${esc(p.line || '因縁あり')}</span></div>`).join('')}
+  </div>`;
+}
+
+function renderDawnNewspaper() {
+  if (!['day','discuss','vote','vote_result'].includes(O.phase)) return '';
+  const lines = [];
+  const victim = O.eliminatedLastNight;
+  if (victim?.name) lines.push(`昨夜の犠牲者は ${victim.name} さん。村の空気が一段重くなりました。`);
+  else if (O.day > 0) lines.push('昨夜は犠牲者なし。護衛成功、猫又警戒、または人狼の判断ミスが疑われます。');
+  if (O.nightReport?.guarded) lines.push('騎士の護衛成功らしき気配があります。守られた位置は信用軸になり得ます。');
+  if (O.nightReport?.dragged) lines.push(`猫又の道連れで ${O.nightReport.dragged} さんも倒れました。人狼陣営に大きな傷です。`);
+  const coNames = Object.entries(O.roleClaims || {}).map(([n,r]) => `${n}:${ROLES[r]?.name || r}`);
+  if (coNames.length) lines.push(`現在のCO: ${coNames.slice(0,5).join(' / ')}${coNames.length>5?' ほか':''}`);
+  const lastVote = O.voteHistory?.[O.voteHistory.length-1];
+  if (lastVote?.executed) lines.push(`前回の処刑は ${lastVote.executed} さん。票の流れが今日の疑惑に残っています。`);
+  if (!lines.length) return '';
+  return `<div class="power-panel">
+    <div class="power-head"><span>📰 夜明け新聞</span><span>第${O.day}日</span></div>
+    ${lines.map(l=>`<div class="power-line">・${esc(l)}</div>`).join('')}
+  </div>`;
+}
+
+function renderP2PStatusPanel() {
+  if (mode !== 'p2p' || !O.phase || ['p2p_setup','setup','lobby','game_over'].includes(O.phase)) return '';
+  const age = O.p2pSyncAt ? Math.max(0, Math.round((Date.now() - O.p2pSyncAt) / 1000)) : null;
+  const heartbeatAge = O.p2pHeartbeatAt ? Math.max(0, Math.round((Date.now() - O.p2pHeartbeatAt) / 1000)) : null;
+  const tone = age === null ? '#64748b' : age <= 8 ? '#34d399' : age <= 25 ? '#fbbf24' : '#f87171';
+  const text = age === null ? '同期待ち' : `${age}秒前に同期`;
+  const diag = (typeof P2PEngine !== 'undefined' && P2PEngine.diagnostics) ? P2PEngine.diagnostics() : {};
+  const playerCount = (O.players || []).length || diag.playerCount || 0;
+  const aliveCount = (O.alive || []).length || diag.aliveCount || 0;
+  const voteText = O.phase === 'vote'
+    ? `${O.voteDone || 0}/${O.voteTotal || 0} 投票済み${O.voteSubmitted ? '（自分済）' : ''}`
+    : (O.voteReadyTotal ? `${O.voteReadyNames.length}/${O.voteReadyTotal} 今すぐ投票` : '待機');
+  const resyncText = O.isHost ? '全員へ最新状態を再送' : 'ホストへ再同期を要求';
+  const heartbeatText = O.isHost
+    ? `${diag.peerHealthyCount || 0}/${diag.connCount || 0} 応答${diag.peerStaleCount ? `・${diag.peerStaleCount}遅延` : ''}`
+    : (heartbeatAge === null ? '心拍待ち' : `${heartbeatAge}秒前`);
+  const warning = age !== null && age > 25
+    ? `<div class="power-line" style="color:#fca5a5;">同期が遅れています。画面が止まっている端末は再同期を押してください。</div>`
+    : '';
+  const heartbeatWarning = (!O.isHost && heartbeatAge !== null && heartbeatAge > 25)
+    ? `<div class="power-line" style="color:#fca5a5;">ホスト心拍が途切れています。ホスト画面・Wi-Fi・画面ロックを確認してください。</div>`
+    : (O.isHost && diag.peerStaleCount > 0
+      ? `<div class="power-line" style="color:#fca5a5;">応答が遅い参加者: ${esc((diag.peerStaleNames || []).join('、') || '不明')}</div>`
+      : '');
+  const lastResync = O.p2pResyncAt ? `<div class="power-line" style="color:#86efac;">再同期: ${Math.max(0, Math.round((Date.now()-O.p2pResyncAt)/1000))}秒前</div>` : '';
+  return `<div class="power-panel" style="border-color:${tone}55;">
+    <div class="power-head" style="color:${tone};"><span>📡 P2P同期</span><span>#${O.p2pSyncSeq || 0}</span></div>
+    <div class="power-line">状態: ${text}。投票・夜行動・議論更新はホストの同期番号で確認しています。</div>
+    <div class="p2p-diag-grid">
+      <div class="p2p-diag-cell"><b>${O.isHost ? 'ホスト' : 'ゲスト'}</b>端末役割</div>
+      <div class="p2p-diag-cell"><b>${esc(O.phase)}</b>画面フェーズ</div>
+      <div class="p2p-diag-cell"><b>${playerCount}人</b>参加者</div>
+      <div class="p2p-diag-cell"><b>${aliveCount}人</b>生存者</div>
+      <div class="p2p-diag-cell"><b>${esc(voteText)}</b>投票状態</div>
+      <div class="p2p-diag-cell"><b>${diag.connCount ?? '-'}</b>接続数</div>
+      <div class="p2p-diag-cell"><b>${esc(heartbeatText)}</b>通信心拍</div>
+      <div class="p2p-diag-cell"><b>${esc(O.p2pLastType || '-')}</b>最終受信</div>
+    </div>
+    ${warning}
+    ${heartbeatWarning}
+    ${lastResync}
+    <button class="p2p-resync-btn" id="p2pResync">${resyncText}</button>
+  </div>`;
+}
+
+function renderVoteTimeline(votes={}, reasons={}) {
+  const entries = Object.entries(votes || {});
+  if (!entries.length) return '';
+  return `<div class="power-panel">
+    <div class="power-head"><span>🗳️ 投票タイムライン</span><span style="color:#64748b;font-size:.72rem;">誰が誰へ入れたか</span></div>
+    <div class="vote-timeline">
+      ${entries.map(([voter,target]) => {
+        const reason = reasons?.[voter] ? `<div style="grid-column:1 / -1;color:#94a3b8;font-size:.72rem;line-height:1.45;">${esc(reasons[voter])}</div>` : '';
+        const rv = rivalryBias(voter, target) ? `<span style="color:#fca5a5;font-size:.7rem;"> 因縁票</span>` : '';
+        return `<div class="vote-timeline-row"><b>${esc(voter)}</b><span class="vote-arrow">→</span><span>${esc(target)}${rv}</span>${reason}</div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderEndgameReplay(players) {
+  const voteDays = O.voteHistory || [];
+  const deaths = O.deadPlayers || [];
+  const lines = [];
+  if (voteDays.length) {
+    voteDays.slice(-4).forEach(v => {
+      const top = Object.entries(v.tally || {}).sort(([,a],[,b])=>b-a)[0];
+      lines.push(`第${v.day}日: ${v.executed || '不明'}さんが処刑。最多票は${top ? `${top[0]}さん ${top[1]}票` : '不明'}。`);
+    });
+  }
+  deaths.slice(-5).forEach(d => lines.push(`死亡記録: ${d.name}さん (${d.cause || '不明'})`));
+  const wolfNames = (players || []).filter(p => p.role === 'WEREWOLF').map(p => p.name);
+  if (wolfNames.length) lines.push(`人狼: ${wolfNames.join('・')}`);
+  if (!lines.length) return '';
+  return `<div class="power-panel">
+    <div class="power-head"><span>🎬 勝敗リプレイ</span><span style="color:#64748b;font-size:.72rem;">重要な流れ</span></div>
+    <div class="replay-grid">${lines.map(l=>`<div class="replay-row">${esc(l)}</div>`).join('')}</div>
+  </div>`;
+}
+
+function renderLocalReplay() {
+  const lines = [];
+  (S.log || []).slice(-8).forEach(l => lines.push(l));
+  if (S.voteResult?.votes) {
+    Object.entries(S.voteResult.votes).forEach(([voter,target]) => lines.push(`${voter} → ${target} に投票`));
+  }
+  if (!lines.length) return '';
+  return `<div class="power-panel">
+    <div class="power-head"><span>🎬 勝敗リプレイ</span><span style="color:#64748b;font-size:.72rem;">ローカル記録</span></div>
+    <div class="replay-grid">${lines.map(l=>`<div class="replay-row">${esc(l)}</div>`).join('')}</div>
   </div>`;
 }
 
@@ -1239,6 +1567,61 @@ const CONFIGS = {
   16: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
   17: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
 };
+
+const RIVALRY_RULES = {
+  'ボブ': {
+    targets: { '沢枝': 2.1, '工場長': 1.2 },
+    label: '裏切り癖と悲観論で場をかき回す',
+    lines: {
+      '沢枝': 'ボブは沢枝のメモとほうれい線を過剰にいじり、疑いを笑いに変えて押し込む。',
+      '工場長': 'ボブは工場長の現場判断を信じ切れず、すぐ裏切り前提で話す。'
+    }
+  },
+  '工場長': {
+    targets: { '沢枝': 2.4, 'ボブ': 1.5 },
+    label: '現場の段取りを乱す相手に強く噛みつく',
+    lines: {
+      '沢枝': '工場長は沢枝の長話とほうれい線を現場停止の原因としていじり倒す。',
+      'ボブ': '工場長はボブのトンチンカンな裏切り宣言をまったく信用していない。'
+    }
+  },
+  '沢枝': {
+    targets: { '工場長': 2.8, 'ボブ': 2.35, '井沢': 2.15 },
+    label: '回りくどいメモで因縁相手を疑い続ける',
+    lines: {
+      '工場長': '沢枝は工場長に「うるせーよ」と毒づき、強引な仕切りをメモで責める。',
+      'ボブ': '沢枝はボブの裏切り口癖とトンチンカンさを計算だと疑う。',
+      '井沢': '沢枝は井沢の理屈が整いすぎることを逆に怪しいと見る。'
+    }
+  },
+  '井沢': {
+    targets: { '沢枝': 1.55 },
+    label: '細かい分析で回りくどい相手を追い詰める',
+    lines: {
+      '沢枝': '井沢は沢枝のメモの多さを、情報を煙に巻く動きとして警戒する。'
+    }
+  }
+};
+
+function rivalryBias(from, to) {
+  return RIVALRY_RULES[from]?.targets?.[to] || 0;
+}
+
+function rivalryLine(from, to) {
+  return RIVALRY_RULES[from]?.lines?.[to] || '';
+}
+
+function activeRivalryPairs(names) {
+  const set = new Set(names || []);
+  const pairs = [];
+  Object.entries(RIVALRY_RULES).forEach(([from, rule]) => {
+    if (!set.has(from)) return;
+    Object.keys(rule.targets || {}).forEach(to => {
+      if (set.has(to)) pairs.push({ from, to, bias:rivalryBias(from, to), line:rivalryLine(from, to) });
+    });
+  });
+  return pairs.sort((a,b)=>b.bias-a.bias);
+}
 
 // ========== CPU PERSONALITIES ==========
 // logical:論理派・整理型  aggressive:攻撃的・先導型  cautious:慎重派・後追い  talkative:饒舌・印象論
@@ -1454,6 +1837,7 @@ function personaChooseTarget(R, cpu, candidates, context='vote') {
     const claimed = R.claims?.[p.name] ? 1 : 0;
     const lowTalk = Math.max(0, 2 - speak);
     const grudge = action.grudge?.[p.name] || 0;
+    const rivalry = rivalryBias(cpu?.name, p.name);
     let score = susp + Math.random() * jitter;
     switch (action.mode) {
       case 'mood': score = cover * 0.7 + speak * 0.3 + susp * 0.8; break;
@@ -1474,7 +1858,9 @@ function personaChooseTarget(R, cpu, candidates, context='vote') {
       case 'betray': score = Math.random() * 4.0 + (cover > 0 ? 1.2 : 0) + (susp < 1 ? 1.0 : -0.2); break;
       default: score = susp + cover * 0.2;
     }
-    score += grudge;
+    score += grudge + rivalry;
+    if (context === 'vote') score += rivalry * 0.35;
+    if (context === 'wolf_night') score += rivalry * 0.22;
     if (context === 'wolf_night') score += cover * 0.65 + claimed * 0.85 - susp * 0.2;
     if (context === 'speak') score += lowTalk * 0.25;
     return score + Math.random() * jitter;
@@ -1693,6 +2079,51 @@ function on(id, fn) { const e = document.getElementById(id); if (e) e.addEventLi
 function normalizeRoomCode(raw) {
   const digits = String(raw ?? '').replace(/\D/g, '');
   return digits ? digits.slice(0, 3).padStart(3, '0') : '';
+}
+
+function p2pJoinUrl(code) {
+  const roomCode = normalizeRoomCode(code);
+  if (!roomCode || typeof window === 'undefined' || !window.location) return '';
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set('p2p', 'join');
+    url.searchParams.set('code', roomCode);
+    return url.toString();
+  } catch (_) {
+    return '';
+  }
+}
+
+function applyP2PLaunchParams() {
+  if (typeof window === 'undefined' || !window.location) return;
+  let params;
+  try { params = new URLSearchParams(window.location.search || ''); }
+  catch (_) { return; }
+  const wantsP2P = ['join', 'p2p'].includes(String(params.get('p2p') || '').toLowerCase()) || params.has('code');
+  const code = normalizeRoomCode(params.get('code') || params.get('room') || '');
+  if (!wantsP2P || !code) return;
+  initOnline();
+  mode = 'p2p';
+  O.phase = 'p2p_setup';
+  O.p2pSub = 'join';
+  O.pendingP2PCode = code;
+  O.cpuCount = 0;
+}
+
+async function copyText(text) {
+  if (!text) return false;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (_) {}
+  try {
+    prompt('このリンクをコピーしてください', text);
+    return true;
+  } catch (_) {
+    return false;
+  }
 }
 
 // ========== RENDER HELPERS ==========
@@ -1933,6 +2364,7 @@ function renderDay() {
     <hr class="div">
     <p class="sec-label">🧑 生存者 (${alivePl.length}人)</p>
     <div class="chips">${chips}</div>
+    ${renderLocalDiscussionHeatPanel()}
     <div class="card" style="text-align:center; margin-top:0.8rem;">
       <p style="color:#94a3b8; font-size:0.9rem;">💬 議論の時間です。怪しい人狼を話し合いで見つけましょう！</p>
     </div>
@@ -1953,6 +2385,7 @@ function renderVote() {
       <h2 style="color:#fff; margin:0.5rem 0;">${esc(voter.name)} さんが投票します</h2>
       <p style="color:#64748b; font-size:0.85rem; margin:0;">誰を処刑しますか？</p>
     </div>
+    ${renderLocalDiscussionHeatPanel()}
     <label style="margin-top:0.8rem;">処刑する人を選んでください</label>
     ${mkSelect('voteTgt', targets)}
     <div class="vote-reason-box">
@@ -1990,7 +2423,9 @@ function renderVoteResult() {
       <p class="sec-label" style="margin-top:0;">📊 得票数</p>
       ${bars}
     </div>
+    ${renderVoteTimeline(S.voteResult.votes, S.voteResult.voteReasons)}
     ${renderVoteReasons(S.voteResult.voteReasons)}
+    ${renderLocalDiscussionHeatPanel()}
     <div class="vote-drama" style="text-align:center; padding:1.5rem; border-radius:16px;
          border:2px solid #ef4444; background:linear-gradient(135deg,#1a0505,#2d0a0a); margin:.6rem 0;">
       <p style="color:#f87171; font-size:.78rem; font-weight:700; letter-spacing:.12em; margin:0 0 .5rem;">⚖️ 処刑決定</p>
@@ -2032,6 +2467,7 @@ function renderGameOver() {
         ${isVillage ? '人狼を全員討伐！村人チームの勝利です！' : '人狼が村人と同数以上になりました...'}
       </p>
     </div>
+    ${renderLocalReplay()}
     <p class="sec-label">📋 全員の役職</p>
     ${rows}
     ${logHtml}
@@ -2215,7 +2651,7 @@ function bindEvents() {
           log(`第${S.day}日: 猫又の道連れで ${nekomataVictim.name} も倒れました`);
         }
       }
-      S.voteResult = {executed, tally, nekomataVictim: nekomataVictim?.name, voteReasons: S.voteReasons};
+      S.voteResult = {executed, tally, nekomataVictim: nekomataVictim?.name, voteReasons: S.voteReasons, votes: S.votes};
       S.winner = checkWin();
       S.phase = 'vote_result';
     }
@@ -2265,6 +2701,28 @@ function bindEvents() {
   on('goP2P', () => { initOnline(); mode = 'p2p'; O.phase = 'p2p_setup'; O.p2pSub = 'choose'; O.cpuCount = 0; render(); });
   on('p2pGoJoin',   () => { O.p2pSub = 'join'; render(); });
   on('p2pBackSetup',() => { O.p2pSub = 'choose'; render(); });
+  on('p2pCopyLink', async () => {
+    const link = p2pJoinUrl(O.roomCode);
+    const ok = await copyText(link);
+    alert(ok ? '参加リンクをコピーしました' : 'コピーできませんでした');
+  });
+  on('p2pShareLink', async () => {
+    const link = p2pJoinUrl(O.roomCode);
+    if (!link) return;
+    try {
+      if (navigator.share) await navigator.share({ title:'人狼ゲーム P2P参加', text:`部屋コード ${O.roomCode}`, url:link });
+      else {
+        const ok = await copyText(link);
+        alert(ok ? '参加リンクをコピーしました' : '共有できませんでした');
+      }
+    } catch (_) {}
+  });
+  on('p2pResync', () => {
+    if (mode !== 'p2p') return;
+    P2PEngine.requestResync();
+    O.p2pResyncAt = Date.now();
+    render();
+  });
   on('p2pCreate', () => {
     const name = (val('p2pName')||'').trim();
     if (!name) { alert('名前を入力してください'); return; }
@@ -2278,6 +2736,7 @@ function bindEvents() {
     const code = normalizeRoomCode(val('p2pCode'));
     if (!name) { alert('名前を入力してください'); return; }
     if (!code) { alert('部屋コードを入力してください'); return; }
+    O.pendingP2PCode = code;
     O.playerName = name; O.isHost = false; O.p2pSub = 'guest_wait'; render();
     P2PEngine.joinRoom(name, code,
       () => { /* joined, waiting for game_started */ },
@@ -2580,6 +3039,7 @@ function bindEvents() {
     (O.myVotes = O.myVotes||[]).push(target); // 戦績スコア用（自分の投票履歴）
     wsSend({type:'vote', target, reason});
     O.voteSubmitted = true;
+    O.voteSentAt = Date.now();
     render();
   });
 
@@ -2915,6 +3375,8 @@ const SoloEngine = (() => {
     // 霊媒師用に処刑情報を保存
     R.lastExecuted = executed;
     R.lastExecutedRole = execP?.role;
+    if (!R.voteHistory) R.voteHistory = [];
+    R.voteHistory.push({day:R.day, votes:{...R.votes}, tally:{...count}, executed});
     // 猫又ルール: 処刑時にランダムな生存者を道連れ
     let nekomataVictim = null;
     if (execP?.role === 'NEKOMATA') {
@@ -2931,6 +3393,7 @@ const SoloEngine = (() => {
       executed, executed_role: execP?.role, tally: count,
       nekomata_victim: nekomataVictim?.name,
       vote_reasons: R.voteReasons,
+      votes: R.votes,
       winner: win,
       players: win ? R.players.map(p=>({name:p.name,role:p.role,alive:p.alive})) : null,
       log: win ? R.log : null,
@@ -4038,6 +4501,10 @@ const BRAIN = (function(){
       const wolves = al.filter(p=>p.role==='WEREWOLF');
       const wolfNames = new Set(wolves.map(p=>p.name));
       const vill = ot.filter(p=>!wolfNames.has(p.name));
+      if (al.length <= 5) {
+        const endTarget = personaChooseTarget(R, cpu, vill, 'vote') || topAcc(R, vill);
+        if (endTarget) return endTarget;
+      }
       // 真の占い師（COしてる）を優先的に処刑
       const trueSeer = R.seerCOs.find(c=>{
         const p = R.players.find(x=>x.name===c.name);
@@ -4066,6 +4533,10 @@ const BRAIN = (function(){
     }
 
     // ── 村人陣営 ──
+    if (al.length <= 5) {
+      const endSuspect = topAcc(R, ot);
+      if (endSuspect && (R.suspicion[endSuspect.name]||0) >= 1) return endSuspect;
+    }
     // 1) 占い師の黒判定がある場合は最優先
     const seerCOAlive = R.seerCOs.filter(c=>{
       const p = R.players.find(x=>x.name===c.name);
@@ -4138,6 +4609,14 @@ const BRAIN = (function(){
     const leadWolf = hunter || wolves.find(p=>p.isCpu && getCpuPersona(p.name)) || wolves[0];
     const vill = al.filter(p=>p.role!=='WEREWOLF');
     if (!vill.length) return null;
+    if (al.length <= 5) {
+      const endgameTarget = [...vill].sort((a,b)=>{
+        const sa = (R.claims?.[a.name] ? 2 : 0) + (R.coverCount?.[a.name] || 0) - (R.suspicion?.[a.name] || 0) * 0.35;
+        const sb = (R.claims?.[b.name] ? 2 : 0) + (R.coverCount?.[b.name] || 0) - (R.suspicion?.[b.name] || 0) * 0.35;
+        return sb - sa;
+      })[0];
+      if (endgameTarget && Math.random() < 0.86) return endgameTarget;
+    }
 
     // 1) CO占い師（真物）優先
     const trueSeer = R.seerCOs.find(c=>{
@@ -4466,6 +4945,7 @@ function renderSoloRecap(){
     </div>
     ${daily}
     ${achHtml}
+    ${renderEndgameReplay(players)}
     <p class="sec-label">📋 全員の役職</p>
     ${rows}
     <hr class="div">
@@ -4614,10 +5094,12 @@ const P2PEngine = (() => {
   let isHost = false;
 
   let _timers = [];
+  let heartbeatTimer = null;
   function emitLocal(msg) { const id = setTimeout(() => handleServer(msg), 0); _timers.push(id); return id; }
   function later(ms, fn)  { const id = setTimeout(fn, ms); _timers.push(id); return id; }
   function resetTimers()  {
     _timers.forEach(clearTimeout); _timers = [];
+    heartbeatTimer = null;
     if (R && R._humanTurnTimer) { clearTimeout(R._humanTurnTimer); R._humanTurnTimer = null; }
     if (R && R._discFallback)   { clearTimeout(R._discFallback);   R._discFallback = null; }
   }
@@ -4626,26 +5108,123 @@ const P2PEngine = (() => {
   function alive()        { return R.players.filter(p=>p.alive); }
   function byName(n)      { return R.players.find(p=>p.name===n); }
   function topAcc(pls)    { let max=0,best=null; pls.forEach(p=>{const c=R.accuCount[p.name]||0;if(c>max){max=c;best=p;}}); return best; }
+  function markPeerSeen(name, phase='') {
+    if (!name) return;
+    if (!R.peerLastSeen) R.peerLastSeen = {};
+    R.peerLastSeen[name] = { at:Date.now(), phase:phase || '' };
+  }
+  function scheduleHeartbeat() {
+    if (!isHost || !R || !R.phase) return;
+    if (heartbeatTimer) clearTimeout(heartbeatTimer);
+    heartbeatTimer = later(8000, () => {
+      heartbeatTimer = null;
+      if (!isHost || !R || !R.phase) return;
+      const list = R.players || R.pendingPlayers || [];
+      const aliveCount = R.players ? R.players.filter(p=>p.alive).length : 0;
+      broadcast({ type:'p2p_heartbeat', phase:R.phase, player_count:list.length, alive_count:aliveCount });
+      scheduleHeartbeat();
+    });
+  }
 
   // ホストから全員にブロードキャスト
+  function p2pPayload(msg) {
+    if (!R.syncSeq) R.syncSeq = 0;
+    return { ...msg, p2p_seq: ++R.syncSeq, p2p_time: Date.now() };
+  }
   function broadcast(msg) {
-    const json = JSON.stringify(msg);
+    const payload = p2pPayload(msg);
+    const json = JSON.stringify(payload);
     Object.values(hostConns).forEach(c => { try { c.send(json); } catch(e){} });
-    emitLocal(msg);
+    emitLocal(payload);
   }
   // ホストから特定プレイヤーのみに送信
   function sendTo(playerName, msg) {
-    const json = JSON.stringify(msg);
+    const payload = p2pPayload(msg);
+    const json = JSON.stringify(payload);
     const cid = Object.keys(connNames).find(k=>connNames[k]===playerName);
     if (cid && hostConns[cid]) { try { hostConns[cid].send(json); } catch(e){} }
-    if (playerName === R.hostName) emitLocal(msg);
+    if (playerName === R.hostName) emitLocal(payload);
   }
   function sendToWolves(msg) {
     R.players.filter(p=>p.role==='WEREWOLF').forEach(p=>sendTo(p.name, msg));
   }
   function sendToConn(connId, msg) {
     const conn = hostConns[connId];
-    if (conn) { try { conn.send(JSON.stringify(msg)); } catch(e){} }
+    if (conn) { try { conn.send(JSON.stringify(p2pPayload(msg))); } catch(e){} }
+  }
+  function publicPlayers(includeRole=false) {
+    return (R.players || R.pendingPlayers || []).map((p,i)=>({
+      pid:i, name:p.name, alive:p.alive !== false, isCpu:!!p.isCpu,
+      avatarIndex:p.avatarIndex, avatarLabel:p.avatarLabel,
+      role: includeRole ? p.role : undefined,
+    }));
+  }
+  function publicAlive() {
+    return alive().map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel}));
+  }
+  function voteReadyNames() {
+    const ready = R.voteReadySet || new Set();
+    return alive().filter(p=>!p.isCpu && ready.has(p.name)).map(p=>p.name);
+  }
+  function actionForPlayer(player) {
+    if (!player || R.phase !== 'night' || !player.alive || player.isCpu || R.humanActionDone?.[player.name]) return null;
+    const al = alive();
+    const others = al.filter(x=>x.name!==player.name);
+    if (player.role==='WEREWOLF') {
+      return {type:'action_needed',action:'wolf',targets:others.filter(x=>x.role!=='WEREWOLF').map(x=>({name:x.name})),wolf_names:al.filter(x=>x.role==='WEREWOLF').map(x=>x.name)};
+    }
+    if (player.role==='SEER') {
+      return {type:'action_needed',action:'seer',targets:others.map(x=>({name:x.name}))};
+    }
+    if (player.role==='DOCTOR') {
+      const docTargets = al.filter(x=>x.name!==player.name && x.name!==R.lastDoctorTarget);
+      return docTargets.length ? {type:'action_needed',action:'doctor',targets:docTargets.map(x=>({name:x.name})),last_protected:R.lastDoctorTarget} : null;
+    }
+    return null;
+  }
+  function resyncPayloadFor(playerName) {
+    const player = byName(playerName);
+    const includeRole = R.phase === 'game_over';
+    const voteResult = R.lastVoteResult || null;
+    const payload = {
+      type:'p2p_resync',
+      phase:R.phase || 'lobby',
+      roomCode:R.roomCode,
+      day:R.day || 0,
+      players:publicPlayers(includeRole),
+      alive:publicAlive(),
+      role:player?.role || null,
+      wolf_partners:player?.role==='WEREWOLF' ? (R.players||[]).filter(p=>p.role==='WEREWOLF' && p.name!==playerName).map(p=>p.name) : [],
+      shared_partners:player?.role==='SHARED' ? (R.players||[]).filter(p=>p.role==='SHARED' && p.name!==playerName).map(p=>p.name) : [],
+      wolf_names:(R.players||[]).filter(p=>p.role==='WEREWOLF').map(p=>p.name),
+      is_host:playerName===R.hostName,
+      night_report:R.nightReport || null,
+      eliminated:R.nightReport?.victim ? {name:R.nightReport.victim} : null,
+      disc_msgs:R.discMsgs || [],
+      disc_round:R.discRound || 1,
+      disc_total_rounds:2,
+      current_speaker:R.waitingForHuman || null,
+      waiting_for:R.waitingForHuman || null,
+      vote_ready_names:voteReadyNames(),
+      vote_ready_total:alive().filter(p=>!p.isCpu).length,
+      vote_ready_all:!!R.voteReadyAll,
+      vote_done:Object.keys(R.votes || {}).length,
+      vote_total:alive().length,
+      vote_submitted:!!(R.humanVotedSet && R.humanVotedSet.has(playerName)),
+      vote_result:voteResult,
+      winner:R.winner || null,
+      log:R.log || [],
+      action_needed:actionForPlayer(player),
+      night_action_done:!!(R.humanActionDone && R.humanActionDone[playerName]),
+    };
+    return payload;
+  }
+  function sendResyncTo(playerName) {
+    if (!playerName) return;
+    sendTo(playerName, resyncPayloadFor(playerName));
+  }
+  function resyncAll() {
+    (R.players || []).filter(p=>!p.isCpu).forEach(p=>sendResyncTo(p.name));
   }
   function beginNightFlow() {
     alive().some(p=>p.role==='WEREWOLF'&&!p.isCpu) ? startWolfChat() : startNight();
@@ -4653,6 +5232,7 @@ const P2PEngine = (() => {
   function handleP2PDisconnect(name) {
     if (!name) return;
     if (R.pendingPlayers) R.pendingPlayers = R.pendingPlayers.filter(p=>p.name!==name);
+    if (R.peerLastSeen) delete R.peerLastSeen[name];
     const inGame = Array.isArray(R.players) && R.players.length > 0;
     if (!inGame) {
       O.players = (O.players||[]).filter(p=>p.name!==name);
@@ -4665,7 +5245,7 @@ const P2PEngine = (() => {
       R.log = R.log || [];
       R.log.push(`${name} left the P2P room`);
     }
-    broadcast({ type:'player_left', players:R.players.map((p,i)=>({pid:i,name:p.name,alive:p.alive})), name });
+    broadcast({ type:'player_left', players:R.players.map((p,i)=>({pid:i,name:p.name,alive:p.alive,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})), name });
     const win = checkWinP2P();
     if (win) { doGameOver(win, null); return; }
     if (R.phase === 'night') {
@@ -4708,7 +5288,10 @@ const P2PEngine = (() => {
     R.hostName = hostName;
     R.pendingPlayers = [{ name: hostName, isCpu: false }];
     R.phase = 'lobby';
+    R.peerLastSeen = {};
     const code = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+    R.roomCode = code;
+    scheduleHeartbeat();
     const pid  = 'WLF' + code;
     peer = new Peer(pid, { debug: 0 });
     peer.on('open', id => {
@@ -4746,24 +5329,44 @@ const P2PEngine = (() => {
     destroy();
     isHost = false;
     peer = new Peer({ debug: 0 });
+    let settled = false;
+    let connectTimer = null;
+    const fail = (err) => {
+      if (settled) return;
+      settled = true;
+      if (connectTimer) { clearTimeout(connectTimer); connectTimer = null; }
+      try { if (guestConn) guestConn.close(); } catch (_) {}
+      try { if (peer) peer.destroy(); } catch (_) {}
+      onError(err instanceof Error ? err : new Error(err?.message || 'P2P connection failed'));
+    };
     peer.on('open', () => {
       guestConn = peer.connect('WLF' + roomCode, { reliable: true });
+      connectTimer = setTimeout(() => {
+        fail(new Error('ホストが見つかりません。部屋コード・ホスト画面・通信環境を確認してください。'));
+      }, 15000);
       guestConn.on('open', () => {
+        if (settled) return;
+        settled = true;
+        if (connectTimer) { clearTimeout(connectTimer); connectTimer = null; }
         guestConn.on('data', raw => {
           try { handleServer(JSON.parse(raw)); } catch(e){}
         });
         guestConn.send(JSON.stringify({ type:'join_room', name: guestName }));
         onJoined();
       });
-      guestConn.on('error', onError);
+      guestConn.on('error', fail);
+      guestConn.on('close', () => {
+        if (!settled) fail(new Error('ホストとの接続が閉じられました。'));
+      });
     });
-    peer.on('error', err => onError(err));
+    peer.on('error', fail);
   }
 
   // ── ゲストからのメッセージをホストが処理 ─────────────
   function handleGuestMsg(connId, data) {
     // '__host__' はホスト自身が送ったメッセージ
     const pname = (connId === '__host__') ? R.hostName : connNames[connId];
+    if (pname && connId !== '__host__' && data.type !== 'join_room') markPeerSeen(pname, data.phase || '');
     switch (data.type) {
       case 'join_room': {
         const name = (data.name||'ゲスト').trim();
@@ -4785,11 +5388,16 @@ const P2PEngine = (() => {
           return;
         }
         R.pendingPlayers.push({ name, isCpu: false });
+        markPeerSeen(name, 'lobby');
         O.players = O.players || [];
         O.players.push({ pid: O.players.length, name });
+        sendToConn(connId, { type:'room_joined', code:R.roomCode, pid:connId, is_host:false, players:O.players });
         broadcast({ type:'player_joined', players: O.players });
         break;
       }
+      case 'heartbeat_ack':
+        markPeerSeen(pname, data.phase || '');
+        break;
       case 'set_cpu_count':
         if (connId !== '__host__' || (R.phase && R.phase !== 'lobby')) break;
         {
@@ -4828,6 +5436,9 @@ const P2PEngine = (() => {
         break;
       case 'vote':
         if (pname) handleVote(pname, data.target, data.reason);
+        break;
+      case 'resync_request':
+        if (pname) sendResyncTo(pname);
         break;
       case 'music_ended':
         if (connId === '__host__' && R.phase === 'discuss') { R.phase = 'voting'; later(300, startVote); }
@@ -4877,8 +5488,10 @@ const P2PEngine = (() => {
       discMsgs:[], discOrder:[], discIdx:0, discRound:1,
       waitingForHuman: null, _discFallback: null,
       votes:{}, voteReasons:{}, humanVotedSet:new Set(), tallyDone:false,
-      accuCount:{}, seerKnown:{}, log:[],
+      accuCount:{}, seerKnown:{}, log:[], syncSeq:0, peerLastSeen:R.peerLastSeen || {},
     };
+    scheduleHeartbeat();
+    assignOnlineAvatars(R.players);
     BRAIN.initR(R); // BRAIN メモリ初期化
     // CPUにパーソナリティをランダム付与
     R.players.forEach(p => { if (p.isCpu) applyCpuPersona(p); });
@@ -4892,7 +5505,7 @@ const P2PEngine = (() => {
       const isH = player.name === R.hostName;
       const msg = {
         type:'game_started', role:player.role, wolf_partners:partners, shared_partners:sharedPartners,
-        players:R.players.map((p,i)=>({pid:i,name:p.name})), is_host:isH,
+        players:R.players.map((p,i)=>({pid:i,name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})), is_host:isH,
       };
       sendTo(player.name, msg);
     });
@@ -5093,7 +5706,7 @@ const P2PEngine = (() => {
     const songStarted = Date.now() + 650;
     if (R._discFallback) clearTimeout(R._discFallback);
     R._discFallback = setTimeout(()=>{ if(R.phase==='discuss'){R.phase='voting';startVote();} }, 5*60*1000);
-    broadcast({type:'discuss_start',round:1,total_rounds:2,eliminated:elim,night_report:R.nightReport,alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu})),readyTotal:al.filter(p=>!p.isCpu).length,song,songStarted});
+    broadcast({type:'discuss_start',round:1,total_rounds:2,eliminated:elim,night_report:R.nightReport,alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})),readyTotal:al.filter(p=>!p.isCpu).length,song,songStarted});
     R.discOrder=shuffle([...al]);
     R.discIdx=0;
     later(600,advanceDisc);
@@ -5167,7 +5780,7 @@ const P2PEngine = (() => {
     const al=alive();
     // 死亡プレイヤーは投票不要
     al.filter(p=>!p.isCpu).forEach(p=>{ /* 生きている人間のみ投票 */ });
-    broadcast({type:'vote_start',alive:al.map(p=>({name:p.name}))});
+    broadcast({type:'vote_start',alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel}))});
     const cpus=al.filter(p=>p.isCpu);
     cpus.forEach((cpu,i)=>later(900+i*600,()=>{
       const tgt=BRAIN.vote(R, cpu);
@@ -5175,9 +5788,10 @@ const P2PEngine = (() => {
         R.votes[cpu.name]=tgt.name;
         R.voteReasons[cpu.name]=BRAIN.voteReason(R, cpu, tgt);
       }
-      const humanCount=al.filter(p=>!p.isCpu).length;
-      broadcast({type:'vote_progress',done:Object.keys(R.votes).length,total:al.length});
-      if (R.humanVotedSet.size>=humanCount&&Object.keys(R.votes).length>=cpus.length+humanCount) later(400,tallyVotes);
+      const currentAlive = alive();
+      const humanCount=currentAlive.filter(p=>!p.isCpu).length;
+      broadcast({type:'vote_progress',done:Object.keys(R.votes).length,total:currentAlive.length});
+      if (R.humanVotedSet.size>=humanCount&&Object.keys(R.votes).length>=currentAlive.length) later(400,tallyVotes);
     }));
     if (!cpus.length && al.filter(p=>!p.isCpu).length===0) later(500,tallyVotes);
   }
@@ -5189,6 +5803,7 @@ const P2PEngine = (() => {
     R.votes[pname]=target;
     R.voteReasons[pname]=(reason || '').trim() || `${target}さんへの疑いを確認する投票です。`;
     R.humanVotedSet.add(pname);
+    sendTo(pname,{type:'vote_ack'});
     const al=alive();
     broadcast({type:'vote_progress',done:Object.keys(R.votes).length,total:al.length});
     const humansAlive=al.filter(p=>!p.isCpu);
@@ -5228,6 +5843,8 @@ const P2PEngine = (() => {
     R.log.push(`第${R.day}日:${executed}が処刑された`);
     // 霊媒師用に処刑情報を保存
     R.lastExecuted=executed; R.lastExecutedRole=execP?.role;
+    if (!R.voteHistory) R.voteHistory = [];
+    R.voteHistory.push({day:R.day, votes:{...R.votes}, tally:{...tally}, executed});
     // 猫又ルール: 処刑時にランダムな生存者を道連れ
     let nekomataVictim=null;
     if (execP?.role==='NEKOMATA') {
@@ -5235,12 +5852,23 @@ const P2PEngine = (() => {
       if(bystanders.length){nekomataVictim=rand(bystanders);nekomataVictim.alive=false;R.log.push(`第${R.day}日:猫又道連れで${nekomataVictim.name}も倒れた`);}
     }
     const win=checkWinP2P();
+    R.phase = win ? 'game_over' : 'vote_result';
+    R.winner = win || null;
+    R.lastVoteResult = {
+      executed,
+      role:execP?.role,
+      tally:{...tally},
+      nekomataVictim:nekomataVictim?.name,
+      voteReasons:{...R.voteReasons},
+      votes:{...R.votes},
+    };
     broadcast({
       type:'vote_result', executed, executed_role:execP?.role, tally,
       nekomata_victim:nekomataVictim?.name,
       vote_reasons:R.voteReasons,
+      votes:R.votes,
       winner:win,
-      players:win?R.players.map(p=>({name:p.name,role:p.role,alive:p.alive})):null,
+      players:win?R.players.map(p=>({name:p.name,role:p.role,alive:p.alive,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})):null,
       log:win?R.log:null,
     });
     // 霊媒師（生存人間）に個別通知
@@ -5258,9 +5886,11 @@ const P2PEngine = (() => {
   }
 
   function doGameOver(winner, victim) {
+    R.phase = 'game_over';
+    R.winner = winner;
     broadcast({
       type:'game_over', winner,
-      players:R.players.map(p=>({name:p.name,role:p.role,alive:p.alive})),
+      players:R.players.map(p=>({name:p.name,role:p.role,alive:p.alive,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})),
       log:R.log,
       night_report:R.nightReport||null,
       eliminated:victim?{name:victim.name,role:victim.role}:null,
@@ -5332,13 +5962,43 @@ const P2PEngine = (() => {
     else if (guestConn&&guestConn.open) { guestConn.send(JSON.stringify(msg)); }
   }
 
+  function requestResync() {
+    if (isHost) resyncAll();
+    else if (guestConn&&guestConn.open) guestConn.send(JSON.stringify({type:'resync_request'}));
+    else handleServer({type:'error', msg:'P2P接続がまだ開いていません'});
+  }
+
+  function diagnostics() {
+    const list = R.players || R.pendingPlayers || [];
+    const now = Date.now();
+    const connectedNames = isHost ? Object.keys(hostConns).map(id=>connNames[id]).filter(Boolean) : [];
+    const peerAges = connectedNames.map(name => {
+      const seen = R.peerLastSeen?.[name]?.at || 0;
+      return { name, age:seen ? Math.max(0, Math.round((now - seen) / 1000)) : null };
+    });
+    const peerHealthy = peerAges.filter(p => p.age !== null && p.age <= 20);
+    const peerStale = peerAges.filter(p => p.age === null || p.age > 20);
+    return {
+      isHost,
+      connCount:isHost ? Object.keys(hostConns).length : (guestConn&&guestConn.open ? 1 : 0),
+      playerCount:list.length,
+      aliveCount:R.players ? R.players.filter(p=>p.alive).length : 0,
+      hostPhase:R.phase || '',
+      roomCode:R.roomCode || '',
+      peerHealthyCount:peerHealthy.length,
+      peerStaleCount:peerStale.length,
+      peerStaleNames:peerStale.map(p=>p.name),
+      peerAges,
+    };
+  }
+
   function destroy() {
     resetTimers(); // 残留タイマーを停止してから破棄
     if (peer) { try{peer.destroy();}catch(e){} peer=null; }
     hostConns={}; connNames={}; guestConn=null; isHost=false; R={};
   }
 
-  return { createRoom, joinRoom, wsSendP2P, startGame, destroy, resetTimers };
+  return { createRoom, joinRoom, wsSendP2P, startGame, destroy, resetTimers, requestResync, diagnostics };
 })();
 
 // ========== ONLINE STATE ==========
@@ -5365,7 +6025,7 @@ function initOnline() {
     tplTarget: null,
     tplSeerType: null, // 'wolf'|'safe'
     // Vote
-    voteSubmitted: false, voteDone: 0, voteTotal: 0, voteReasons: {},
+    voteSubmitted: false, voteDone: 0, voteTotal: 0, voteSentAt: 0, voteAckAt: 0, voteReasons: {}, voteHistory: [], lastVoteResult: null,
     voteResult: null, winner: null,
     finalPlayers: [], log: [],
     // 役職カミングアウト追跡
@@ -5378,7 +6038,8 @@ function initOnline() {
     // 霊媒師
     mediumReveal: null,
     // P2P固有
-    p2pSub: 'choose', soloTotal: 5,
+    p2pSub: 'choose', pendingP2PCode: '', soloTotal: 5, p2pSyncSeq: 0, p2pSyncAt: 0, p2pResyncAt: 0, p2pLastType: '',
+    p2pHeartbeatAt: 0, p2pHostPhase: '',
     // 成長システム（捜査ノート・難易度・リザルト）※ solo/p2p/online 共通
     notebook: {}, soloDiff: 'normal', gameRecap: null, _scored: false,
     // 戦績スコア用の自己追跡（自分の投票履歴・占い的中・護衛成功）
@@ -5411,6 +6072,11 @@ function wsSend(msg) {
 }
 
 function handleServer(data) {
+  if (data && data.type) O.p2pLastType = data.type;
+  if (data && data.p2p_seq) {
+    O.p2pSyncSeq = data.p2p_seq;
+    O.p2pSyncAt = Date.now();
+  }
   switch(data.type) {
     case 'room_created':
       O.roomCode = data.code; O.pid = data.pid; O.isHost = true;
@@ -5431,9 +6097,81 @@ function handleServer(data) {
       if (['solo','p2p','online'].includes(mode)) {
         O.notebook = {}; O._scored = false; O.gameRecap = null;
         O.myVotes = []; O.mySeerHits = 0; O.myGuardSuccess = 0; O._myLastGuard = null;
-        O.intelMsgs = [];
+        O.intelMsgs = []; O.voteHistory = []; O.lastVoteResult = null;
+        if (!data.p2p_seq) { O.p2pSyncSeq = 0; O.p2pSyncAt = 0; }
       }
       break;
+    case 'p2p_heartbeat':
+      O.p2pHeartbeatAt = Date.now();
+      O.p2pHostPhase = data.phase || O.p2pHostPhase || '';
+      if (mode === 'p2p' && !O.isHost) {
+        try { P2PEngine.wsSendP2P({ type:'heartbeat_ack', phase:O.phase || '', seen_seq:O.p2pSyncSeq || 0 }); } catch(e) {}
+      }
+      break;
+    case 'p2p_resync': {
+      O.p2pResyncAt = Date.now();
+      O.roomCode = data.roomCode || O.roomCode;
+      O.day = data.day || O.day || 0;
+      O.players = data.players || O.players || [];
+      O.alive = data.alive || O.alive || [];
+      O.myRole = data.role || O.myRole;
+      O.wolfPartners = data.wolf_partners || O.wolfPartners || [];
+      O.sharedPartners = data.shared_partners || O.sharedPartners || [];
+      if (mode === 'p2p') O.isHost = !!data.is_host;
+      O.nightReport = data.night_report || O.nightReport || null;
+      O.eliminatedLastNight = data.eliminated || O.eliminatedLastNight || null;
+      O.voteReadyNames = data.vote_ready_names || [];
+      O.voteReadyTotal = data.vote_ready_total || O.voteReadyTotal || 0;
+      O.voteReadyAll = !!data.vote_ready_all;
+      O.voteDone = data.vote_done ?? O.voteDone ?? 0;
+      O.voteTotal = data.vote_total ?? O.voteTotal ?? 0;
+
+      if (data.phase === 'wolf_chat') {
+        O.wolfPartnerNames = data.wolf_names || O.wolfPartnerNames || [];
+        O.wolfChatReady = false;
+        O.phase = 'wolf_chat';
+      } else if (data.phase === 'night') {
+        O.nightActionNeeded = data.action_needed || null;
+        O.nightActionDone = !!data.night_action_done;
+        O.phase = 'night';
+      } else if (data.phase === 'discuss') {
+        O.discMsgs = data.disc_msgs || [];
+        O.intelMsgs = (data.disc_msgs || []).map(m => ({...m, day: O.day}));
+        O.discRound = data.disc_round || 1;
+        O.discTotalRounds = data.disc_total_rounds || 2;
+        O.currentSpeaker = data.current_speaker || null;
+        O.isMyDiscTurn = data.waiting_for === O.playerName;
+        O.tplStep = O.isMyDiscTurn ? 'cat' : null;
+        O.phase = 'discuss';
+      } else if (data.phase === 'vote') {
+        O.voteSubmitted = !!data.vote_submitted;
+        O.voteAckAt = O.voteSubmitted ? Date.now() : 0;
+        O.voteResult = null;
+        O.phase = 'vote';
+      } else if (data.phase === 'vote_result' || data.phase === 'game_over') {
+        const vr = data.vote_result;
+        if (vr) {
+          O.voteResult = {
+            executed: vr.executed,
+            role: vr.role,
+            tally: vr.tally || {},
+            nekomataVictim: vr.nekomataVictim,
+            voteReasons: vr.voteReasons || {},
+            votes: vr.votes || {},
+          };
+          O.lastVoteResult = O.voteResult;
+        }
+        O.winner = data.winner || null;
+        if (data.phase === 'game_over') {
+          O.finalPlayers = (data.players || []).map(p => ({name:p.name || '?', role:p.role, alive:!!p.alive}));
+          O.log = data.log || O.log || [];
+        }
+        O.phase = data.phase;
+      } else {
+        O.phase = data.phase || O.phase;
+      }
+      break;
+    }
     case 'wolf_chat_start':
       O.wolfPartnerNames = data.wolf_names || [];
       O.wolfChatMsgs = []; O.wolfChatReady = false;
@@ -5533,24 +6271,30 @@ function handleServer(data) {
       break;
     case 'vote_ready_all':
       O.voteReadyAll = true;
+      O.voteReadyTotal = data.readyTotal || O.voteReadyTotal || (O.alive||[]).filter(p=>!p.isCpu).length || (O.alive||[]).length;
       fadeOutMusic(1700);
       break;
     case 'vote_start':
       stopMusic(); // 議論BGMを停止
       if (O._musicFailTimer) { clearTimeout(O._musicFailTimer); O._musicFailTimer = null; }
-      O.alive = data.alive; O.voteSubmitted = false; O.voteReasons = {};
+      O.alive = data.alive; O.voteSubmitted = false; O.voteSentAt = 0; O.voteAckAt = 0; O.voteReasons = {};
       O.voteTarget = '';
       O.voteReasonDraft = '';
       O.voteDone = 0; O.voteTotal = data.alive.length;
       O.voteResult = null; O.phase = 'vote'; break;
     case 'vote_progress':
       O.voteDone = data.done; O.voteTotal = data.total; break;
+    case 'vote_ack':
+      O.voteSubmitted = true; O.voteAckAt = Date.now(); break;
     case 'medium_reveal':
       // 霊媒師のみに届く: 処刑された人の役職を記録
       O.mediumReveal = { target: data.target, role: data.role };
       break;
     case 'vote_result':
-      O.voteResult = {executed: data.executed, role: data.executed_role, tally: data.tally, nekomataVictim: data.nekomata_victim, voteReasons: data.vote_reasons || {}};
+      O.voteResult = {executed: data.executed, role: data.executed_role, tally: data.tally, nekomataVictim: data.nekomata_victim, voteReasons: data.vote_reasons || {}, votes: data.votes || {}};
+      O.lastVoteResult = O.voteResult;
+      O.voteHistory = O.voteHistory || [];
+      O.voteHistory.push({day: O.day, executed: data.executed, tally: data.tally || {}, votes: data.votes || {}, reasons: data.vote_reasons || {}});
       O.winner = data.winner;
       if (data.players && data.players.length > 0) {
         O.finalPlayers = data.players.map(p => ({
@@ -5566,6 +6310,7 @@ function handleServer(data) {
         if (!O.deadPlayers.find(d=>d.name===data.executed))
           O.deadPlayers.push({ name:data.executed, role:data.executed_role, avatar:av, day:O.day, cause:'処刑' });
         delete O.roleClaims[data.executed];
+        if (O.alive) O.alive = O.alive.filter(p=>p.name!==data.executed);
       }
       // 猫又の道連れを死亡リストへ
       if (data.nekomata_victim) {
@@ -5832,12 +6577,16 @@ function renderODiscuss() {
     ${ph('☀️', `第${O.day}日`, '村人会議 ─ 人狼を探し出せ！', '#fbbf24')}
     ${victimCard}
     ${renderDawnIntel()}
+    ${renderDawnNewspaper()}
+    ${renderP2PStatusPanel()}
     ${musicIndicator}
     <p class="sec-label" style="margin:.6rem 0 .2rem;">🧑 生存者 (${O.alive.length}人)</p>
     <div class="chips" style="margin-bottom:.4rem;">${aliveChips}</div>
     ${renderNotebook()}
     ${renderCaseFile()}
     ${renderAiIntelPanel()}
+    ${renderDiscussionHeatPanel()}
+    ${renderRivalryPanel()}
     ${deadListHtml}
     <hr class="div" style="margin:.4rem 0;">
     ${myRoleReminder()}
@@ -5854,7 +6603,7 @@ function renderODiscuss() {
         </button>
       </div>
     </div>
-    ${voteReadySection}
+    <div class="mobile-action">${voteReadySection}</div>
     ${renderCoChat()}
     <div class="chat-feed" id="discFeed">${msgs}${typingHtml}${waitHtml}</div>
     ${freeInput}
@@ -6222,10 +6971,15 @@ function renderODay() {
   return `
     ${ph('☀️',`第 ${O.day} 日`,'村人たちが目を覚ましました','#fbbf24')}
     ${elimCard}
+    ${renderDawnNewspaper()}
+    ${renderP2PStatusPanel()}
     <hr class="div">
     <p class="sec-label">🧑 生存者 (${O.alive.length}人)</p>
     <div class="chips">${chips}</div>
     ${renderCaseFile()}
+    ${renderAiIntelPanel()}
+    ${renderDiscussionHeatPanel()}
+    ${renderRivalryPanel()}
     <div class="card" style="text-align:center; margin-top:0.8rem;">
       <p style="color:#94a3b8; font-size:0.9rem;">💬 議論の時間です！</p>
     </div>
@@ -6258,11 +7012,17 @@ function renderOVote() {
 
   if (O.voteSubmitted || !myAlive) {
     const pct = O.voteTotal > 0 ? Math.round(O.voteDone / O.voteTotal * 100) : 0;
+    const voteStatusText = !myAlive
+      ? '観戦中'
+      : O.voteAckAt
+        ? '✅ 投票がホストに受理されました。集計中...'
+        : '📨 投票を送信しました。ホストの受付確認を待っています...';
     return `
       ${ph('🗳️',`第 ${O.day} 日 投票`,'集計中','#fbbf24')}
       ${deadListHtml}
+      ${renderP2PStatusPanel()}
       <div class="card" style="text-align:center;">
-        <p style="color:#64748b; font-size:0.85rem; margin-bottom:0.5rem;">${O.voteSubmitted ? '✅ 投票しました！集計中...' : '観戦中'}</p>
+        <p style="color:#64748b; font-size:0.85rem; margin-bottom:0.5rem;">${voteStatusText}</p>
         <div style="background:rgba(255,255,255,0.08); border-radius:8px; height:8px; overflow:hidden;">
           <div style="background:#6b21a8; height:100%; width:${pct}%; transition:width 0.4s;"></div>
         </div>
@@ -6298,6 +7058,9 @@ function renderOVote() {
     ${ph('🗳️',`第 ${O.day} 日 投票`,'誰を処刑しますか？','#fbbf24')}
     ${deadListHtml}
     ${renderCaseFile()}
+    ${renderAiIntelPanel()}
+    ${renderDiscussionHeatPanel()}
+    ${renderP2PStatusPanel()}
     <div class="card" style="padding:.8rem;">
       <p style="color:#fbbf24;font-size:.85rem;font-weight:700;margin:0 0 .4rem;">⚖️ 処刑する人を選んでください</p>
       <p style="color:#64748b;font-size:.75rem;margin:0 0 .5rem;">👆 アバターをタップすると自動選択されます</p>
@@ -6307,7 +7070,7 @@ function renderOVote() {
         <label for="oVoteReason">投票理由（結果画面に残ります）</label>
         <textarea id="oVoteReason" maxlength="120" placeholder="例：発言が少なく、占い師COへの反応も遅かったため">${esc(voteReasonDraft)}</textarea>
       </div>
-      <button class="btn btn-primary" id="oVoteSend" style="margin-top:0.6rem;">🗳️　投票する</button>
+      <div class="mobile-action"><button class="btn btn-primary" id="oVoteSend" style="margin-top:0.6rem;">🗳️　投票する</button></div>
     </div>
   `;
 }
@@ -6331,7 +7094,9 @@ function renderOVoteResult() {
        </div>` : '';
   return `
     ${ph('⚖️',`第${O.day}日 処刑結果`,'村人会議の結論が出ました','#f87171')}
+    ${renderP2PStatusPanel()}
     <div class="card"><p class="sec-label" style="margin-top:0;">📊 得票数</p>${bars}</div>
+    ${renderVoteTimeline(r.votes, r.voteReasons)}
     ${renderVoteReasons(r.voteReasons)}
     <div class="vote-drama" style="text-align:center; padding:1.5rem; border-radius:16px;
          border:2px solid #ef4444; background:linear-gradient(135deg,#1a0505,#2d0a0a); margin:.6rem 0;">
@@ -6342,6 +7107,8 @@ function renderOVoteResult() {
     </div>
     ${nekHtml}
     ${renderCaseFile()}
+    ${renderAiIntelPanel()}
+    ${renderDiscussionHeatPanel()}
     ${nextBtn}
   `;
 }
@@ -6370,6 +7137,7 @@ function renderOGameOver() {
     <div class="card-colored" style="text-align:center; border:1px solid ${isV?'#22c55e':'#ef4444'}; background:${isV?'#22c55e':'#ef4444'}18; margin-bottom:1.2rem;">
       <p style="color:${color}; margin:0;">${isV?'村人チームの完全勝利！':'人狼の知略が勝りました...'}</p>
     </div>
+    ${renderEndgameReplay(players)}
     <p class="sec-label">📋 全員の役職</p>
     ${rows}${logHtml}
     <hr class="div">
@@ -6455,10 +7223,29 @@ function renderCodex() {
   `;
 }
 
+function renderP2PDeviceCheck(peerUnavailable) {
+  const loc = (typeof window !== 'undefined' && window.location) ? window.location : null;
+  const protocol = loc?.protocol || '';
+  const host = loc?.host || '';
+  const isFile = protocol === 'file:';
+  const pageLine = isFile
+    ? 'このPCでは file で開いています。スマホ実機は同じHTMLへアクセスできないため、下のLAN用URLかGitHub Pagesなどで開いてください。'
+    : `${host || '現在のURL'} をスマホ側でも開ければ実機P2Pを試せます。`;
+  const peerLine = peerUnavailable
+    ? 'PeerJSが未読込です。スマホ/PCがインターネットへ接続できるか確認してください。'
+    : 'PeerJS読込OK。部屋コードまたは参加リンクで接続できます。';
+  const peerColor = peerUnavailable ? '#f59e0b' : '#34d399';
+  return `<div class="card" style="border:1px solid ${peerColor}44;background:${peerUnavailable?'rgba(245,158,11,.06)':'rgba(52,211,153,.05)'};">
+    <p style="color:${peerColor};font-size:.83rem;font-weight:800;margin:0 0 .35rem;">📱 実機P2Pチェック</p>
+    <p style="color:#94a3b8;font-size:.78rem;line-height:1.6;margin:0;">${esc(peerLine)}<br>${esc(pageLine)}</p>
+  </div>`;
+}
+
 // ========== P2P SETUP SCREEN ==========
 function renderP2PSetup() {
   const sub = O.p2pSub || 'choose';
   const peerUnavailable = (typeof Peer === 'undefined') || window._peerJsFailed;
+  const deviceCheck = renderP2PDeviceCheck(peerUnavailable);
   const peerWarn = peerUnavailable ? `
     <div class="card" style="border:1px solid #f59e0b;background:rgba(245,158,11,.08);">
       <p style="color:#fbbf24;font-size:.84rem;font-weight:800;margin:0 0 .25rem;">⚠️ P2P通信ライブラリを読み込めません</p>
@@ -6468,14 +7255,27 @@ function renderP2PSetup() {
     const pRows = (O.players||[]).map(p=>`<span class="chip">${esc(p.name)}</span>`).join('');
     const total = (O.players||[]).length + (O.cpuCount||0);
     const canStart = total >= 4;
+    const joinLink = p2pJoinUrl(O.roomCode);
+    const joinLinkHtml = joinLink ? `
+      <div class="card" style="border:1px solid #10b98144;background:rgba(16,185,129,.06);">
+        <p style="color:#34d399;font-size:.83rem;font-weight:800;margin:0 0 .4rem;">📱 実機参加リンク</p>
+        <input type="text" value="${esc(joinLink)}" readonly style="font-size:.78rem;letter-spacing:0;text-align:left;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.45rem;">
+          <button class="btn btn-success" id="p2pShareLink" style="margin:0;padding:.62rem .4rem;font-size:.86rem;">共有</button>
+          <button class="btn btn-ghost" id="p2pCopyLink" style="margin:0;padding:.62rem .4rem;font-size:.86rem;">コピー</button>
+        </div>
+        <p style="color:#64748b;font-size:.72rem;line-height:1.55;margin:.45rem 0 0;">スマホでこのリンクを開くと、P2P参加画面に入り部屋コードが自動入力されます。</p>
+      </div>` : '';
     return `
       ${ph('🌐','ホスト待機中','部屋コードを仲間に伝えてください','#34d399')}
       ${peerWarn}
+      ${deviceCheck}
       <div class="card" style="text-align:center;border:2px solid #059669;padding:1.5rem;">
         <p style="color:#64748b;font-size:.85rem;margin-bottom:.4rem;">🔑 部屋コード（仲間に伝える）</p>
         <div style="font-size:3rem;font-weight:900;letter-spacing:.3em;color:#34d399;">${O.roomCode||'---'}</div>
         <p class="p2p-badge" style="justify-content:center;margin-top:.5rem;"><span class="p2p-dot"></span>接続待ち...</p>
       </div>
+      ${joinLinkHtml}
       <p class="sec-label">👥 参加中 (${(O.players||[]).length}人)</p>
       <div class="chips">${pRows||'<span style="color:#475569;font-size:.85rem;">まだ誰もいません</span>'}</div>
       <p class="sec-label">🤖 CPUプレイヤー人数</p>
@@ -6495,6 +7295,7 @@ function renderP2PSetup() {
     return `
       ${ph('🌐','P2P接続中','ホストへ接続しています...','#34d399')}
       ${peerWarn}
+      ${deviceCheck}
       <div class="card" style="text-align:center;">
         <div style="font-size:2.5rem;margin-bottom:.5rem;">⏳</div>
         <p style="color:#64748b;">ホストへの接続を待っています</p>
@@ -6506,6 +7307,7 @@ function renderP2PSetup() {
   return `
     ${ph('🌐','P2Pオンライン','サーバー不要でどこからでも対戦！','#34d399')}
     ${peerWarn}
+    ${deviceCheck}
     <div class="card">
       <label>あなたの名前</label>
       <input type="text" id="p2pName" value="${esc(O.playerName||'')}" placeholder="名前を入力">
@@ -6513,7 +7315,7 @@ function renderP2PSetup() {
     ${isJoin ? `
       <div class="card">
         <label>部屋コード（ホストに聞く）</label>
-        <input type="text" id="p2pCode" placeholder="例: 042" style="letter-spacing:.25em;font-size:1.8rem;text-align:center;" maxlength="3" inputmode="numeric">
+        <input type="text" id="p2pCode" value="${esc(O.pendingP2PCode||'')}" placeholder="例: 042" style="letter-spacing:.25em;font-size:1.8rem;text-align:center;" maxlength="3" inputmode="numeric">
         <button class="btn btn-success" id="p2pJoin" style="margin-top:.6rem;">🚪　参加する</button>
       </div>
       <button class="btn btn-ghost" id="p2pBackSetup">← 戻る</button>
@@ -6685,6 +7487,7 @@ function wolfTplTarget(idx) {
 // ========== START ==========
 let mode = 'pre_opening'; // pre_opening | opening | home | local | online | solo | p2p
 initState();
+applyP2PLaunchParams();
 installChatVoiceUnlock();
 render();
 </script>
