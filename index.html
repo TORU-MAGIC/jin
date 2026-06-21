@@ -205,6 +205,58 @@ label { color: #94a3b8; font-size: 0.85rem; display: block; margin-bottom: 0.15r
   background: rgba(255,255,255,0.09);
   color: #e2e8f0;
 }
+.chip.disconnected,
+.vote-avatar-btn.disconnected {
+  opacity: 0.62;
+  filter: grayscale(0.7);
+  border-color: rgba(245,158,11,0.65) !important;
+  box-shadow: inset 0 0 0 1px rgba(245,158,11,0.25);
+}
+.conn-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.3rem;
+  padding: 0.08rem 0.34rem;
+  border-radius: 999px;
+  border: 1px solid rgba(245,158,11,0.48);
+  background: rgba(245,158,11,0.13);
+  color: #fbbf24;
+  font-size: 0.62rem;
+  font-weight: 900;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.p2p-presence-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.45rem 0 0.2rem;
+}
+.p2p-presence-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+}
+.p2p-offline-age {
+  color: #fbbf24;
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.btn:disabled,
+.vote-ready-btn:disabled,
+.send-btn:disabled,
+.tpl-btn:disabled,
+.quick-fill:disabled,
+.tpl-cat:disabled {
+  opacity: 0.46;
+  cursor: not-allowed;
+  filter: grayscale(0.35);
+}
+.free-chat-bar input:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
 
 /* Player row (game over) */
 .player-row {
@@ -465,6 +517,36 @@ details summary:hover { color: #94a3b8; }
 .p2p-diag-cell b{display:block;color:#f8fafc;font-size:.82rem;margin-bottom:.08rem;}
 .p2p-resync-btn{width:100%;border:none;border-radius:8px;background:linear-gradient(135deg,#065f46,#0369a1);color:#fff;font-size:.82rem;font-weight:800;padding:.56rem .65rem;margin-top:.45rem;cursor:pointer;}
 .p2p-resync-btn:active{opacity:.82;transform:scale(.98);}
+.p2p-action-lock{border:1px solid #f59e0b66;background:rgba(245,158,11,.08);border-radius:8px;text-align:center;margin:.55rem 0;padding:.65rem .75rem;}
+.p2p-action-lock-title{color:#fbbf24;font-size:.84rem;font-weight:800;margin:0 0 .35rem;}
+.p2p-action-lock-text{color:#94a3b8;font-size:.76rem;line-height:1.55;margin:0 0 .55rem;}
+.p2p-action-lock .p2p-resync-btn{max-width:18rem;margin:.2rem auto 0;}
+.p2p-pending-line{border:1px solid rgba(96,165,250,.28);background:rgba(96,165,250,.08);border-radius:8px;color:#93c5fd;font-size:.78rem;font-weight:800;line-height:1.5;text-align:center;margin:.45rem 0;padding:.48rem .6rem;}
+.p2p-detail-box{margin:.5rem 0 .12rem;border-top:1px solid rgba(255,255,255,.08);padding-top:.45rem;}
+.p2p-detail-box summary{list-style:none;cursor:pointer;color:#93c5fd;font-size:.76rem;font-weight:800;padding:.2rem 0;}
+.p2p-detail-box summary::-webkit-details-marker{display:none;}
+.p2p-peer-list,.p2p-event-log{display:grid;gap:.28rem;margin-top:.35rem;}
+.p2p-peer-row{display:grid;grid-template-columns:1fr auto auto;gap:.35rem;align-items:center;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:.34rem .42rem;font-size:.72rem;color:#cbd5e1;}
+.p2p-peer-row .warn{color:#fbbf24;}
+.p2p-peer-row .bad{color:#fca5a5;}
+.p2p-event-row{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:.34rem .42rem;font-size:.72rem;color:#94a3b8;line-height:1.45;}
+.p2p-action-receipt{border:1px solid rgba(34,197,94,.22);background:rgba(34,197,94,.06);border-radius:8px;padding:.54rem .62rem;margin:.5rem 0;color:#cbd5e1;}
+.p2p-action-receipt-title{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-size:.8rem;font-weight:900;color:#86efac;margin-bottom:.25rem;}
+.p2p-action-receipt-text{font-size:.74rem;line-height:1.5;color:#94a3b8;margin:0;}
+.p2p-action-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.42rem;}
+.p2p-action-tag{border:1px solid rgba(148,163,184,.22);background:rgba(148,163,184,.08);border-radius:99px;padding:.2rem .46rem;font-size:.7rem;color:#cbd5e1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.p2p-action-tag.done{border-color:#22c55e66;background:rgba(34,197,94,.12);color:#bbf7d0;}
+.p2p-action-tag.pending{border-color:#f59e0b66;background:rgba(245,158,11,.1);color:#fde68a;}
+.p2p-action-tag.bad{border-color:#ef444466;background:rgba(239,68,68,.1);color:#fecaca;}
+.voice-assist{border:1px solid rgba(96,165,250,.26);background:rgba(96,165,250,.08);border-radius:8px;padding:.58rem .65rem;margin:.5rem 0;color:#cbd5e1;}
+.voice-assist.warn{border-color:#f59e0b66;background:rgba(245,158,11,.08);}
+.voice-assist.ok{border-color:#22c55e55;background:rgba(34,197,94,.08);}
+.voice-assist-title{font-size:.82rem;font-weight:900;margin:0 0 .25rem;color:#93c5fd;}
+.voice-assist.warn .voice-assist-title{color:#fbbf24;}
+.voice-assist.ok .voice-assist-title{color:#86efac;}
+.voice-assist-text{font-size:.76rem;line-height:1.55;color:#94a3b8;margin:0;}
+.voice-assist-btn{width:100%;margin-top:.45rem;border:none;border-radius:8px;background:linear-gradient(135deg,#0369a1,#065f46);color:#fff;font-size:.8rem;font-weight:900;padding:.5rem .6rem;cursor:pointer;}
+.voice-assist-btn:active{opacity:.82;transform:scale(.98);}
 .rivalry-pair{display:flex;align-items:center;justify-content:space-between;gap:.55rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:7px;padding:.38rem .48rem;margin:.28rem 0;font-size:.76rem;}
 .rivalry-pair b{color:#fca5a5;}
 .vote-timeline{display:grid;gap:.36rem;margin:.5rem 0;}
@@ -918,6 +1000,42 @@ function chatVoiceLabel() {
   return _chatVoicePreferred ? '🔊 自然音声' : '🔊 音声ON';
 }
 
+function chatVoiceStatus() {
+  const supported = canUseChatVoice();
+  const voice = supported ? getChatVoice() : null;
+  return {
+    supported,
+    unlocked: _chatVoiceUnlocked,
+    pending: _pendingChatSpeech.length,
+    voiceName: voice ? (voice.name || voice.voiceURI || '日本語音声') : '',
+    lang: voice ? (voice.lang || '') : ''
+  };
+}
+
+function renderChatVoiceAssistPanel() {
+  const st = chatVoiceStatus();
+  if (!st.supported) {
+    return `<div class="voice-assist warn">
+      <div class="voice-assist-title">この端末はチャット音声に非対応です</div>
+      <p class="voice-assist-text">Chrome / Safari の最新版、または端末の読み上げ音声設定を確認してください。P2Pでも音声は各スマホ側で再生されます。</p>
+    </div>`;
+  }
+  const cls = st.unlocked ? 'ok' : 'warn';
+  const title = st.unlocked ? 'チャット音声は有効です' : 'スマホ音声を有効化';
+  const voiceLine = st.voiceName
+    ? `使用中: ${esc(st.voiceName)}${st.lang ? ` / ${esc(st.lang)}` : ''}`
+    : '端末の日本語音声を使用します';
+  const pendingLine = st.pending ? ` 未再生の発言が${st.pending}件あります。` : '';
+  const text = st.unlocked
+    ? `${voiceLine}。${pendingLine}`
+    : 'スマホでは最初のタップ後に音声が有効になります。聞こえない端末はこのボタンで解除とテスト再生をしてください。';
+  return `<div class="voice-assist ${cls}">
+    <div class="voice-assist-title">${title}</div>
+    <p class="voice-assist-text">${text}</p>
+    <button class="voice-assist-btn" id="btnChatVoiceEnable">${st.unlocked ? '音声テスト' : '音声を有効化してテスト'}</button>
+  </div>`;
+}
+
 function flushPendingChatSpeech() {
   if (!_pendingChatSpeech.length || !_chatVoiceUnlocked) return;
   const pending = _pendingChatSpeech.splice(-8);
@@ -1006,6 +1124,18 @@ function appendIncomingChatOnce(list, msg) {
   const last = list[list.length - 1];
   if (last && last.name === msg.name && last.text === msg.text) return false;
   list.push(msg);
+  return true;
+}
+
+function appendDiscussMessageOnce(msg) {
+  if (!appendIncomingChatOnce(O.discMsgs, msg)) return false;
+  if (!O.intelMsgs) O.intelMsgs = [];
+  appendIncomingChatOnce(O.intelMsgs, {...msg, day: O.day});
+  speakChatMessage(msg.name, msg.text);
+  if (!O.deadPlayers.find(d=>d.name===msg.name)) {
+    const explicitClaim = detectExplicitRoleClaim(msg.text);
+    if (explicitClaim) O.roleClaims[msg.name] = explicitClaim;
+  }
   return true;
 }
 
@@ -1457,6 +1587,297 @@ function renderDawnNewspaper() {
   </div>`;
 }
 
+function playerStateByName(name) {
+  return (O.players || []).find(p => p.name === name)
+    || (O.alive || []).find(p => p.name === name)
+    || null;
+}
+
+function isP2PDisconnected(nameOrPlayer) {
+  const p = typeof nameOrPlayer === 'string' ? playerStateByName(nameOrPlayer) : nameOrPlayer;
+  if (!p) return false;
+  const byRoster = typeof nameOrPlayer !== 'string' && p.name ? playerStateByName(p.name) : null;
+  return !!(p.disconnected || byRoster?.disconnected);
+}
+
+function connectionBadge(nameOrPlayer) {
+  return isP2PDisconnected(nameOrPlayer) ? '<span class="conn-badge">通信切断中</span>' : '';
+}
+
+function playerChipHtml(player, opts={}) {
+  const name = player?.name || String(player || '');
+  const av = getAvatar(name, O.players);
+  const claim = opts.claim && O.roleClaims?.[name] ? roleClaimBadge(O.roleClaims[name], true) : '';
+  const disconnected = isP2PDisconnected(player) || isP2PDisconnected(name);
+  return `<span class="chip${disconnected ? ' disconnected' : ''}" style="display:inline-flex;align-items:center;">${avatarFace(av, 'portrait-chip')} ${esc(name)}${claim}${connectionBadge(player)}</span>`;
+}
+
+function disconnectedPlayers() {
+  return (O.players || []).filter(p => p.disconnected);
+}
+
+function disconnectedNames() {
+  return disconnectedPlayers().map(p => p.name);
+}
+
+function disconnectedAgeText(player) {
+  const at = Number(player?.disconnectedAt || 0);
+  if (!at) return '';
+  const sec = Math.max(0, Math.round((Date.now() - at) / 1000));
+  return sec < 60 ? `${sec}秒` : `${Math.floor(sec / 60)}分${sec % 60}秒`;
+}
+
+function renderP2PPresenceStrip() {
+  const players = disconnectedPlayers();
+  if (!players.length) return '';
+  return `<div class="power-line" style="color:#fbbf24;">P2P: ${players.length}人が再接続待ちです。死亡扱いにせず、同じ名前で復帰できます。</div>
+    <div class="p2p-presence-list">${players.map(p => {
+      const age = disconnectedAgeText(p);
+      return `<span class="p2p-presence-item">${playerChipHtml(p)}${age ? `<span class="p2p-offline-age">${age}</span>` : ''}</span>`;
+    }).join('')}</div>`;
+}
+
+function p2pReasonLabel(reason) {
+  const map = {
+    connection_closed: '接続が閉じました',
+    send_failed: '送信に失敗しました',
+    resync_send_failed: '再同期要求に失敗しました',
+    heartbeat_timeout: 'ホスト心拍が途切れました',
+    phase_mismatch: '画面フェーズがずれました',
+    resume_sync: '画面復帰時の再同期',
+    vote_ack_timeout: '投票受理確認が遅れています',
+    reconnecting: '再接続中',
+    reconnected: '再接続しました',
+    auto_resync: '自動再同期',
+    p2p_resync: '再同期を受信',
+    vote_sent: '投票を送信',
+    vote_received: '投票を受信',
+    vote_ack: '投票受理',
+    vote_invalid: '投票が無効',
+    night_action_sent: '夜行動を送信',
+    night_action_received: '夜行動を受信',
+    action_ack: '夜行動受理',
+    night_action_invalid: '夜行動が無効',
+    wolf_ready_sent: '人狼相談完了を送信',
+    wolf_ready_received: '人狼相談完了を受信',
+    wolf_ready_ack: '人狼相談完了承認',
+    wolf_ready_invalid: '人狼相談完了が無効',
+    wolf_ready_ack_timeout: '人狼相談完了の受理が遅れています',
+    vote_ready_sent: '今すぐ投票を送信',
+    vote_ready_received: '今すぐ投票を受信',
+    vote_ready_ack: '今すぐ投票を受理',
+    vote_ready_invalid: '今すぐ投票が無効',
+    vote_ready_ack_timeout: '今すぐ投票の受理が遅れています',
+    night_action_ack_timeout: '夜行動の受理が遅れています',
+    resync_request: '再同期要求',
+  };
+  return map[reason] || reason || '';
+}
+
+function syncAlivePresence() {
+  const byName = new Map((O.players || []).map(p => [p.name, p]));
+  if (!Array.isArray(O.alive)) return;
+  O.alive = O.alive.map(p => {
+    const src = byName.get(p.name);
+    if (!src) return p;
+    return {
+      ...p,
+      disconnected: !!src.disconnected,
+      disconnectedAt: src.disconnectedAt || p.disconnectedAt || null,
+      avatarIndex: p.avatarIndex ?? src.avatarIndex,
+      avatarLabel: p.avatarLabel ?? src.avatarLabel,
+      isCpu: p.isCpu ?? src.isCpu
+    };
+  });
+}
+
+function activeHumanCount() {
+  return (O.alive || []).filter(p => !p.isCpu && !isP2PDisconnected(p)).length;
+}
+
+function p2pActionLocked() {
+  return mode === 'p2p' && !O.isHost && !!O.p2pConnClosedAt;
+}
+
+function pushP2PEvent(reason, detail='') {
+  if (typeof O === 'undefined' || typeof mode === 'undefined' || mode !== 'p2p') return;
+  if (!O.p2pEventLog) O.p2pEventLog = [];
+  O.p2pEventLog.unshift({
+    at: Date.now(),
+    reason: reason || '',
+    detail: detail || '',
+    phase: O.phase || '',
+    seq: O.p2pSyncSeq || 0
+  });
+  O.p2pEventLog = O.p2pEventLog.slice(0, 8);
+}
+
+function p2pAgeLabel(age) {
+  if (age === null || age === undefined || !isFinite(Number(age))) return '-';
+  const sec = Math.max(0, Math.round(Number(age) / 1000));
+  return sec < 60 ? `${sec}秒前` : `${Math.floor(sec/60)}分${sec%60}秒前`;
+}
+
+function renderP2PDiagnosticDetails(diag={}, heartbeatAge=null) {
+  if (mode !== 'p2p') return '';
+  const peers = (diag.peerAges || []).map(peer => {
+    const ageSec = peer.age === null || peer.age === undefined ? null : Math.max(0, Math.round(Number(peer.age)));
+    const status = ageSec === null ? 'bad' : ageSec > 25 ? 'bad' : ageSec > 12 ? 'warn' : '';
+    const lagValue = Number(peer.lag ?? peer.seqLag ?? 0);
+    const lag = lagValue ? `<span class="${lagValue > 2 ? 'bad' : 'warn'}">seq -${lagValue}</span>` : '<span>seq OK</span>';
+    const name = peer.name || peer.id || 'unknown';
+    return `<div class="p2p-peer-row">
+      <span>${esc(name)}</span>
+      <span class="${status}">${ageSec === null ? '-' : `${ageSec}秒前`}</span>
+      ${lag}
+    </div>`;
+  }).join('');
+  const guestHost = !O.isHost
+    ? `<div class="p2p-peer-row">
+        <span>ホスト心拍</span>
+        <span class="${heartbeatAge !== null && heartbeatAge > 25 ? 'bad' : heartbeatAge !== null && heartbeatAge > 12 ? 'warn' : ''}">${heartbeatAge === null ? '-' : `${heartbeatAge}秒前`}</span>
+        <span>${esc(O.p2pHostPhase || '-')}</span>
+      </div>`
+    : '';
+  const peerBlock = (peers || guestHost)
+    ? `<div class="p2p-peer-list">${guestHost}${peers}</div>`
+    : `<div class="p2p-event-row">接続相手の診断データはまだありません。</div>`;
+  const events = (O.p2pEventLog || []).map(ev => {
+    const label = p2pReasonLabel(ev.reason) || ev.reason || 'event';
+    const detail = ev.detail ? ` / ${ev.detail}` : '';
+    const elapsed = ev.at ? p2pAgeLabel(Date.now() - ev.at) : '-';
+    return `<div class="p2p-event-row">${elapsed} #${ev.seq || 0} ${esc(label)}${esc(detail)} <span style="color:#64748b;">${esc(ev.phase || '')}</span></div>`;
+  }).join('') || `<div class="p2p-event-row">直近の再同期イベントはありません。</div>`;
+  return `<details class="p2p-detail-box">
+    <summary>診断詳細を開く</summary>
+    ${peerBlock}
+    <div class="p2p-event-log">${events}</div>
+  </details>`;
+}
+
+function p2pActionTag(name, state='pending', note='') {
+  return `<span class="p2p-action-tag ${state}">${esc(name)}${note ? ` ${esc(note)}` : ''}</span>`;
+}
+
+function renderP2PActionReceiptPanel(diag={}) {
+  if (mode !== 'p2p') return '';
+  const ap = diag.actionProgress || {};
+  let title = '';
+  let text = '';
+  let tags = '';
+  if (O.isHost) {
+    if (O.phase === 'vote' && ap.vote) {
+      const total = ap.vote.total || 0;
+      const done = ap.vote.doneNames || [];
+      const pending = ap.vote.pendingNames || [];
+      title = '投票受理状況';
+      text = `ホスト受信 ${done.length}/${total}。投票が止まる場合は未受理の名前を確認してください。`;
+      tags = [
+        ...done.map(n => p2pActionTag(n, 'done', ap.vote.autoNames?.includes(n) ? '自動' : '受理')),
+        ...pending.map(n => p2pActionTag(n, 'pending', '未受理'))
+      ].join('');
+    } else if (O.phase === 'night' && ap.night) {
+      const done = ap.night.doneNames || [];
+      const pending = ap.night.pendingNames || [];
+      title = '夜行動受理状況';
+      text = `ホスト受信 ${done.length}/${ap.night.total || 0}。未受理が残ると夜が明けません。`;
+      tags = [
+        ...done.map(n => p2pActionTag(n, 'done', '完了')),
+        ...pending.map(n => p2pActionTag(n, 'pending', '待ち'))
+      ].join('');
+    } else if (O.phase === 'wolf_chat' && ap.wolfChat) {
+      const ready = ap.wolfChat.readyNames || [];
+      const pending = ap.wolfChat.pendingNames || [];
+      title = '人狼相談の準備状況';
+      text = `人狼の準備 ${ready.length}/${ap.wolfChat.total || 0}。全員完了で夜行動へ進みます。`;
+      tags = [
+        ...ready.map(n => p2pActionTag(n, 'done', '完了')),
+        ...pending.map(n => p2pActionTag(n, 'pending', '相談中'))
+      ].join('');
+    } else if (O.phase === 'discuss' && ap.discuss) {
+      const ready = ap.discuss.readyNames || [];
+      const pending = ap.discuss.pendingNames || [];
+      title = '今すぐ投票の準備状況';
+      text = `準備 ${ready.length}/${ap.discuss.total || 0}。全員が押すと投票へ移ります。`;
+      tags = [
+        ...ready.map(n => p2pActionTag(n, 'done', 'OK')),
+        ...pending.map(n => p2pActionTag(n, 'pending', '待ち'))
+      ].join('');
+    }
+  } else if (O.phase === 'vote') {
+    const waiting = !!O.voteSubmitted && !O.voteAckAt;
+    title = '自分の投票送信';
+    text = O.voteAckAt
+      ? `ホスト受理済みです。投票先: ${O.voteSentTarget || O.voteTarget || '不明'}`
+      : waiting
+        ? `送信済み、ホストの受理確認待ちです。${O.voteAckRetryCount ? `再送 ${O.voteAckRetryCount}回。` : ''}`
+        : 'まだ投票していません。';
+    tags = O.voteAckAt
+      ? p2pActionTag('受理済み', 'done')
+      : waiting
+        ? p2pActionTag('ACK待ち', O.voteAckWarningAt ? 'bad' : 'pending')
+        : p2pActionTag('未送信', 'pending');
+  } else if (O.phase === 'night') {
+    title = '自分の夜行動送信';
+    const actionName = O.nightActionNeeded?.action || '行動なし';
+    text = O.nightActionDone
+      ? 'ホストに夜行動が受理されました。'
+      : O.nightActionPending
+        ? '夜行動を送信済みです。ホストの受理確認を待っています。'
+        : `現在の行動: ${actionName}`;
+    tags = O.nightActionDone
+      ? p2pActionTag('受理済み', 'done')
+      : O.nightActionPending
+        ? p2pActionTag('ACK待ち', 'pending')
+        : p2pActionTag(actionName, 'pending');
+  } else if (O.phase === 'wolf_chat') {
+    title = '自分の人狼相談';
+    text = O.wolfChatReady
+      ? 'ホストに準備完了が受理されました。'
+      : O.wolfChatReadyPending
+        ? '準備完了を送信済みです。ホストの受理確認を待っています。'
+        : '相談中です。準備できたら完了を押してください。';
+    tags = O.wolfChatReady
+      ? p2pActionTag('受理済み', 'done')
+      : O.wolfChatReadyPending
+        ? p2pActionTag('ACK待ち', 'pending')
+        : p2pActionTag('相談中', 'pending');
+  } else if (O.phase === 'discuss') {
+    const ready = O.voteReadyNames.includes(O.playerName);
+    title = '自分の今すぐ投票';
+    text = O.voteReadyAll
+      ? '全員の準備が揃いました。投票へ移ります。'
+      : ready
+        ? 'ホストに今すぐ投票の準備が受理されました。'
+        : O.voteReadyPending
+          ? '今すぐ投票を送信済みです。ホストの受理確認を待っています。'
+          : '議論を切り上げたい時は今すぐ投票を押してください。';
+    tags = O.voteReadyAll
+      ? p2pActionTag('全員準備完了', 'done')
+      : ready
+        ? p2pActionTag('受理済み', 'done')
+        : O.voteReadyPending
+          ? p2pActionTag('ACK待ち', 'pending')
+          : p2pActionTag('未送信', 'pending');
+  }
+  if (!title) return '';
+  return `<div class="p2p-action-receipt">
+    <div class="p2p-action-receipt-title"><span>${title}</span><span>${esc(O.isHost ? 'host' : 'guest')}</span></div>
+    <p class="p2p-action-receipt-text">${esc(text)}</p>
+    ${tags ? `<div class="p2p-action-tags">${tags}</div>` : ''}
+  </div>`;
+}
+
+function renderP2PActionBlockedNotice() {
+  if (!p2pActionLocked()) return '';
+  const reason = p2pReasonLabel(O.p2pAutoResyncReason);
+  return `<div class="p2p-action-lock" role="alert">
+    <p class="p2p-action-lock-title">P2P接続が不安定です${reason ? `（${esc(reason)}）` : ''}</p>
+    <p class="p2p-action-lock-text">投票・夜行動・発言は再接続後に送信してください。役職と現在の画面は同じ名前で復帰できます。</p>
+    <button class="p2p-resync-btn" id="p2pReconnectAction">同じ名前で再接続</button>
+  </div>`;
+}
+
 function renderP2PStatusPanel() {
   if (mode !== 'p2p' || !O.phase || ['p2p_setup','setup','lobby','game_over'].includes(O.phase)) return '';
   const age = O.p2pSyncAt ? Math.max(0, Math.round((Date.now() - O.p2pSyncAt) / 1000)) : null;
@@ -1466,12 +1887,14 @@ function renderP2PStatusPanel() {
   const diag = (typeof P2PEngine !== 'undefined' && P2PEngine.diagnostics) ? P2PEngine.diagnostics() : {};
   const playerCount = (O.players || []).length || diag.playerCount || 0;
   const aliveCount = (O.alive || []).length || diag.aliveCount || 0;
+  const disconnected = disconnectedNames();
+  const hasReadyTotal = O.phase === 'discuss' && Number.isFinite(Number(O.voteReadyTotal));
   const voteText = O.phase === 'vote'
     ? `${O.voteDone || 0}/${O.voteTotal || 0} 投票済み${O.voteSubmitted ? '（自分済）' : ''}`
-    : (O.voteReadyTotal ? `${O.voteReadyNames.length}/${O.voteReadyTotal} 今すぐ投票` : '待機');
+    : (hasReadyTotal ? `${O.voteReadyNames.length}/${Number(O.voteReadyTotal)} 今すぐ投票` : '待機');
   const resyncText = O.isHost ? '全員へ最新状態を再送' : 'ホストへ再同期を要求';
   const heartbeatText = O.isHost
-    ? `${diag.peerHealthyCount || 0}/${diag.connCount || 0} 応答${diag.peerStaleCount ? `・${diag.peerStaleCount}遅延` : ''}`
+    ? `${diag.peerHealthyCount || 0}/${diag.connCount || 0} 応答${diag.peerStaleCount ? `・${diag.peerStaleCount}遅延` : ''}${diag.peerLagCount ? `・${diag.peerLagCount}再送` : ''}`
     : (heartbeatAge === null ? '心拍待ち' : `${heartbeatAge}秒前`);
   const warning = age !== null && age > 25
     ? `<div class="power-line" style="color:#fca5a5;">同期が遅れています。画面が止まっている端末は再同期を押してください。</div>`
@@ -1481,24 +1904,48 @@ function renderP2PStatusPanel() {
     : (O.isHost && diag.peerStaleCount > 0
       ? `<div class="power-line" style="color:#fca5a5;">応答が遅い参加者: ${esc((diag.peerStaleNames || []).join('、') || '不明')}</div>`
       : '');
+  const lagWarning = O.isHost && diag.peerLagCount > 0
+    ? `<div class="power-line" style="color:#fde68a;">同期番号が遅い参加者へ自動再送: ${esc((diag.peerLagNames || []).join('、') || '不明')}</div>`
+    : '';
   const lastResync = O.p2pResyncAt ? `<div class="power-line" style="color:#86efac;">再同期: ${Math.max(0, Math.round((Date.now()-O.p2pResyncAt)/1000))}秒前</div>` : '';
+  const autoResync = !O.isHost && O.p2pAutoResyncAt
+    ? `<div class="power-line" style="color:#fde68a;">自動再同期: ${Math.max(0, Math.round((Date.now()-O.p2pAutoResyncAt)/1000))}秒前${O.p2pAutoResyncReason ? `（${esc(p2pReasonLabel(O.p2pAutoResyncReason))}）` : ''}</div>`
+    : '';
+  const closedWarning = !O.isHost && O.p2pConnClosedAt
+    ? `<div class="power-line" style="color:#fca5a5;">P2P接続が不安定です${O.p2pAutoResyncReason ? `（${esc(p2pReasonLabel(O.p2pAutoResyncReason))}）` : ''}。同じ名前で再接続すると現在の役職・画面に復帰します。</div>`
+    : '';
+  const reconnectButton = !O.isHost && O.p2pConnClosedAt
+    ? `<button class="p2p-resync-btn" id="p2pReconnect">同じ名前で再接続</button>`
+    : '';
+  const detailPanel = renderP2PDiagnosticDetails(diag, heartbeatAge);
+  const actionPanel = renderP2PActionReceiptPanel(diag);
+  const voicePanel = ['discuss','wolf_chat'].includes(O.phase) ? renderChatVoiceAssistPanel() : '';
   return `<div class="power-panel" style="border-color:${tone}55;">
-    <div class="power-head" style="color:${tone};"><span>📡 P2P同期</span><span>#${O.p2pSyncSeq || 0}</span></div>
+    <div class="power-head" style="color:${tone};"><span>📡 P2P同期</span><span>#${O.p2pSyncSeq || 0}${disconnected.length ? ' / offline ' + disconnected.length : ''}</span></div>
     <div class="power-line">状態: ${text}。投票・夜行動・議論更新はホストの同期番号で確認しています。</div>
     <div class="p2p-diag-grid">
       <div class="p2p-diag-cell"><b>${O.isHost ? 'ホスト' : 'ゲスト'}</b>端末役割</div>
       <div class="p2p-diag-cell"><b>${esc(O.phase)}</b>画面フェーズ</div>
       <div class="p2p-diag-cell"><b>${playerCount}人</b>参加者</div>
       <div class="p2p-diag-cell"><b>${aliveCount}人</b>生存者</div>
+      <div class="p2p-diag-cell"><b>${disconnected.length ? disconnected.length + '人' : 'なし'}</b>通信切断中</div>
       <div class="p2p-diag-cell"><b>${esc(voteText)}</b>投票状態</div>
       <div class="p2p-diag-cell"><b>${diag.connCount ?? '-'}</b>接続数</div>
       <div class="p2p-diag-cell"><b>${esc(heartbeatText)}</b>通信心拍</div>
       <div class="p2p-diag-cell"><b>${esc(O.p2pLastType || '-')}</b>最終受信</div>
     </div>
+    ${renderP2PPresenceStrip()}
+    ${actionPanel}
+    ${voicePanel}
     ${warning}
     ${heartbeatWarning}
+    ${lagWarning}
+    ${closedWarning}
     ${lastResync}
+    ${autoResync}
+    ${detailPanel}
     <button class="p2p-resync-btn" id="p2pResync">${resyncText}</button>
+    ${reconnectButton}
   </div>`;
 }
 
@@ -2092,6 +2539,30 @@ function p2pJoinUrl(code) {
   } catch (_) {
     return '';
   }
+}
+
+function p2pShareInfo(code='') {
+  const url = p2pJoinUrl(code);
+  if (typeof window === 'undefined' || !window.location) {
+    return { url, host:'', isLocal:false, isFile:false, hint:'' };
+  }
+  const loc = window.location;
+  const host = loc.hostname || '';
+  const isFile = loc.protocol === 'file:';
+  const isLoopback = /^(localhost|127(?:\.\d{1,3}){3}|0\.0\.0\.0|\[?::1\]?)$/i.test(host);
+  const isPrivate = /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(host);
+  const hostPort = loc.port ? `:${loc.port}` : '';
+  const lanExample = isFile
+    ? ''
+    : `${loc.protocol}//192.168.x.x${hostPort}${loc.pathname || '/'}${url ? new URL(url).search : ''}`;
+  const hint = isFile
+    ? 'スマホ参加は file:// では共有できません。PCでローカルサーバーを起動して、スマホから同じURLへアクセスしてください。'
+    : isLoopback
+      ? `このURLはこの端末専用です。スマホではPCのLAN IPに置き換えてください。例: ${lanExample}`
+      : isPrivate
+        ? '同じWi-Fi上のスマホなら、この参加リンクを開ける可能性が高いです。'
+        : 'スマホがこのURLを開けるか確認してください。開けない場合は同じWi-Fi上のPCのLAN IPを使います。';
+  return { url, host, isLocal:isLoopback, isPrivate, isFile, lanExample, hint };
 }
 
 function applyP2PLaunchParams() {
@@ -2702,33 +3173,61 @@ function bindEvents() {
   on('p2pGoJoin',   () => { O.p2pSub = 'join'; render(); });
   on('p2pBackSetup',() => { O.p2pSub = 'choose'; render(); });
   on('p2pCopyLink', async () => {
-    const link = p2pJoinUrl(O.roomCode);
+    const share = p2pShareInfo(O.roomCode);
+    const link = share.url;
     const ok = await copyText(link);
-    alert(ok ? '参加リンクをコピーしました' : 'コピーできませんでした');
+    alert(ok ? `参加リンクをコピーしました${share.isLocal || share.isFile ? '\nスマホではPCのLAN IPに置き換えてください。' : ''}` : 'コピーできませんでした');
   });
   on('p2pShareLink', async () => {
-    const link = p2pJoinUrl(O.roomCode);
+    const share = p2pShareInfo(O.roomCode);
+    const link = share.url;
     if (!link) return;
     try {
-      if (navigator.share) await navigator.share({ title:'人狼ゲーム P2P参加', text:`部屋コード ${O.roomCode}`, url:link });
+      if (navigator.share) await navigator.share({ title:'人狼ゲーム P2P参加', text:`部屋コード ${O.roomCode}\n${share.hint || ''}`, url:link });
       else {
         const ok = await copyText(link);
-        alert(ok ? '参加リンクをコピーしました' : '共有できませんでした');
+        alert(ok ? `参加リンクをコピーしました${share.isLocal || share.isFile ? '\nスマホではPCのLAN IPに置き換えてください。' : ''}` : '共有できませんでした');
       }
     } catch (_) {}
   });
   on('p2pResync', () => {
     if (mode !== 'p2p') return;
-    P2PEngine.requestResync();
-    O.p2pResyncAt = Date.now();
+    if (P2PEngine.requestResync()) O.p2pResyncAt = Date.now();
+    render();
+  });
+  on('p2pReconnect', () => {
+    if (mode !== 'p2p') return;
+    P2PEngine.reconnect();
+    render();
+  });
+  on('p2pReconnectAction', () => {
+    if (mode !== 'p2p') return;
+    P2PEngine.reconnect();
     render();
   });
   on('p2pCreate', () => {
     const name = (val('p2pName')||'').trim();
     if (!name) { alert('名前を入力してください'); return; }
     O.playerName = name; O.isHost = true; O.players = [{ pid:0, name }];
+    O.roomCode = null;
+    O.p2pSub = 'host_creating';
+    O.p2pCreateAttempt = 1;
+    O.p2pCreateError = '';
+    render();
     P2PEngine.createRoom(name, code => {
-      O.roomCode = code; O.p2pSub = 'host_wait'; render();
+      O.roomCode = code;
+      O.p2pSub = 'host_wait';
+      O.p2pCreateAttempt = 0;
+      O.p2pCreateError = '';
+      render();
+    }, err => {
+      const msg = err?.message || String(err || 'P2P部屋作成に失敗しました');
+      O.roomCode = null;
+      O.p2pSub = 'choose';
+      O.p2pCreateAttempt = 0;
+      O.p2pCreateError = msg;
+      render();
+      alert('部屋を作れませんでした: ' + msg);
     });
   });
   on('p2pJoin', () => {
@@ -2747,7 +3246,7 @@ function bindEvents() {
   on('oCpuDec', () => {
     if ((O.cpuCount||0) > 0) {
       O.cpuCount--;
-      if (mode==='p2p') { render(); } else wsSend({type:'set_cpu_count',count:O.cpuCount});
+      wsSend({type:'set_cpu_count',count:O.cpuCount});
       render();
     }
   });
@@ -2757,7 +3256,7 @@ function bindEvents() {
     const maxCpu = mode==='p2p' ? Math.max(0, MAX_PLAYERS - humans) : MAX_PLAYERS - 1;
     if ((O.cpuCount||0) < maxCpu) {
       O.cpuCount++;
-      if (mode==='p2p') { render(); } else wsSend({type:'set_cpu_count',count:O.cpuCount});
+      wsSend({type:'set_cpu_count',count:O.cpuCount});
       render();
     }
   });
@@ -2781,7 +3280,12 @@ function bindEvents() {
   // ONLINE SETUP
   on('oGoJoin',    () => { O.setupSub = 'join'; render(); });
   on('oBackSetup', () => { O.setupSub = 'choose'; render(); });
-  on('goHome',     () => { if (O.ws) O.ws.close(); initOnline(); mode = 'home'; render(); });
+  on('goHome',     () => {
+    if (O.ws) O.ws.close();
+    if (mode === 'solo') SoloEngine.resetTimers();
+    if (mode === 'p2p') P2PEngine.destroy();
+    initOnline(); mode = 'home'; render();
+  });
 
   on('oCreate', () => {
     const name = (val('oName') || '').trim();
@@ -2808,11 +3312,25 @@ function bindEvents() {
   on('oStartNight', () => wsSend({type:'start_night'}));
 
   // WOLF CHAT
-  on('wolfChatDone', () => { O.wolfChatReady = true; wsSend({type:'wolf_chat_done'}); render(); });
+  on('wolfChatDone', () => {
+    if (p2pActionLocked()) { render(); return; }
+    if (O.wolfChatReady || O.wolfChatReadyPending) return;
+    if (!wsSend({type:'wolf_chat_done'})) return;
+    if (mode === 'p2p') {
+      O.wolfChatReadyPending = true;
+      scheduleP2PActionAckWatchdog('wolf_ready');
+    } else {
+      O.wolfChatReady = true;
+    }
+    render();
+  });
   // wolf テンプレート（target不要）は wolfSend() をグローバル関数として定義
   // wolf テンプレート（target必要）は wolfTplTarget() をグローバル関数として定義
   document.querySelectorAll('.wolf-tpl-send').forEach(btn => {
-    btn.addEventListener('click', () => { wolfSend(btn.dataset.msg); });
+    btn.addEventListener('click', () => {
+      if (p2pActionLocked()) { render(); return; }
+      wolfSend(btn.dataset.msg);
+    });
   });
 
   // DISCUSS - テンプレートカテゴリ
@@ -2851,15 +3369,16 @@ function bindEvents() {
   // DISCUSS - message send buttons
   document.querySelectorAll('.tpl-send').forEach(btn => {
     btn.addEventListener('click', () => {
+      if (p2pActionLocked()) { render(); return; }
       const msg = btn.dataset.msg;
       if (!msg) return;
+      if (!wsSend({type:'disc_message', text: msg})) return;
       // カミングアウト検出（各COステップで送信した場合）
       if      (O.tplStep === 'msg_seer')    O.roleClaims[O.playerName] = 'SEER';
       else if (O.tplStep === 'msg_medium')  O.roleClaims[O.playerName] = 'MEDIUM';
       else if (O.tplStep === 'msg_doctor')  O.roleClaims[O.playerName] = 'DOCTOR';
       else if (O.tplStep === 'msg_neko')    O.roleClaims[O.playerName] = 'NEKOMATA';
       else if (O.tplStep === 'msg_shared')  O.roleClaims[O.playerName] = 'SHARED';
-      wsSend({type:'disc_message', text: msg});
       O.isMyDiscTurn = false; O.tplStep = null;
       render();
     });
@@ -2867,10 +3386,20 @@ function bindEvents() {
 
   // DISCUSS - 投票開始ボタン
   on('btnVoteReady', () => {
+    if (p2pActionLocked()) { render(); return; }
     if (O.voteReadyAll) return;
     if (O.voteReadyNames.includes(O.playerName)) return;
+    if (O.voteReadyPending) return;
     if (!O.alive.some(p=>p.name===O.playerName)) return;
-    wsSend({type:'vote_ready'});
+    O.voteReadyPending = true;
+    if (!wsSend({type:'vote_ready'})) { O.voteReadyPending = false; return; }
+    if (mode === 'p2p') scheduleP2PActionAckWatchdog('vote_ready');
+    if (mode !== 'p2p') {
+      if (!O.voteReadyNames.includes(O.playerName)) O.voteReadyNames.push(O.playerName);
+      O.voteReadyTotal = O.voteReadyTotal || activeHumanCount();
+      O.voteReadyPending = false;
+    }
+    render();
   });
 
   // DISCUSS - BGMミュートボタン（端末単位。同じ部屋に複数スマホがある時に2重再生防止）
@@ -2886,10 +3415,13 @@ function bindEvents() {
   // DISCUSS - チャット速度切替（熟読/ゆっくり/標準/はやい）
   on('btnChatSpeed', () => { cycleChatSpeed(); render(); });
   on('btnChatVoiceTest', () => { testChatVoice(); });
+  on('btnChatVoiceEnable', () => { testChatVoice(); });
 
   // DISCUSS/WOLF - クイック入力（送信せず、編集できるよう入力欄へ入れる）
   document.querySelectorAll('[data-chat-template]').forEach(btn => {
     btn.addEventListener('click', () => {
+      if (p2pActionLocked()) { render(); return; }
+      if (O.phase === 'wolf_chat' && (O.wolfChatReady || O.wolfChatReadyPending)) return;
       const input = document.getElementById(btn.dataset.chatInput || 'discFreeInput');
       if (!input) return;
       const targetEl = document.getElementById(btn.dataset.chatTarget || '');
@@ -2903,12 +3435,13 @@ function bindEvents() {
 
   // DISCUSS - フリーテキスト送信
   on('discFreeSend', () => {
+    if (p2pActionLocked()) { render(); return; }
     const input = document.getElementById('discFreeInput');
     const text = (input ? input.value : '').trim();
     if (!text) return;
     const explicitClaim = detectExplicitRoleClaim(text);
+    if (!wsSend({type:'disc_message', text})) return;
     if (explicitClaim) O.roleClaims[O.playerName] = explicitClaim;
-    wsSend({type:'disc_message', text});
     if (O.isMyDiscTurn) { O.isMyDiscTurn=false; O.tplStep=null; }
     if (input) input.value='';
     render();
@@ -2920,11 +3453,12 @@ function bindEvents() {
 
   // WOLF CHAT - フリーテキスト送信
   on('wolfFreeSend', () => {
+    if (p2pActionLocked()) { render(); return; }
+    if (O.wolfChatReady || O.wolfChatReadyPending) return;
     const input = document.getElementById('wolfFreeInput');
     const text = (input ? input.value : '').trim();
     if (!text) return;
-    wolfSend(text);
-    if (input) input.value='';
+    if (wolfSend(text) && input) input.value='';
   });
   { // Enter key for wolf free input
     const wi = document.getElementById('wolfFreeInput');
@@ -2934,6 +3468,7 @@ function bindEvents() {
   // DISCUSS - クイック同調ボタン（data-agree-name）
   document.querySelectorAll('[data-agree-name]').forEach(btn => {
     btn.addEventListener('click', () => {
+      if (p2pActionLocked()) { render(); return; }
       if (!O.isMyDiscTurn) return;
       const name = btn.dataset.agreeName;
       const agree_templates = [
@@ -2944,7 +3479,7 @@ function bindEvents() {
         `${name}さんへの指摘は鋭いと思います 🎯`,
       ];
       const msg = agree_templates[Math.floor(Math.random()*agree_templates.length)];
-      wsSend({type:'disc_message', text:msg});
+      if (!wsSend({type:'disc_message', text:msg})) return;
       O.isMyDiscTurn=false; O.tplStep=null;
       render();
     });
@@ -2988,12 +3523,14 @@ function bindEvents() {
   // ONLINE NIGHT ACTION — wolf はアイコングリッドから選択
   document.querySelectorAll('[data-wolf-pick]').forEach(card => {
     card.addEventListener('click', () => {
+      if (p2pActionLocked() || O.nightActionPending) return;
       O._wolfNightSel = card.dataset.wolfPick;
       render();
     });
   });
 
   on('oNightSend', () => {
+    if (p2pActionLocked()) { render(); return; }
     const btn = document.getElementById('oNightSend');
     const action = btn ? btn.dataset.action : null;
     // wolf: ステルスグリッドから選択、それ以外: ドロップダウン
@@ -3017,8 +3554,13 @@ function bindEvents() {
       }
     }
     if (action === 'doctor') O._myLastGuard = target; // 戦績: 護衛成功判定用
-    wsSend({type:'night_action', action, target});
-    O.nightActionDone = true;
+    if (!wsSend({type:'night_action', action, target})) return;
+    if (mode === 'p2p') {
+      O.nightActionPending = true;
+      scheduleP2PActionAckWatchdog('night_action');
+    } else {
+      O.nightActionDone = true;
+    }
     O._wolfNightSel = null;
     render();
   });
@@ -3027,6 +3569,7 @@ function bindEvents() {
 
   // ONLINE VOTE
   on('oVoteSend', () => {
+    if (p2pActionLocked()) { render(); return; }
     if (O.voteSubmitted) return; // 二重投票防止
     const target = O.voteTarget || val('oVoteTgt');
     if (!target) return;
@@ -3037,9 +3580,16 @@ function bindEvents() {
     }
     const reason = (O.voteReasonDraft || val('oVoteReason') || '').trim() || `${target}さんの発言と投票の流れが気になりました。`;
     (O.myVotes = O.myVotes||[]).push(target); // 戦績スコア用（自分の投票履歴）
-    wsSend({type:'vote', target, reason});
+    if (!wsSend({type:'vote', target, reason})) return;
     O.voteSubmitted = true;
     O.voteSentAt = Date.now();
+    O.voteAckAt = 0;
+    O.voteAckWarningAt = 0;
+    O.voteAckRetryAt = 0;
+    O.voteAckRetryCount = 0;
+    O.voteSentTarget = target;
+    O.voteSentReason = reason;
+    scheduleVoteAckWatchdog();
     render();
   });
 
@@ -3142,6 +3692,12 @@ const SoloEngine = (() => {
         t += 1300 + Math.floor(Math.random()*600);
       });
     }
+  }
+
+  function beginNightFlow() {
+    if (!['role', 'vote_result'].includes(R.phase)) return false;
+    R.players[0].role==='WEREWOLF' ? startWolfChat() : startNight();
+    return true;
   }
 
   // ── 夜フェーズ ────────────────────────────────────────
@@ -3495,7 +4051,7 @@ const SoloEngine = (() => {
   function handle(data) {
     switch (data.type) {
       case 'start_night':
-        if (R.players[0].role==='WEREWOLF') startWolfChat(); else startNight();
+        beginNightFlow();
         break;
       case 'wolf_chat_done':
         later(400, startNight);
@@ -3572,7 +4128,7 @@ const SoloEngine = (() => {
         break;
       }
       case 'next_night':
-        later(300, () => R.players[0].role==='WEREWOLF' ? startWolfChat() : startNight());
+        later(300, beginNightFlow);
         break;
     }
   }
@@ -4905,12 +5461,12 @@ function renderSoloRecap(){
   const isV = O.winner==='village', won = g.won;
   const color = won ? '#4ade80' : '#f87171';
   const players=(O.finalPlayers&&O.finalPlayers.length)?O.finalPlayers:(O.players||[]);
-  const rows = players.map(p=>{ const info=ROLES[p.role]||{}; const mine=p.name===O.playerName;
+  const rows = players.map(p=>{ const info=ROLES[p.role]||{}; const mine=p.name===O.playerName; const status=p.disconnected&&p.alive?'📶 切断中':(p.alive?'✅ 生存':'💀 死亡');
     return `<div class="player-row" style="border-left-color:${info.color||'#666'};${mine?'background:rgba(99,102,241,.12);':''}">
       <span class="pr-icon">${info.icon||'❓'}</span>
       <span class="pr-name">${esc(p.name)}${mine?' <span style="color:#a5b4fc;font-size:.7rem;">(あなた)</span>':''}</span>
       <span class="pr-role" style="color:${info.color||'#aaa'};">${info.name||p.role||'不明'}</span>
-      <span class="pr-status">${p.alive?'✅ 生存':'💀 死亡'}</span>
+      <span class="pr-status">${status}</span>
     </div>`; }).join('');
   const scoreLines = g.scoreLines.map(l=>`<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.18rem 0;color:#cbd5e1;"><span>${l.label}</span><span style="font-weight:700;color:${l.pts>=0?'#4ade80':'#f87171'};">${l.pts>=0?'+':''}${l.pts}</span></div>`).join('');
   const levelUp = g.leveledUp ? `<div class="levelup-banner">🎉 レベルアップ！ Lv.${g.before.level} → <strong>Lv.${g.after.level}</strong>${g.rankChanged?`　新ランク：${g.after.rank.icon} ${g.after.rank.name}`:''}</div>` : '';
@@ -5086,6 +5642,9 @@ function spawnConfetti(color1, color2) {
 // ========== P2P ENGINE (PeerJS サーバーレスオンライン) ==========
 const P2PEngine = (() => {
   const CPU_NAMES = CHARACTER_AVATARS.slice(0, MAX_PLAYERS - 1).map(a => a.label);
+  const P2P_STALE_MS = 22000;
+  const P2P_SOFT_DISCONNECT_MS = 42000;
+  const P2P_CREATE_MAX_ATTEMPTS = 12;
   let peer = null;
   let guestConn = null;   // guest→host接続
   let hostConns = {};     // host: { connId: DataConnection }
@@ -5095,6 +5654,7 @@ const P2PEngine = (() => {
 
   let _timers = [];
   let heartbeatTimer = null;
+  let joinAttemptId = 0;
   function emitLocal(msg) { const id = setTimeout(() => handleServer(msg), 0); _timers.push(id); return id; }
   function later(ms, fn)  { const id = setTimeout(fn, ms); _timers.push(id); return id; }
   function resetTimers()  {
@@ -5105,13 +5665,52 @@ const P2PEngine = (() => {
   }
   function rand(a)        { return a[Math.floor(Math.random()*a.length)]; }
   function shuffle(a)     { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
-  function alive()        { return R.players.filter(p=>p.alive); }
-  function byName(n)      { return R.players.find(p=>p.name===n); }
+  function randomRoomCode() { return String(Math.floor(Math.random() * 1000)).padStart(3, '0'); }
+  function closePeerOnly() {
+    if (peer) { try { peer.destroy(); } catch(e) {} peer = null; }
+    guestConn = null;
+    hostConns = {};
+    connNames = {};
+  }
+  function alive()        { return (R.players || []).filter(p=>p.alive); }
+  function byName(n)      { return (R.players || []).find(p=>p.name===n); }
   function topAcc(pls)    { let max=0,best=null; pls.forEach(p=>{const c=R.accuCount[p.name]||0;if(c>max){max=c;best=p;}}); return best; }
-  function markPeerSeen(name, phase='') {
+  function markPeerSeen(name, phase='', seenSeq=null) {
     if (!name) return;
     if (!R.peerLastSeen) R.peerLastSeen = {};
-    R.peerLastSeen[name] = { at:Date.now(), phase:phase || '' };
+    const prev = R.peerLastSeen[name] || {};
+    const seq = Number(seenSeq);
+    R.peerLastSeen[name] = {
+      at:Date.now(),
+      phase:phase || prev.phase || '',
+      seenSeq:Number.isFinite(seq) ? seq : (prev.seenSeq ?? null),
+    };
+    restoreSoftDisconnectedPeer(name);
+  }
+  function restoreSoftDisconnectedPeer(name) {
+    if (!Array.isArray(R.players) || !R.players.length) return false;
+    const player = byName(name);
+    if (!player || !player.disconnected) return false;
+    player.disconnected = false;
+    player.disconnectedAt = null;
+    if (R.phase === 'discuss' && R.voteReadySet && !R.voteReadyAll) R.voteReadySet.delete(name);
+    R.log = R.log || [];
+    R.log.push(`${name} returned before the P2P room closed the connection`);
+    broadcast({ type:'player_reconnected', players:publicPlayers(false), name, soft:true });
+    if (R.phase === 'discuss' && !R.voteReadyAll) broadcastVoteReadyP2P();
+    sendResyncTo(name);
+    return true;
+  }
+  function detectStalePeerDisconnects() {
+    if (!isHost || !Array.isArray(R.players) || !R.players.length) return;
+    const now = Date.now();
+    R.players
+      .filter(p => !p.isCpu && p.name !== R.hostName && !p.disconnected)
+      .forEach(p => {
+        const seen = R.peerLastSeen?.[p.name]?.at || 0;
+        const age = seen ? now - seen : Number.POSITIVE_INFINITY;
+        if (age > P2P_SOFT_DISCONNECT_MS) handleP2PDisconnect(p.name);
+      });
   }
   function scheduleHeartbeat() {
     if (!isHost || !R || !R.phase) return;
@@ -5121,6 +5720,7 @@ const P2PEngine = (() => {
       if (!isHost || !R || !R.phase) return;
       const list = R.players || R.pendingPlayers || [];
       const aliveCount = R.players ? R.players.filter(p=>p.alive).length : 0;
+      detectStalePeerDisconnects();
       broadcast({ type:'p2p_heartbeat', phase:R.phase, player_count:list.length, alive_count:aliveCount });
       scheduleHeartbeat();
     });
@@ -5156,15 +5756,17 @@ const P2PEngine = (() => {
     return (R.players || R.pendingPlayers || []).map((p,i)=>({
       pid:i, name:p.name, alive:p.alive !== false, isCpu:!!p.isCpu,
       avatarIndex:p.avatarIndex, avatarLabel:p.avatarLabel,
+      disconnected:!!p.disconnected,
+      disconnectedAt:p.disconnectedAt || null,
       role: includeRole ? p.role : undefined,
     }));
   }
   function publicAlive() {
-    return alive().map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel}));
+    return alive().map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel,disconnected:!!p.disconnected,disconnectedAt:p.disconnectedAt||null}));
   }
   function voteReadyNames() {
     const ready = R.voteReadySet || new Set();
-    return alive().filter(p=>!p.isCpu && ready.has(p.name)).map(p=>p.name);
+    return alive().filter(p=>!p.isCpu && !p.disconnected && ready.has(p.name)).map(p=>p.name);
   }
   function actionForPlayer(player) {
     if (!player || R.phase !== 'night' || !player.alive || player.isCpu || R.humanActionDone?.[player.name]) return null;
@@ -5186,6 +5788,7 @@ const P2PEngine = (() => {
     const player = byName(playerName);
     const includeRole = R.phase === 'game_over';
     const voteResult = R.lastVoteResult || null;
+    const voteIsFinal = !!(R.humanVotedSet && R.humanVotedSet.has(playerName) && !(R.autoVotes && R.autoVotes.has(playerName)));
     const payload = {
       type:'p2p_resync',
       phase:R.phase || 'lobby',
@@ -5197,6 +5800,7 @@ const P2PEngine = (() => {
       wolf_partners:player?.role==='WEREWOLF' ? (R.players||[]).filter(p=>p.role==='WEREWOLF' && p.name!==playerName).map(p=>p.name) : [],
       shared_partners:player?.role==='SHARED' ? (R.players||[]).filter(p=>p.role==='SHARED' && p.name!==playerName).map(p=>p.name) : [],
       wolf_names:(R.players||[]).filter(p=>p.role==='WEREWOLF').map(p=>p.name),
+      wolf_chat_ready:!!(R.wolfDoneSet && R.wolfDoneSet.has(playerName)),
       is_host:playerName===R.hostName,
       night_report:R.nightReport || null,
       eliminated:R.nightReport?.victim ? {name:R.nightReport.victim} : null,
@@ -5206,11 +5810,11 @@ const P2PEngine = (() => {
       current_speaker:R.waitingForHuman || null,
       waiting_for:R.waitingForHuman || null,
       vote_ready_names:voteReadyNames(),
-      vote_ready_total:alive().filter(p=>!p.isCpu).length,
+      vote_ready_total:p2pAliveHumans().length,
       vote_ready_all:!!R.voteReadyAll,
       vote_done:Object.keys(R.votes || {}).length,
       vote_total:alive().length,
-      vote_submitted:!!(R.humanVotedSet && R.humanVotedSet.has(playerName)),
+      vote_submitted:voteIsFinal,
       vote_result:voteResult,
       winner:R.winner || null,
       log:R.log || [],
@@ -5226,28 +5830,91 @@ const P2PEngine = (() => {
   function resyncAll() {
     (R.players || []).filter(p=>!p.isCpu).forEach(p=>sendResyncTo(p.name));
   }
+  function maybeResyncLaggingPeer(playerName, seenSeq) {
+    if (!playerName || !R.syncSeq) return;
+    if (!Array.isArray(R.players) || !R.players.length) return;
+    const seq = Number(seenSeq);
+    if (!Number.isFinite(seq)) return;
+    const lag = R.syncSeq - seq;
+    if (lag < 4) return;
+    if (!R.peerAutoResyncAt) R.peerAutoResyncAt = {};
+    const now = Date.now();
+    if (now - (R.peerAutoResyncAt[playerName] || 0) < 12000) return;
+    R.peerAutoResyncAt[playerName] = now;
+    sendResyncTo(playerName);
+  }
+  function dropPreviousConnForName(name, exceptConnId) {
+    Object.keys(connNames).forEach(cid => {
+      if (cid === exceptConnId || connNames[cid] !== name) return;
+      const old = hostConns[cid];
+      delete connNames[cid];
+      delete hostConns[cid];
+      try { old?.close?.(); } catch(e) {}
+    });
+  }
+  function autoVoteForDisconnected(name) {
+    const voter = byName(name);
+    if (!voter || !voter.alive || voter.isCpu || R.phase !== 'vote') return;
+    if (!R.votes) R.votes = {};
+    if (!R.voteReasons) R.voteReasons = {};
+    if (!R.humanVotedSet) R.humanVotedSet = new Set();
+    if (!R.autoVotes) R.autoVotes = new Set();
+    const targets = alive().filter(p=>p.name!==name);
+    if (!targets.length) return;
+    if (!R.votes[name]) {
+      const target = topAcc(targets) || rand(targets);
+      R.votes[name] = target.name;
+      R.voteReasons[name] = '通信切断中のため、ゲーム停止防止の仮投票です。再接続すれば投票確定前に上書きできます。';
+    }
+    R.autoVotes.add(name);
+    R.humanVotedSet.add(name);
+  }
+  function maybeTallyVotesP2P(delay=500) {
+    if (R.phase !== 'vote' || R.tallyDone) return;
+    const al = alive();
+    const humansAlive = al.filter(p=>!p.isCpu);
+    if (R.humanVotedSet && R.humanVotedSet.size>=humansAlive.length && Object.keys(R.votes||{}).length>=al.length)
+      later(delay, tallyVotes);
+  }
+  function reconnectPlayer(connId, name) {
+    const player = byName(name);
+    if (!player || player.isCpu) return false;
+    dropPreviousConnForName(name, connId);
+    connNames[connId] = name;
+    player.disconnected = false;
+    player.disconnectedAt = null;
+    markPeerSeen(name, R.phase || '', null);
+    if (R.phase === 'discuss' && R.voteReadySet && !R.voteReadyAll) R.voteReadySet.delete(name);
+    R.log = R.log || [];
+    R.log.push(`${name} reconnected to the P2P room`);
+    broadcast({ type:'player_reconnected', players:publicPlayers(false), name });
+    if (R.phase === 'discuss' && !R.voteReadyAll) broadcastVoteReadyP2P();
+    sendResyncTo(name);
+    return true;
+  }
   function beginNightFlow() {
+    if (!['role', 'vote_result'].includes(R.phase)) return false;
     alive().some(p=>p.role==='WEREWOLF'&&!p.isCpu) ? startWolfChat() : startNight();
+    return true;
   }
   function handleP2PDisconnect(name) {
     if (!name) return;
     if (R.pendingPlayers) R.pendingPlayers = R.pendingPlayers.filter(p=>p.name!==name);
-    if (R.peerLastSeen) delete R.peerLastSeen[name];
     const inGame = Array.isArray(R.players) && R.players.length > 0;
     if (!inGame) {
+      if (R.peerLastSeen) delete R.peerLastSeen[name];
       O.players = (O.players||[]).filter(p=>p.name!==name);
-      broadcast({ type:'player_left', players: O.players, name });
+      broadcast({ type:'player_left', players: O.players, name, cpu_count: O.cpuCount || 0 });
       return;
     }
     const player = byName(name);
     if (player) {
-      player.alive = false;
+      player.disconnected = true;
+      player.disconnectedAt = Date.now();
       R.log = R.log || [];
-      R.log.push(`${name} left the P2P room`);
+      R.log.push(`${name} disconnected from the P2P room`);
     }
-    broadcast({ type:'player_left', players:R.players.map((p,i)=>({pid:i,name:p.name,alive:p.alive,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})), name });
-    const win = checkWinP2P();
-    if (win) { doGameOver(win, null); return; }
+    broadcast({ type:'player_left', players:publicPlayers(false), name, disconnected:true });
     if (R.phase === 'night') {
       R.humanActionDone[name] = true;
       checkNightDone();
@@ -5267,39 +5934,65 @@ const P2PEngine = (() => {
       broadcastVoteReadyP2P();
       _checkVoteReadyP2P();
     } else if (R.phase === 'vote') {
-      if (!R.humanVotedSet) R.humanVotedSet = new Set();
-      R.humanVotedSet.add(name);
+      autoVoteForDisconnected(name);
       const al = alive();
       broadcast({type:'vote_progress',done:Object.keys(R.votes||{}).length,total:al.length});
-      const humansAlive = al.filter(p=>!p.isCpu);
-      if (R.humanVotedSet.size>=humansAlive.length && Object.keys(R.votes||{}).length>=al.length)
-        later(500,tallyVotes);
+      maybeTallyVotesP2P(500);
     }
   }
 
   // ── ホスト: 部屋作成 ──────────────────────────────────
-  function createRoom(hostName, onCode) {
+  function createRoom(hostName, onCode, onError=null, attempt=1) {
+    const notifyError = (err) => {
+      const normalized = err instanceof Error ? err : new Error(err?.message || String(err || 'P2P room creation failed'));
+      if (typeof onError === 'function') onError(normalized);
+      else alert('P2P接続エラー: ' + normalized.message);
+    };
     if (typeof Peer === 'undefined') {
-      alert('P2P機能の読み込みに失敗しました。インターネット接続を確認するか、ソロデモ/ローカルモードで遊んでください。');
+      notifyError(new Error('P2P機能の読み込みに失敗しました。インターネット接続を確認するか、ソロデモ/ローカルモードで遊んでください。'));
       return;
     }
-    destroy();
-    isHost = true;
-    R.hostName = hostName;
-    R.pendingPlayers = [{ name: hostName, isCpu: false }];
-    R.phase = 'lobby';
-    R.peerLastSeen = {};
-    const code = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+    if (attempt <= 1) {
+      destroy();
+      isHost = true;
+      R.hostName = hostName;
+      R.pendingPlayers = [{ name: hostName, isCpu: false }];
+      R.phase = 'lobby';
+      R.peerLastSeen = {};
+      R.syncSeq = 0;
+      scheduleHeartbeat();
+    } else {
+      closePeerOnly();
+      isHost = true;
+    }
+    const code = randomRoomCode();
     R.roomCode = code;
-    scheduleHeartbeat();
     const pid  = 'WLF' + code;
-    peer = new Peer(pid, { debug: 0 });
-    peer.on('open', id => {
-      const roomCode = id.startsWith('WLF') ? id.slice(3, 6) : normalizeRoomCode(id);
-      onCode(roomCode);
+    if (typeof O === 'object') {
+      O.roomCode = code;
+      O.p2pCreateAttempt = attempt;
+      try { render(); } catch(e) {}
+    }
+    let createdPeer = null;
+    try {
+      createdPeer = new Peer(pid, { debug: 0 });
+      peer = createdPeer;
+    } catch (err) {
+      destroy();
+      notifyError(new Error('P2P部屋の作成に失敗しました: ' + (err?.message || err)));
+      return;
+    }
+    createdPeer.on('open', id => {
+      if (peer !== createdPeer) return;
+      const openedId = String(id || pid);
+      const roomCode = openedId.startsWith('WLF') ? openedId.slice(3, 6) : normalizeRoomCode(openedId);
+      R.roomCode = roomCode;
+      if (typeof onCode === 'function') onCode(roomCode);
     });
-    peer.on('connection', conn => {
+    createdPeer.on('connection', conn => {
+      if (peer !== createdPeer) return;
       conn.on('open', () => {
+        if (peer !== createdPeer) return;
         hostConns[conn.peer] = conn;
         conn.on('data', raw => {
           try { handleGuestMsg(conn.peer, JSON.parse(raw)); } catch(e){}
@@ -5312,9 +6005,21 @@ const P2PEngine = (() => {
         });
       });
     });
-    peer.on('error', err => {
-      if (err.type === 'unavailable-id') { peer.destroy(); createRoom(hostName, onCode); }
-      else alert('P2P接続エラー: ' + err.message);
+    createdPeer.on('error', err => {
+      if (peer !== createdPeer) return;
+      if (err?.type === 'unavailable-id') {
+        try { createdPeer.destroy(); } catch(e) {}
+        if (peer === createdPeer) peer = null;
+        if (attempt < P2P_CREATE_MAX_ATTEMPTS) {
+          createRoom(hostName, onCode, onError, attempt + 1);
+          return;
+        }
+        destroy();
+        notifyError(new Error('3桁の部屋コードが混雑しています。少し待ってからもう一度作成してください。'));
+        return;
+      }
+      destroy();
+      notifyError(new Error('P2P接続エラー: ' + (err?.message || err)));
     });
   }
 
@@ -5327,25 +6032,35 @@ const P2PEngine = (() => {
     const roomCode = normalizeRoomCode(code);
     if (!roomCode) { onError(new Error('room code is empty')); return; }
     destroy();
+    const attemptId = ++joinAttemptId;
     isHost = false;
-    peer = new Peer({ debug: 0 });
+    let currentPeer = null;
+    try {
+      currentPeer = new Peer({ debug: 0 });
+      peer = currentPeer;
+    } catch (err) {
+      onError(new Error('P2P接続の準備に失敗しました: ' + (err?.message || err)));
+      return;
+    }
     let settled = false;
     let connectTimer = null;
+    const isCurrentAttempt = () => attemptId === joinAttemptId && peer === currentPeer;
     const fail = (err) => {
-      if (settled) return;
+      if (settled || !isCurrentAttempt()) return;
       settled = true;
       if (connectTimer) { clearTimeout(connectTimer); connectTimer = null; }
       try { if (guestConn) guestConn.close(); } catch (_) {}
       try { if (peer) peer.destroy(); } catch (_) {}
       onError(err instanceof Error ? err : new Error(err?.message || 'P2P connection failed'));
     };
-    peer.on('open', () => {
+    currentPeer.on('open', () => {
+      if (!isCurrentAttempt()) return;
       guestConn = peer.connect('WLF' + roomCode, { reliable: true });
-      connectTimer = setTimeout(() => {
+      connectTimer = later(15000, () => {
         fail(new Error('ホストが見つかりません。部屋コード・ホスト画面・通信環境を確認してください。'));
-      }, 15000);
+      });
       guestConn.on('open', () => {
-        if (settled) return;
+        if (settled || !isCurrentAttempt()) return;
         settled = true;
         if (connectTimer) { clearTimeout(connectTimer); connectTimer = null; }
         guestConn.on('data', raw => {
@@ -5356,23 +6071,30 @@ const P2PEngine = (() => {
       });
       guestConn.on('error', fail);
       guestConn.on('close', () => {
+        if (!isCurrentAttempt()) return;
         if (!settled) fail(new Error('ホストとの接続が閉じられました。'));
+        else {
+          O.p2pConnClosedAt = Date.now();
+          O.p2pAutoResyncReason = 'connection_closed';
+          try { render(); } catch(e) {}
+        }
       });
     });
-    peer.on('error', fail);
+    currentPeer.on('error', fail);
   }
 
   // ── ゲストからのメッセージをホストが処理 ─────────────
   function handleGuestMsg(connId, data) {
     // '__host__' はホスト自身が送ったメッセージ
     const pname = (connId === '__host__') ? R.hostName : connNames[connId];
-    if (pname && connId !== '__host__' && data.type !== 'join_room') markPeerSeen(pname, data.phase || '');
+    if (pname && connId !== '__host__' && data.type !== 'join_room') markPeerSeen(pname, data.phase || '', data.seen_seq);
     switch (data.type) {
       case 'join_room': {
         const name = (data.name||'ゲスト').trim();
         connNames[connId] = name;
         R.pendingPlayers = R.pendingPlayers||[];
         if (R.phase && R.phase !== 'lobby') {
+          if (reconnectPlayer(connId, name)) return;
           delete connNames[connId];
           sendToConn(connId, {type:'error', msg:'game already started', fatal:true});
           return;
@@ -5388,15 +6110,17 @@ const P2PEngine = (() => {
           return;
         }
         R.pendingPlayers.push({ name, isCpu: false });
+        O.cpuCount = Math.max(0, Math.min(O.cpuCount || 0, MAX_PLAYERS - R.pendingPlayers.length));
         markPeerSeen(name, 'lobby');
         O.players = O.players || [];
         O.players.push({ pid: O.players.length, name });
-        sendToConn(connId, { type:'room_joined', code:R.roomCode, pid:connId, is_host:false, players:O.players });
-        broadcast({ type:'player_joined', players: O.players });
+        sendToConn(connId, { type:'room_joined', code:R.roomCode, pid:connId, is_host:false, players:O.players, cpu_count:O.cpuCount || 0 });
+        broadcast({ type:'player_joined', players: O.players, cpu_count:O.cpuCount || 0 });
         break;
       }
       case 'heartbeat_ack':
-        markPeerSeen(pname, data.phase || '');
+        markPeerSeen(pname, data.phase || '', data.seen_seq);
+        maybeResyncLaggingPeer(pname, data.seen_seq);
         break;
       case 'set_cpu_count':
         if (connId !== '__host__' || (R.phase && R.phase !== 'lobby')) break;
@@ -5417,9 +6141,14 @@ const P2PEngine = (() => {
         beginNightFlow();
         break;
       case 'wolf_chat_done':
-        if (R.phase !== 'wolf_chat' || !pname) break;
+        if (R.phase !== 'wolf_chat' || !pname) {
+          if (pname) { pushP2PEvent('wolf_ready_invalid', `${pname} / phase:${R.phase || '-'}`); sendResyncTo(pname); }
+          break;
+        }
+        pushP2PEvent('wolf_ready_received', pname);
         if (!R.wolfDoneSet) R.wolfDoneSet = new Set();
         R.wolfDoneSet.add(pname);
+        sendTo(pname, {type:'wolf_chat_ready_ack'});
         {
           const humanWolves = alive().filter(p=>p.role==='WEREWOLF'&&!p.isCpu).map(p=>p.name);
           if (humanWolves.every(n=>R.wolfDoneSet.has(n))) later(400, startNight);
@@ -5429,25 +6158,43 @@ const P2PEngine = (() => {
         if (pname) sendToWolves({ type:'wolf_chat_msg', name:pname, text:data.text });
         break;
       case 'night_action':
-        if (pname) handleNightAction(pname, data);
+        if (pname) {
+          pushP2PEvent('night_action_received', `${pname}/${data.action || ''}`);
+          handleNightAction(pname, data);
+        }
         break;
       case 'disc_message':
         if (pname) handleDiscMsg(pname, data.text);
         break;
       case 'vote':
-        if (pname) handleVote(pname, data.target, data.reason);
+        if (pname) {
+          pushP2PEvent('vote_received', `${pname} -> ${data.target || ''}`);
+          handleVote(pname, data.target, data.reason);
+        }
         break;
       case 'resync_request':
-        if (pname) sendResyncTo(pname);
+        if (pname) {
+          pushP2PEvent('resync_request', pname);
+          sendResyncTo(pname);
+        }
         break;
       case 'music_ended':
         if (connId === '__host__' && R.phase === 'discuss') { R.phase = 'voting'; later(300, startVote); }
         break;
       case 'vote_ready':
-        if (!isHost || R.phase !== 'discuss' || !pname) break;
-        if (!alive().some(p=>p.name===pname && !p.isCpu)) break;
+        if (!isHost || R.phase !== 'discuss' || !pname) {
+          if (pname) { pushP2PEvent('vote_ready_invalid', `${pname || '-'} / phase:${R.phase || '-'}`); sendResyncTo(pname); }
+          break;
+        }
+        if (!alive().some(p=>p.name===pname && !p.isCpu)) {
+          pushP2PEvent('vote_ready_invalid', `${pname} / not alive`);
+          sendResyncTo(pname);
+          break;
+        }
+        pushP2PEvent('vote_ready_received', pname);
         if (!R.voteReadySet) R.voteReadySet = new Set();
         R.voteReadySet.add(pname);
+        sendTo(pname, {type:'vote_ready_ack'});
         markP2PCpuReady();
         broadcastVoteReadyP2P();
         _checkVoteReadyP2P();
@@ -5463,7 +6210,8 @@ const P2PEngine = (() => {
   function startGame() {
     resetTimers(); // 前ゲームのタイマーを掃除
     const humanPlayers = R.pendingPlayers || [{ name: R.hostName, isCpu: false }];
-    const cpuCount = O.cpuCount || 0;
+    const cpuCount = Math.max(0, Math.min(O.cpuCount || 0, MAX_PLAYERS - humanPlayers.length));
+    O.cpuCount = cpuCount;
     const cpuPool = shuffle(CPU_NAMES.filter(n=>!humanPlayers.find(p=>p.name===n)));
     const allPlayers = [...humanPlayers];
     for (let i=0; i<cpuCount; i++)
@@ -5487,7 +6235,7 @@ const P2PEngine = (() => {
       wolfDoneSet:new Set(),
       discMsgs:[], discOrder:[], discIdx:0, discRound:1,
       waitingForHuman: null, _discFallback: null,
-      votes:{}, voteReasons:{}, humanVotedSet:new Set(), tallyDone:false,
+      votes:{}, voteReasons:{}, humanVotedSet:new Set(), autoVotes:new Set(), tallyDone:false,
       accuCount:{}, seerKnown:{}, log:[], syncSeq:0, peerLastSeen:R.peerLastSeen || {},
     };
     scheduleHeartbeat();
@@ -5517,6 +6265,7 @@ const P2PEngine = (() => {
     R.wolfDoneSet = new Set();
     BRAIN.initR(R);
     const wolves = alive().filter(p=>p.role==='WEREWOLF');
+    wolves.filter(p=>!p.isCpu && p.disconnected).forEach(p=>R.wolfDoneSet.add(p.name));
     sendToWolves({ type:'wolf_chat_start', wolf_names:wolves.map(p=>p.name) });
     const cpuWolves = wolves.filter(p=>p.isCpu);
     const vill = alive().filter(p=>p.role!=='WEREWOLF');
@@ -5527,6 +6276,10 @@ const P2PEngine = (() => {
         later(t, ()=>sendToWolves({type:'wolf_chat_msg',name:w.name,text:personagizeWolfNight(w,tgt.name)}));
         t += 1400 + Math.floor(Math.random()*600);
       });
+    }
+    const humanWolves = wolves.filter(p=>!p.isCpu).map(p=>p.name);
+    if (!humanWolves.length || humanWolves.every(n=>R.wolfDoneSet.has(n))) {
+      later(cpuWolves.length ? 2600 : 700, startNight);
     }
   }
 
@@ -5545,6 +6298,7 @@ const P2PEngine = (() => {
     // 各役職プレイヤーにアクション要求
     al.forEach(p => {
       if (p.isCpu) return;
+      if (p.disconnected) { R.humanActionDone[p.name] = true; return; }
       const others = al.filter(x=>x!==p);
       // 初日から全役職が行動可能
       if (p.role==='WEREWOLF') {
@@ -5595,39 +6349,58 @@ const P2PEngine = (() => {
 
   function handleNightAction(pname, data) {
     const player = byName(pname);
-    if (R.phase !== 'night' || !player || !player.alive || R.humanActionDone[pname]) return;
+    if (R.phase !== 'night' || !player || !player.alive) {
+      pushP2PEvent('night_action_invalid', `${pname} / phase:${R.phase || '-'}`);
+      sendResyncTo(pname);
+      return;
+    }
+    if (R.humanActionDone[pname]) {
+      pushP2PEvent('night_action_invalid', `${pname} / duplicate`);
+      sendTo(pname,{type:'action_ack'});
+      sendResyncTo(pname);
+      return;
+    }
+    let doneNames = [pname];
     if (player.role==='WEREWOLF') {
       const tgt=byName(data.target);
       if (!tgt || !tgt.alive || tgt.role==='WEREWOLF') {
         sendTo(pname,{type:'error',msg:'invalid wolf target'});
+        sendResyncTo(pname);
         return;
       }
+      doneNames = alive().filter(p=>p.role==='WEREWOLF'&&!p.isCpu).map(p=>p.name);
       R.humanWolfChoice=data.target;
       sendToWolves({type:'wolf_chosen',target:data.target});
       sendTo(pname,{type:'action_ack'});
+      pushP2PEvent('action_ack', `${pname}/wolf`);
     } else if (player.role==='SEER') {
       const tgt=byName(data.target);
       if (!tgt || !tgt.alive || tgt.name===player.name) {
         sendTo(pname,{type:'error',msg:'占える相手を選び直してください'});
+        sendResyncTo(pname);
         return;
       }
       const iw=tgt?tgt.role==='WEREWOLF':false;
       R.seerKnown[data.target]=iw;
       sendTo(pname,{type:'seer_result',target:data.target,is_wolf:iw});
+      pushP2PEvent('action_ack', `${pname}/seer`);
     } else if (player.role==='DOCTOR') {
       const tgt=byName(data.target);
       if (!tgt || !tgt.alive || tgt.name===player.name) {
         sendTo(pname,{type:'error',msg:'騎士は自分自身を護衛できません'});
+        sendResyncTo(pname);
         return;
       }
       if (tgt.name===R.lastDoctorTarget) {
         sendTo(pname,{type:'error',msg:'同じ人を2夜連続で護衛することはできません'});
+        sendResyncTo(pname);
         return;
       }
       R.doctorTarget=data.target;
       sendTo(pname,{type:'action_ack'});
+      pushP2PEvent('action_ack', `${pname}/doctor`);
     }
-    R.humanActionDone[pname]=true;
+    doneNames.forEach(n => { R.humanActionDone[n]=true; });
     checkNightDone();
   }
 
@@ -5667,7 +6440,12 @@ const P2PEngine = (() => {
 
   // ── 議論 ────────────────────────────────────────────
   function p2pAliveHumans() {
-    return alive().filter(p=>!p.isCpu);
+    return alive().filter(p=>!p.isCpu && !p.disconnected);
+  }
+
+  function markP2PDisconnectedReady() {
+    if (!R.voteReadySet) R.voteReadySet = new Set();
+    alive().filter(p=>!p.isCpu && p.disconnected).forEach(p=>R.voteReadySet.add(p.name));
   }
 
   function markP2PCpuReady() {
@@ -5677,6 +6455,7 @@ const P2PEngine = (() => {
 
   function broadcastVoteReadyP2P() {
     if (!R.voteReadySet) R.voteReadySet = new Set();
+    markP2PDisconnectedReady();
     const humans = p2pAliveHumans();
     const readyNames = humans.filter(p=>R.voteReadySet.has(p.name)).map(p=>p.name);
     broadcast({ type:'vote_ready_upd', readyNames, readyTotal:humans.length });
@@ -5685,6 +6464,7 @@ const P2PEngine = (() => {
   function _checkVoteReadyP2P() {
     if (R.phase !== 'discuss') return;
     if (R.voteReadyAll) return;
+    markP2PDisconnectedReady();
     markP2PCpuReady();
     const humans = p2pAliveHumans();
     if (!humans.length || humans.every(p => R.voteReadySet.has(p.name))) {
@@ -5704,9 +6484,10 @@ const P2PEngine = (() => {
     const al=alive();
     const song = _pickSong();
     const songStarted = Date.now() + 650;
+    markP2PDisconnectedReady();
     if (R._discFallback) clearTimeout(R._discFallback);
     R._discFallback = setTimeout(()=>{ if(R.phase==='discuss'){R.phase='voting';startVote();} }, 5*60*1000);
-    broadcast({type:'discuss_start',round:1,total_rounds:2,eliminated:elim,night_report:R.nightReport,alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})),readyTotal:al.filter(p=>!p.isCpu).length,song,songStarted});
+    broadcast({type:'discuss_start',round:1,total_rounds:2,eliminated:elim,night_report:R.nightReport,alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel,disconnected:!!p.disconnected,disconnectedAt:p.disconnectedAt||null})),readyTotal:p2pAliveHumans().length,song,songStarted});
     R.discOrder=shuffle([...al]);
     R.discIdx=0;
     later(600,advanceDisc);
@@ -5721,7 +6502,14 @@ const P2PEngine = (() => {
         later(700, advanceDisc);
       } else {
         // 2ラウンド完了: 全CPUを自動レディ
-        alive().filter(p=>p.isCpu).forEach((p,i) => {
+        const cpuPlayers = alive().filter(p=>p.isCpu);
+        if (!cpuPlayers.length) {
+          markP2PDisconnectedReady();
+          broadcastVoteReadyP2P();
+          _checkVoteReadyP2P();
+          return;
+        }
+        cpuPlayers.forEach((p,i) => {
           later(600 + i*350, () => {
             if (R.phase !== 'discuss') return;
             markP2PCpuReady();
@@ -5734,6 +6522,13 @@ const P2PEngine = (() => {
     }
     const player = R.discOrder[R.discIdx];
     if (!player || !player.alive) { R.discIdx++; later(300, advanceDisc); return; }
+    if (!player.isCpu && player.disconnected) {
+      if (!R.voteReadySet) R.voteReadySet = new Set();
+      R.voteReadySet.add(player.name);
+      R.discIdx++;
+      later(200, advanceDisc);
+      return;
+    }
     if (player.isCpu) {
       broadcast({ type:'disc_turn', name:player.name });
       later(typingDelay(player.personality), () => {
@@ -5775,12 +6570,12 @@ const P2PEngine = (() => {
 
   // ── 投票 ─────────────────────────────────────────────
   function startVote() {
-    R.phase='vote'; R.votes={}; R.voteReasons={}; R.humanVotedSet=new Set(); R.tallyDone=false;
+    R.phase='vote'; R.votes={}; R.voteReasons={}; R.humanVotedSet=new Set(); R.autoVotes=new Set(); R.tallyDone=false;
     if (R._discFallback) { clearTimeout(R._discFallback); R._discFallback = null; } // 議論フォールバックを停止
     const al=alive();
-    // 死亡プレイヤーは投票不要
-    al.filter(p=>!p.isCpu).forEach(p=>{ /* 生きている人間のみ投票 */ });
-    broadcast({type:'vote_start',alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel}))});
+    al.filter(p=>!p.isCpu && p.disconnected).forEach(p=>autoVoteForDisconnected(p.name));
+    broadcast({type:'vote_start',alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel,disconnected:!!p.disconnected,disconnectedAt:p.disconnectedAt||null}))});
+    if (Object.keys(R.votes||{}).length) broadcast({type:'vote_progress',done:Object.keys(R.votes).length,total:al.length});
     const cpus=al.filter(p=>p.isCpu);
     cpus.forEach((cpu,i)=>later(900+i*600,()=>{
       const tgt=BRAIN.vote(R, cpu);
@@ -5789,26 +6584,41 @@ const P2PEngine = (() => {
         R.voteReasons[cpu.name]=BRAIN.voteReason(R, cpu, tgt);
       }
       const currentAlive = alive();
-      const humanCount=currentAlive.filter(p=>!p.isCpu).length;
       broadcast({type:'vote_progress',done:Object.keys(R.votes).length,total:currentAlive.length});
-      if (R.humanVotedSet.size>=humanCount&&Object.keys(R.votes).length>=currentAlive.length) later(400,tallyVotes);
+      maybeTallyVotesP2P(400);
     }));
-    if (!cpus.length && al.filter(p=>!p.isCpu).length===0) later(500,tallyVotes);
+    if (!cpus.length) maybeTallyVotesP2P(500);
   }
 
   function handleVote(pname, target, reason='') {
     const voter = byName(pname);
     const validTarget = alive().some(p=>p.name===target && p.name!==pname);
-    if (R.phase !== 'vote' || !voter || !voter.alive || !validTarget || R.humanVotedSet.has(pname)) return;
+    const alreadyFinal = R.humanVotedSet && R.humanVotedSet.has(pname) && !(R.autoVotes && R.autoVotes.has(pname));
+    if (R.phase !== 'vote' || !voter || !voter.alive) {
+      pushP2PEvent('vote_invalid', `${pname} / phase:${R.phase || '-'}`);
+      sendResyncTo(pname);
+      return;
+    }
+    if (!validTarget) {
+      pushP2PEvent('vote_invalid', `${pname} -> ${target || '-'}`);
+      sendTo(pname,{type:'error',msg:'投票先が現在の生存者と合いません。最新状態に再同期します。'});
+      sendResyncTo(pname);
+      return;
+    }
+    if (alreadyFinal) {
+      sendTo(pname,{type:'vote_ack'});
+      pushP2PEvent('vote_ack', `${pname} duplicate`);
+      return;
+    }
     R.votes[pname]=target;
     R.voteReasons[pname]=(reason || '').trim() || `${target}さんへの疑いを確認する投票です。`;
     R.humanVotedSet.add(pname);
+    if (R.autoVotes) R.autoVotes.delete(pname);
     sendTo(pname,{type:'vote_ack'});
+    pushP2PEvent('vote_ack', pname);
     const al=alive();
     broadcast({type:'vote_progress',done:Object.keys(R.votes).length,total:al.length});
-    const humansAlive=al.filter(p=>!p.isCpu);
-    if (R.humanVotedSet.size>=humansAlive.length&&Object.keys(R.votes).length>=al.length)
-      later(500,tallyVotes);
+    maybeTallyVotesP2P(500);
   }
 
   function cpuVoteTarget(cpu) {
@@ -5868,7 +6678,7 @@ const P2PEngine = (() => {
       vote_reasons:R.voteReasons,
       votes:R.votes,
       winner:win,
-      players:win?R.players.map(p=>({name:p.name,role:p.role,alive:p.alive,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})):null,
+      players:win?R.players.map(p=>({name:p.name,role:p.role,alive:p.alive,disconnected:!!p.disconnected,disconnectedAt:p.disconnectedAt||null,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})):null,
       log:win?R.log:null,
     });
     // 霊媒師（生存人間）に個別通知
@@ -5890,7 +6700,7 @@ const P2PEngine = (() => {
     R.winner = winner;
     broadcast({
       type:'game_over', winner,
-      players:R.players.map(p=>({name:p.name,role:p.role,alive:p.alive,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})),
+      players:R.players.map(p=>({name:p.name,role:p.role,alive:p.alive,disconnected:!!p.disconnected,disconnectedAt:p.disconnectedAt||null,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})),
       log:R.log,
       night_report:R.nightReport||null,
       eliminated:victim?{name:victim.name,role:victim.role}:null,
@@ -5957,15 +6767,78 @@ const P2PEngine = (() => {
   }
 
   // ── 外部公開 ─────────────────────────────────────────
+  function guestPayload(msg) {
+    if (!msg || typeof msg !== 'object') return msg;
+    return {
+      ...msg,
+      phase: msg.phase || O.phase || '',
+      seen_seq: msg.seen_seq ?? O.p2pSyncSeq ?? 0,
+    };
+  }
+  function markGuestSendClosed(reason='send_failed') {
+    if (isHost) return;
+    O.p2pConnClosedAt = Date.now();
+    O.p2pAutoResyncReason = reason;
+    pushP2PEvent(reason, 'send closed');
+    try { render(); } catch(e) {}
+  }
+  function trackGuestActionSend(msg) {
+    if (isHost || !msg || !msg.type) return;
+    const detail = msg.target || msg.action || msg.reason || '';
+    if (msg.type === 'vote') pushP2PEvent('vote_sent', detail);
+    else if (msg.type === 'night_action') pushP2PEvent('night_action_sent', detail);
+    else if (msg.type === 'wolf_chat_done') pushP2PEvent('wolf_ready_sent', '');
+    else if (msg.type === 'vote_ready') pushP2PEvent('vote_ready_sent', '');
+    else if (msg.type === 'resync_request') pushP2PEvent('resync_request', msg.reason || '');
+  }
   function wsSendP2P(msg) {
-    if (isHost) { handleGuestMsg('__host__', msg); }
-    else if (guestConn&&guestConn.open) { guestConn.send(JSON.stringify(msg)); }
+    if (isHost) { handleGuestMsg('__host__', msg); return true; }
+    if (guestConn&&guestConn.open) {
+      try {
+        guestConn.send(JSON.stringify(guestPayload(msg)));
+        trackGuestActionSend(msg);
+        return true;
+      } catch(e) {
+        markGuestSendClosed('send_failed');
+        return false;
+      }
+    }
+    markGuestSendClosed('connection_closed');
+    return false;
   }
 
   function requestResync() {
-    if (isHost) resyncAll();
-    else if (guestConn&&guestConn.open) guestConn.send(JSON.stringify({type:'resync_request'}));
-    else handleServer({type:'error', msg:'P2P接続がまだ開いていません'});
+    if (isHost) { resyncAll(); return true; }
+    if (guestConn&&guestConn.open) {
+      try {
+        guestConn.send(JSON.stringify(guestPayload({type:'resync_request'})));
+        return true;
+      } catch(e) {
+        markGuestSendClosed('resync_send_failed');
+        return false;
+      }
+    }
+    markGuestSendClosed('connection_closed');
+    handleServer({type:'error', msg:'P2P接続がまだ開いていません'});
+    return false;
+  }
+
+  function reconnect() {
+    if (isHost) return false;
+    const name = (O.playerName || '').trim();
+    const code = normalizeRoomCode(O.roomCode || O.pendingP2PCode || '');
+    if (!name || !code) {
+      handleServer({type:'error', msg:'再接続に必要な名前または部屋コードが見つかりません'});
+      return false;
+    }
+    clearP2PConnectionWarning(false);
+    O.p2pAutoResyncReason = 'reconnecting';
+    pushP2PEvent('reconnecting', code);
+    joinRoom(name, code,
+      () => { clearP2PConnectionWarning(true); O.p2pAutoResyncReason = 'reconnected'; pushP2PEvent('reconnected', code); render(); },
+      err => { O.p2pConnClosedAt = Date.now(); pushP2PEvent('connection_closed', 'reconnect failed'); handleServer({type:'error', msg:'再接続できませんでした: ' + (err?.message || err)}); }
+    );
+    return true;
   }
 
   function diagnostics() {
@@ -5973,39 +6846,222 @@ const P2PEngine = (() => {
     const now = Date.now();
     const connectedNames = isHost ? Object.keys(hostConns).map(id=>connNames[id]).filter(Boolean) : [];
     const peerAges = connectedNames.map(name => {
-      const seen = R.peerLastSeen?.[name]?.at || 0;
-      return { name, age:seen ? Math.max(0, Math.round((now - seen) / 1000)) : null };
+      const state = R.peerLastSeen?.[name] || {};
+      const seen = state.at || 0;
+      const lag = Number.isFinite(Number(state.seenSeq)) && R.syncSeq ? Math.max(0, R.syncSeq - Number(state.seenSeq)) : null;
+      return { name, age:seen ? Math.max(0, Math.round((now - seen) / 1000)) : null, seenSeq:state.seenSeq ?? null, lag };
     });
-    const peerHealthy = peerAges.filter(p => p.age !== null && p.age <= 20);
-    const peerStale = peerAges.filter(p => p.age === null || p.age > 20);
+    const staleLimitSec = Math.round(P2P_STALE_MS / 1000);
+    const peerHealthy = peerAges.filter(p => p.age !== null && p.age <= staleLimitSec);
+    const peerStale = peerAges.filter(p => p.age === null || p.age > staleLimitSec);
+    const peerLagging = peerAges.filter(p => p.lag !== null && p.lag >= 4);
+    const aliveList = (R.players && typeof alive === 'function') ? alive() : [];
+    const humanAlive = aliveList.filter(p=>!p.isCpu);
+    const actionProgress = {};
+    if (R.phase === 'vote') {
+      const votedNames = Object.keys(R.votes || {});
+      const aliveNames = aliveList.map(p=>p.name);
+      actionProgress.vote = {
+        total:aliveNames.length,
+        doneNames:votedNames.filter(n=>aliveNames.includes(n)),
+        pendingNames:aliveNames.filter(n=>!votedNames.includes(n)),
+        autoNames:Array.from(R.autoVotes || []),
+      };
+    }
+    if (R.phase === 'night') {
+      const doneMap = R.humanActionDone || {};
+      const names = humanAlive.map(p=>p.name);
+      actionProgress.night = {
+        total:names.length,
+        doneNames:names.filter(n=>doneMap[n]),
+        pendingNames:names.filter(n=>!doneMap[n]),
+      };
+    }
+    if (R.phase === 'wolf_chat') {
+      const wolfNames = aliveList.filter(p=>p.role==='WEREWOLF' && !p.isCpu).map(p=>p.name);
+      const readySet = R.wolfDoneSet || new Set();
+      actionProgress.wolfChat = {
+        total:wolfNames.length,
+        readyNames:wolfNames.filter(n=>readySet.has(n)),
+        pendingNames:wolfNames.filter(n=>!readySet.has(n)),
+      };
+    }
+    if (R.phase === 'discuss') {
+      const humans = typeof p2pAliveHumans === 'function' ? p2pAliveHumans() : humanAlive.filter(p=>!p.disconnected);
+      const readySet = R.voteReadySet || new Set();
+      const names = humans.map(p=>p.name);
+      actionProgress.discuss = {
+        total:names.length,
+        readyNames:names.filter(n=>readySet.has(n)),
+        pendingNames:names.filter(n=>!readySet.has(n)),
+      };
+    }
     return {
       isHost,
       connCount:isHost ? Object.keys(hostConns).length : (guestConn&&guestConn.open ? 1 : 0),
       playerCount:list.length,
       aliveCount:R.players ? R.players.filter(p=>p.alive).length : 0,
+      disconnectedCount:R.players ? R.players.filter(p=>p.disconnected).length : 0,
       hostPhase:R.phase || '',
       roomCode:R.roomCode || '',
       peerHealthyCount:peerHealthy.length,
       peerStaleCount:peerStale.length,
       peerStaleNames:peerStale.map(p=>p.name),
+      peerLagCount:peerLagging.length,
+      peerLagNames:peerLagging.map(p=>p.name),
       peerAges,
+      actionProgress,
     };
   }
 
   function destroy() {
+    joinAttemptId++;
     resetTimers(); // 残留タイマーを停止してから破棄
     if (peer) { try{peer.destroy();}catch(e){} peer=null; }
     hostConns={}; connNames={}; guestConn=null; isHost=false; R={};
   }
 
-  return { createRoom, joinRoom, wsSendP2P, startGame, destroy, resetTimers, requestResync, diagnostics };
+  return { createRoom, joinRoom, wsSendP2P, startGame, destroy, resetTimers, requestResync, reconnect, diagnostics };
 })();
 
 // ========== ONLINE STATE ==========
 // mode は最下部で 'opening' として初期化
 let O = {};
+let p2pWatchdogTimer = null;
+let p2pResumeHooksInstalled = false;
+let voteAckWatchdogTimer = null;
+let p2pActionAckWatchdogTimer = null;
+
+function clearP2PWatchdog() {
+  if (p2pWatchdogTimer) clearTimeout(p2pWatchdogTimer);
+  p2pWatchdogTimer = null;
+}
+
+function clearVoteAckWatchdog() {
+  if (voteAckWatchdogTimer) clearTimeout(voteAckWatchdogTimer);
+  voteAckWatchdogTimer = null;
+}
+
+function clearP2PActionAckWatchdog() {
+  if (p2pActionAckWatchdogTimer) clearTimeout(p2pActionAckWatchdogTimer);
+  p2pActionAckWatchdogTimer = null;
+}
+
+function clearP2PConnectionWarning(clearAuto=false) {
+  O.p2pConnClosedAt = 0;
+  if (clearAuto) {
+    O.p2pAutoResyncAt = 0;
+    O.p2pAutoResyncReason = '';
+  }
+}
+
+function scheduleP2PActionAckWatchdog(kind) {
+  clearP2PActionAckWatchdog();
+  if (mode !== 'p2p' || O.isHost || !kind) return;
+  const phaseAtSend = O.phase || '';
+  p2pActionAckWatchdogTimer = setTimeout(() => {
+    p2pActionAckWatchdogTimer = null;
+    if (mode !== 'p2p' || O.isHost || O.phase !== phaseAtSend) return;
+    const stillPending =
+      (kind === 'wolf_ready' && O.wolfChatReadyPending && !O.wolfChatReady) ||
+      (kind === 'night_action' && O.nightActionPending && !O.nightActionDone) ||
+      (kind === 'vote_ready' && O.voteReadyPending && !O.voteReadyNames.includes(O.playerName));
+    if (!stillPending) return;
+    const reason = `${kind}_ack_timeout`;
+    pushP2PEvent(reason, phaseAtSend);
+    p2pAutoResync(reason);
+    render();
+  }, 9000);
+}
+
+function p2pAutoResync(reason='') {
+  if (mode !== 'p2p' || O.isHost) return false;
+  const now = Date.now();
+  if (now - (O.p2pAutoResyncAt || 0) < 12000) return false;
+  O.p2pAutoResyncAt = now;
+  O.p2pAutoResyncReason = reason;
+  pushP2PEvent(reason || 'auto_resync', 'request');
+  try {
+    const ok = P2PEngine.wsSendP2P({ type:'resync_request', reason });
+    if (!ok) return false;
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function scheduleVoteAckWatchdog() {
+  clearVoteAckWatchdog();
+  if (mode !== 'p2p' || !O.voteSubmitted || O.voteAckAt || O.phase !== 'vote') return;
+  voteAckWatchdogTimer = setTimeout(() => {
+    voteAckWatchdogTimer = null;
+    if (mode !== 'p2p' || O.phase !== 'vote' || !O.voteSubmitted || O.voteAckAt) return;
+    O.voteAckWarningAt = Date.now();
+    p2pAutoResync('vote_ack_timeout');
+    const retryCount = O.voteAckRetryCount || 0;
+    const target = O.voteSentTarget || O.voteTarget || '';
+    const reason = O.voteSentReason || O.voteReasonDraft || '';
+    const canRetry = retryCount < 2 && target && (O.alive || []).some(p => p.name === target && p.name !== O.playerName);
+    if (canRetry && wsSend({type:'vote', target, reason, retry:true})) {
+      O.voteAckRetryCount = retryCount + 1;
+      O.voteAckRetryAt = Date.now();
+      scheduleVoteAckWatchdog();
+    }
+    render();
+  }, 9000);
+}
+
+function scheduleP2PWatchdog() {
+  clearP2PWatchdog();
+  if (mode !== 'p2p' || O.isHost || !O.p2pHeartbeatAt) return;
+  p2pWatchdogTimer = setTimeout(() => {
+    if (mode !== 'p2p' || O.isHost || !O.p2pHeartbeatAt) return;
+    const age = Date.now() - O.p2pHeartbeatAt;
+    const activePhase = O.phase && !['p2p_setup','setup','lobby','game_over'].includes(O.phase);
+    if (activePhase && age > 25000) {
+      p2pAutoResync('heartbeat_timeout');
+      render();
+    }
+  }, 26000);
+}
+
+function p2pResumeSync(reason='resume_sync') {
+  if (mode !== 'p2p' || !O || !O.phase) return false;
+  if (['p2p_setup','setup','lobby','game_over'].includes(O.phase)) return false;
+  const now = Date.now();
+  if (now - (O.p2pResumeSyncAt || 0) < 4000) return false;
+  O.p2pResumeSyncAt = now;
+  pushP2PEvent(reason || 'resume_sync', 'resume');
+  let ok = false;
+  if (O.isHost) {
+    ok = P2PEngine.requestResync();
+    if (ok) O.p2pResyncAt = now;
+  } else if (O.p2pConnClosedAt) {
+    ok = P2PEngine.reconnect();
+  } else {
+    ok = p2pAutoResync(reason);
+  }
+  render();
+  return ok;
+}
+
+function installP2PResumeHooks() {
+  if (p2pResumeHooksInstalled || typeof window === 'undefined') return;
+  p2pResumeHooksInstalled = true;
+  const resumeSoon = () => setTimeout(() => p2pResumeSync('resume_sync'), 180);
+  try {
+    document.addEventListener('visibilitychange', () => {
+      if (!document.visibilityState || document.visibilityState === 'visible') resumeSoon();
+    });
+  } catch(e) {}
+  try { window.addEventListener('focus', resumeSoon); } catch(e) {}
+  try { window.addEventListener('pageshow', resumeSoon); } catch(e) {}
+}
 
 function initOnline() {
+  clearP2PWatchdog();
+  clearVoteAckWatchdog();
+  clearP2PActionAckWatchdog();
   O = {
     ws: null, pid: null, isHost: false,
     roomCode: null, playerName: '', serverAddr: 'localhost:8765',
@@ -6014,10 +7070,10 @@ function initOnline() {
     myRole: null, wolfPartners: [], sharedPartners: [],
     phase: 'setup',
     day: 0, alive: [], eliminatedLastNight: null, nightReport: null,
-    nightActionNeeded: null, nightActionDone: false,
+    nightActionNeeded: null, nightActionDone: false, nightActionPending: false,
     seerResult: null, wolfChosen: null,
     // Wolf chat
-    wolfChatMsgs: [], wolfChatReady: false, wolfPartnerNames: [],
+    wolfChatMsgs: [], wolfChatReady: false, wolfChatReadyPending: false, wolfPartnerNames: [],
     // Discussion
     discMsgs: [], intelMsgs: [], discRound: 1, discTotalRounds: 2,
     currentSpeaker: null, isMyDiscTurn: false,
@@ -6025,21 +7081,22 @@ function initOnline() {
     tplTarget: null,
     tplSeerType: null, // 'wolf'|'safe'
     // Vote
-    voteSubmitted: false, voteDone: 0, voteTotal: 0, voteSentAt: 0, voteAckAt: 0, voteReasons: {}, voteHistory: [], lastVoteResult: null,
+    voteSubmitted: false, voteDone: 0, voteTotal: 0, voteSentAt: 0, voteAckAt: 0, voteAckWarningAt: 0, voteAckRetryAt: 0, voteAckRetryCount: 0, voteSentTarget: '', voteSentReason: '', voteReasons: {}, voteHistory: [], lastVoteResult: null,
     voteResult: null, winner: null,
     finalPlayers: [], log: [],
     // 役職カミングアウト追跡
     roleClaims: {},   // { playerName: 'SEER'|'DOCTOR' } — 宣言のみ、未確定
     deadPlayers: [],  // [{ name, role, avatar, day }]
     // 投票開始ボタン
-    voteReadyNames: [], voteReadyAll: false, voteReadyTotal: 0,
+    voteReadyNames: [], voteReadyAll: false, voteReadyTotal: 0, voteReadyPending: false,
     // 人狼夜選択（ステルス）
     _wolfNightSel: null,
     // 霊媒師
     mediumReveal: null,
     // P2P固有
-    p2pSub: 'choose', pendingP2PCode: '', soloTotal: 5, p2pSyncSeq: 0, p2pSyncAt: 0, p2pResyncAt: 0, p2pLastType: '',
-    p2pHeartbeatAt: 0, p2pHostPhase: '',
+    p2pSub: 'choose', pendingP2PCode: '', p2pCreateAttempt: 0, p2pCreateError: '', soloTotal: 5, p2pSyncSeq: 0, p2pSyncAt: 0, p2pResyncAt: 0, p2pLastType: '',
+    p2pHeartbeatAt: 0, p2pHostPhase: '', p2pAutoResyncAt: 0, p2pAutoResyncReason: '', p2pConnClosedAt: 0, p2pResumeSyncAt: 0,
+    p2pEventLog: [],
     // 成長システム（捜査ノート・難易度・リザルト）※ solo/p2p/online 共通
     notebook: {}, soloDiff: 'normal', gameRecap: null, _scored: false,
     // 戦績スコア用の自己追跡（自分の投票履歴・占い的中・護衛成功）
@@ -6066,9 +7123,10 @@ function wsConnect(addr, onOpen) {
 }
 
 function wsSend(msg) {
-  if (mode === 'solo')  { SoloEngine.handle(msg); return; }
-  if (mode === 'p2p')   { P2PEngine.wsSendP2P(msg); return; }
-  if (O.ws && O.ws.readyState === WebSocket.OPEN) O.ws.send(JSON.stringify(msg));
+  if (mode === 'solo')  { SoloEngine.handle(msg); return true; }
+  if (mode === 'p2p')   return P2PEngine.wsSendP2P(msg);
+  if (O.ws && O.ws.readyState === WebSocket.OPEN) { O.ws.send(JSON.stringify(msg)); return true; }
+  return false;
 }
 
 function handleServer(data) {
@@ -6083,9 +7141,14 @@ function handleServer(data) {
       O.players = data.players; O.phase = 'lobby'; break;
     case 'room_joined':
       O.roomCode = data.code; O.pid = data.pid; O.isHost = false;
-      O.players = data.players; O.phase = 'lobby'; break;
+      clearP2PConnectionWarning(true);
+      O.players = data.players; O.cpuCount = data.cpu_count ?? O.cpuCount ?? 0; O.phase = 'lobby'; break;
     case 'player_joined': case 'player_left':
-      O.players = data.players; break;
+      O.players = data.players; O.cpuCount = data.cpu_count ?? O.cpuCount ?? 0; syncAlivePresence(); break;
+    case 'player_reconnected':
+      clearP2PConnectionWarning(true);
+      pushP2PEvent('reconnected', data.name || '');
+      O.players = data.players || O.players; syncAlivePresence(); break;
     case 'became_host':
       O.isHost = true; break;
     case 'cpu_count_updated':
@@ -6093,6 +7156,11 @@ function handleServer(data) {
     case 'game_started':
       O.myRole = data.role; O.wolfPartners = data.wolf_partners || []; O.sharedPartners = data.shared_partners || [];
       O.players = data.players; O.isHost = data.is_host || O.isHost;
+      clearP2PConnectionWarning(false);
+      O.nightActionPending = false;
+      O.wolfChatReadyPending = false;
+      O.voteReadyPending = false;
+      clearP2PActionAckWatchdog();
       O.phase = 'role';
       if (['solo','p2p','online'].includes(mode)) {
         O.notebook = {}; O._scored = false; O.gameRecap = null;
@@ -6100,16 +7168,28 @@ function handleServer(data) {
         O.intelMsgs = []; O.voteHistory = []; O.lastVoteResult = null;
         if (!data.p2p_seq) { O.p2pSyncSeq = 0; O.p2pSyncAt = 0; }
       }
+      syncAlivePresence();
       break;
     case 'p2p_heartbeat':
       O.p2pHeartbeatAt = Date.now();
+      clearP2PConnectionWarning(false);
       O.p2pHostPhase = data.phase || O.p2pHostPhase || '';
       if (mode === 'p2p' && !O.isHost) {
         try { P2PEngine.wsSendP2P({ type:'heartbeat_ack', phase:O.phase || '', seen_seq:O.p2pSyncSeq || 0 }); } catch(e) {}
+        const hostPhase = data.phase || '';
+        const localPhase = O.phase || '';
+        const syncPhases = ['role','wolf_chat','night','discuss','vote','vote_result','game_over'];
+        const recoverableLocalPhases = ['setup','p2p_setup','lobby', ...syncPhases];
+        if (hostPhase && localPhase && hostPhase !== localPhase && syncPhases.includes(hostPhase) && recoverableLocalPhases.includes(localPhase)) {
+          p2pAutoResync('phase_mismatch');
+        }
+        scheduleP2PWatchdog();
       }
       break;
     case 'p2p_resync': {
       O.p2pResyncAt = Date.now();
+      pushP2PEvent('p2p_resync', data.phase || '');
+      clearP2PConnectionWarning(true);
       O.roomCode = data.roomCode || O.roomCode;
       O.day = data.day || O.day || 0;
       O.players = data.players || O.players || [];
@@ -6121,18 +7201,25 @@ function handleServer(data) {
       O.nightReport = data.night_report || O.nightReport || null;
       O.eliminatedLastNight = data.eliminated || O.eliminatedLastNight || null;
       O.voteReadyNames = data.vote_ready_names || [];
-      O.voteReadyTotal = data.vote_ready_total || O.voteReadyTotal || 0;
+      O.voteReadyTotal = data.vote_ready_total ?? O.voteReadyTotal ?? 0;
       O.voteReadyAll = !!data.vote_ready_all;
+      O.voteReadyPending = false;
       O.voteDone = data.vote_done ?? O.voteDone ?? 0;
       O.voteTotal = data.vote_total ?? O.voteTotal ?? 0;
+      if (data.phase !== 'night') O.nightActionPending = false;
+      if (data.phase !== 'wolf_chat') O.wolfChatReadyPending = false;
+      if (data.phase !== 'discuss') O.voteReadyPending = false;
+      clearP2PActionAckWatchdog();
 
       if (data.phase === 'wolf_chat') {
         O.wolfPartnerNames = data.wolf_names || O.wolfPartnerNames || [];
-        O.wolfChatReady = false;
+        O.wolfChatReady = !!data.wolf_chat_ready;
+        O.wolfChatReadyPending = false;
         O.phase = 'wolf_chat';
       } else if (data.phase === 'night') {
         O.nightActionNeeded = data.action_needed || null;
         O.nightActionDone = !!data.night_action_done;
+        O.nightActionPending = false;
         O.phase = 'night';
       } else if (data.phase === 'discuss') {
         O.discMsgs = data.disc_msgs || [];
@@ -6146,9 +7233,20 @@ function handleServer(data) {
       } else if (data.phase === 'vote') {
         O.voteSubmitted = !!data.vote_submitted;
         O.voteAckAt = O.voteSubmitted ? Date.now() : 0;
+        if (O.voteSubmitted) {
+          clearVoteAckWatchdog();
+          O.voteAckWarningAt = 0;
+        } else {
+          clearVoteAckWatchdog();
+          O.voteSentAt = 0;
+          O.voteAckWarningAt = 0;
+          O.voteAckRetryAt = 0;
+          O.voteAckRetryCount = 0;
+        }
         O.voteResult = null;
         O.phase = 'vote';
       } else if (data.phase === 'vote_result' || data.phase === 'game_over') {
+        clearVoteAckWatchdog();
         const vr = data.vote_result;
         if (vr) {
           O.voteResult = {
@@ -6163,21 +7261,30 @@ function handleServer(data) {
         }
         O.winner = data.winner || null;
         if (data.phase === 'game_over') {
-          O.finalPlayers = (data.players || []).map(p => ({name:p.name || '?', role:p.role, alive:!!p.alive}));
+          O.finalPlayers = (data.players || []).map(p => ({name:p.name || '?', role:p.role, alive:!!p.alive, disconnected:!!p.disconnected, disconnectedAt:p.disconnectedAt||null}));
           O.log = data.log || O.log || [];
         }
         O.phase = data.phase;
       } else {
         O.phase = data.phase || O.phase;
       }
+      syncAlivePresence();
       break;
     }
     case 'wolf_chat_start':
       O.wolfPartnerNames = data.wolf_names || [];
-      O.wolfChatMsgs = []; O.wolfChatReady = false;
+      O.wolfChatMsgs = []; O.wolfChatReady = false; O.wolfChatReadyPending = false;
+      clearP2PActionAckWatchdog();
       // alive リストをプレイヤー全員で初期化（夜前なので全員生存）
       if (!O.alive || !O.alive.length) O.alive = O.players.map(p=>({ name: p.name }));
+      syncAlivePresence();
       O.phase = 'wolf_chat'; break;
+    case 'wolf_chat_ready_ack':
+      pushP2PEvent('wolf_ready_ack', '');
+      clearP2PActionAckWatchdog();
+      O.wolfChatReady = true;
+      O.wolfChatReadyPending = false;
+      break;
     case 'wolf_chat_msg':
       if (appendIncomingChatOnce(O.wolfChatMsgs, {name: data.name, text: data.text})) {
         speakChatMessage(data.name, data.text);
@@ -6185,20 +7292,29 @@ function handleServer(data) {
       break;
     case 'night_start':
       O.day = data.day; O.nightActionNeeded = null;
-      O.nightActionDone = false; O.seerResult = null; O.wolfChosen = null;
+      O.nightActionDone = false; O.nightActionPending = false; O.seerResult = null; O.wolfChosen = null;
+      clearP2PActionAckWatchdog();
       O.phase = 'night'; break;
     case 'action_needed':
-      O.nightActionNeeded = data; break;
+      O.nightActionNeeded = data; O.nightActionPending = false; break;
     case 'seer_result':
       O.seerResult = {target: data.target, isWolf: data.is_wolf};
       if (data.is_wolf) O.mySeerHits = (O.mySeerHits||0) + 1; // 戦績: 占いで人狼発見
-      O.nightActionDone = true; break;
+      pushP2PEvent('action_ack', `seer/${data.target || ''}`);
+      clearP2PActionAckWatchdog();
+      O.nightActionPending = false; O.nightActionDone = true; break;
     case 'action_ack': case 'wolf_chosen':
       if (data.type === 'wolf_chosen') O.wolfChosen = data.target;
-      O.nightActionDone = true; break;
+      pushP2PEvent('action_ack', data.type === 'wolf_chosen' ? `wolf/${data.target || ''}` : '');
+      clearP2PActionAckWatchdog();
+      O.nightActionPending = false; O.nightActionDone = true; break;
     case 'discuss_start':
+      O.nightActionPending = false;
+      O.wolfChatReadyPending = false;
+      clearP2PActionAckWatchdog();
       O.discMsgs = []; O.discRound = data.round; O.discTotalRounds = data.total_rounds;
       O.eliminatedLastNight = data.eliminated; O.nightReport = data.night_report || null; O.alive = data.alive;
+      syncAlivePresence();
       // 戦績: 騎士の護衛成功を夜明けの結果から推定（守った夜に死者ゼロ＝成功）
       if (O.myRole==='DOCTOR' && O._myLastGuard) {
         if (!data.eliminated) O.myGuardSuccess = (O.myGuardSuccess||0) + 1;
@@ -6206,7 +7322,8 @@ function handleServer(data) {
       }
       O.currentSpeaker = null; O.isMyDiscTurn = false; O.tplStep = null;
       O.voteReadyNames = []; O.voteReadyAll = false;
-      O.voteReadyTotal = data.readyTotal || (O.alive||[]).filter(p=>!p.isCpu).length || (O.alive||[]).length;
+      O.voteReadyPending = false;
+      O.voteReadyTotal = data.readyTotal ?? activeHumanCount();
       // 夜に殺された人を死亡リストへ（役職確定）
       if (data.eliminated) {
         const av = getAvatar(data.eliminated.name, O.players);
@@ -6252,32 +7369,40 @@ function handleServer(data) {
     case 'your_disc_turn':
       O.isMyDiscTurn = true; O.tplStep = 'cat'; O.tplTarget = null; break;
     case 'disc_message':
-      O.discMsgs.push({name: data.name, text: data.text});
-      if (!O.intelMsgs) O.intelMsgs = [];
-      O.intelMsgs.push({name: data.name, text: data.text, day: O.day});
-      speakChatMessage(data.name, data.text);
-      // カミングアウト自動検出（明示的に本人が名乗った場合のみ）
-      if (!O.deadPlayers.find(d=>d.name===data.name)) {
-        const explicitClaim = detectExplicitRoleClaim(data.text);
-        if (explicitClaim) O.roleClaims[data.name] = explicitClaim;
-      }
+      appendDiscussMessageOnce({name: data.name, text: data.text});
       O.currentSpeaker = null; break;
     case 'day_start':
       O.eliminatedLastNight = data.eliminated; O.alive = data.alive;
+      syncAlivePresence();
       O.phase = 'day'; break;
     case 'vote_ready_upd':
       O.voteReadyNames = data.readyNames || [];
-      O.voteReadyTotal = data.readyTotal || O.voteReadyTotal || (O.alive||[]).filter(p=>!p.isCpu).length || (O.alive||[]).length;
+      if (O.voteReadyNames.includes(O.playerName)) O.voteReadyPending = false;
+      O.voteReadyTotal = data.readyTotal ?? O.voteReadyTotal ?? activeHumanCount();
+      break;
+    case 'vote_ready_ack':
+      pushP2PEvent('vote_ready_ack', '');
+      clearP2PActionAckWatchdog();
+      O.voteReadyPending = false;
+      if (!O.voteReadyNames.includes(O.playerName)) O.voteReadyNames.push(O.playerName);
       break;
     case 'vote_ready_all':
       O.voteReadyAll = true;
-      O.voteReadyTotal = data.readyTotal || O.voteReadyTotal || (O.alive||[]).filter(p=>!p.isCpu).length || (O.alive||[]).length;
+      O.voteReadyPending = false;
+      clearP2PActionAckWatchdog();
+      O.voteReadyTotal = data.readyTotal ?? O.voteReadyTotal ?? activeHumanCount();
       fadeOutMusic(1700);
       break;
     case 'vote_start':
       stopMusic(); // 議論BGMを停止
       if (O._musicFailTimer) { clearTimeout(O._musicFailTimer); O._musicFailTimer = null; }
-      O.alive = data.alive; O.voteSubmitted = false; O.voteSentAt = 0; O.voteAckAt = 0; O.voteReasons = {};
+      clearVoteAckWatchdog();
+      clearP2PActionAckWatchdog();
+      O.nightActionPending = false;
+      O.wolfChatReadyPending = false;
+      O.voteReadyPending = false;
+      O.alive = data.alive; O.voteSubmitted = false; O.voteSentAt = 0; O.voteAckAt = 0; O.voteAckWarningAt = 0; O.voteAckRetryAt = 0; O.voteAckRetryCount = 0; O.voteSentTarget = ''; O.voteSentReason = ''; O.voteReasons = {};
+      syncAlivePresence();
       O.voteTarget = '';
       O.voteReasonDraft = '';
       O.voteDone = 0; O.voteTotal = data.alive.length;
@@ -6285,12 +7410,16 @@ function handleServer(data) {
     case 'vote_progress':
       O.voteDone = data.done; O.voteTotal = data.total; break;
     case 'vote_ack':
-      O.voteSubmitted = true; O.voteAckAt = Date.now(); break;
+      clearVoteAckWatchdog();
+      pushP2PEvent('vote_ack', O.voteSentTarget || O.voteTarget || '');
+      O.voteSubmitted = true; O.voteAckAt = Date.now(); O.voteAckWarningAt = 0; break;
     case 'medium_reveal':
       // 霊媒師のみに届く: 処刑された人の役職を記録
       O.mediumReveal = { target: data.target, role: data.role };
       break;
     case 'vote_result':
+      clearVoteAckWatchdog();
+      clearP2PActionAckWatchdog();
       O.voteResult = {executed: data.executed, role: data.executed_role, tally: data.tally, nekomataVictim: data.nekomata_victim, voteReasons: data.vote_reasons || {}, votes: data.votes || {}};
       O.lastVoteResult = O.voteResult;
       O.voteHistory = O.voteHistory || [];
@@ -6301,6 +7430,8 @@ function handleServer(data) {
           name: p.name || '?',
           role: p.role || undefined,
           alive: !!p.alive,
+          disconnected: !!p.disconnected,
+          disconnectedAt: p.disconnectedAt || null,
         }));
         O.log = data.log || [];
       }
@@ -6321,6 +7452,8 @@ function handleServer(data) {
       }
       O.phase = 'vote_result'; break;
     case 'game_over':
+      clearVoteAckWatchdog();
+      clearP2PActionAckWatchdog();
       O.winner = data.winner;
       O.nightReport = data.night_report || O.nightReport || null;
       // data.players が null/undefined の場合は既存の finalPlayers を保持（フォールバック）
@@ -6330,6 +7463,8 @@ function handleServer(data) {
           name: p.name || '?',
           role: p.role || undefined,
           alive: !!p.alive,
+          disconnected: !!p.disconnected,
+          disconnectedAt: p.disconnectedAt || null,
         }));
       }
       O.log = data.log || []; O.eliminatedLastNight = data.eliminated;
@@ -6341,6 +7476,10 @@ function handleServer(data) {
       ), 300);
       break;
     case 'error':
+      O.nightActionPending = false;
+      O.wolfChatReadyPending = false;
+      O.voteReadyPending = false;
+      clearP2PActionAckWatchdog();
       alert(data.msg || data.message);
       if (data.fatal && mode === 'p2p') {
         P2PEngine.destroy();
@@ -6372,6 +7511,14 @@ function renderOnline() {
 
 // ── 人狼チャット ──────────────────────────────────────────────
 function renderOWolfChat() {
+  const actionLocked = p2pActionLocked();
+  const readyLocked = actionLocked || O.wolfChatReady || O.wolfChatReadyPending;
+  const actionBlock = renderP2PActionBlockedNotice();
+  const readyNotice = O.wolfChatReadyPending
+    ? `<div class="p2p-pending-line">ホストの受理待ちです。画面を閉じずに待ってください。</div>`
+    : O.wolfChatReady
+      ? `<div class="p2p-pending-line" style="border-color:#22c55e55;background:rgba(34,197,94,.08);color:#86efac;">準備完了です。仲間の準備を待っています。</div>`
+      : '';
   // 人狼チームメンバーをアバター付きで表示
   const teamAvatarsHtml = O.wolfPartnerNames.length ? `
     <div style="display:flex;justify-content:center;gap:.8rem;flex-wrap:wrap;margin:.5rem 0 .8rem;">
@@ -6408,11 +7555,14 @@ function renderOWolfChat() {
     const needsTarget = t.includes('{n}');
     const label = (WOLF_TPL_LABELS[i] || (needsTarget ? t.replace('{n}','…') : t));
     const action = needsTarget ? `wolfTplTarget(${i})` : `wolfSend('${t.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')`;
-    return `<button class="tpl-btn" onclick="${action}">${label}</button>`;
+    return `<button class="tpl-btn" ${readyLocked ? 'disabled' : ''} onclick="${action}">${label}</button>`;
   }).join('');
 
   return `
     ${ph('🌙', `第${O.day}夜`, 'チームメモ', '#60a5fa')}
+    ${renderP2PStatusPanel()}
+    ${actionBlock}
+    ${readyNotice}
     <div style="display:flex;justify-content:flex-end;margin:.2rem 0 .4rem;">
       <button id="btnChatVoiceTest" title="スマホで音声を有効化してテスト再生" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#94a3b8;border-radius:8px;padding:.25rem .55rem;font-size:.76rem;cursor:pointer;white-space:nowrap;">
         ${chatVoiceLabel()} テスト
@@ -6431,20 +7581,22 @@ function renderOWolfChat() {
     <div class="chat-compose">
       ${quickWolfChatPanel()}
       <div class="free-chat-bar">
-        <input type="text" id="wolfFreeInput" placeholder="メモを入力..." maxlength="200">
-        <button class="send-btn" id="wolfFreeSend">送信</button>
+        <input type="text" id="wolfFreeInput" placeholder="メモを入力..." maxlength="200" ${readyLocked ? 'disabled' : ''}>
+        <button class="send-btn" id="wolfFreeSend" ${readyLocked ? 'disabled' : ''}>送信</button>
       </div>
     </div>
     <p class="tpl-section-label" style="color:#334155;">クイック入力</p>
     ${tplButtons}
     <hr class="div">
-    <button class="btn btn-night" id="wolfChatDone">次へ進む ▶</button>
+    <button class="btn btn-night" id="wolfChatDone" ${readyLocked ? 'disabled' : ''}>${O.wolfChatReadyPending ? '受理待ち...' : O.wolfChatReady ? '準備完了' : '次へ進む ▶'}</button>
   `;
 }
 
 // ── 議論フェーズ ──────────────────────────────────────────────
 function renderODiscuss() {
   const elim = O.eliminatedLastNight;
+  const actionLocked = p2pActionLocked();
+  const actionBlock = renderP2PActionBlockedNotice();
 
   // チャットメッセージ（キャラクターアバター付き）
   const msgs = O.discMsgs.map(m => {
@@ -6499,12 +7651,7 @@ function renderODiscuss() {
        </div>`;
 
   // 生存者チップ（アバター＋カミングアウトバッジ）
-  const aliveChips = O.alive.map(p => {
-    const av = getAvatar(p.name, O.players);
-    const claim = O.roleClaims[p.name];
-    const badge = claim ? roleClaimBadge(claim, true) : '';
-    return `<span class="chip" style="display:inline-flex;align-items:center;">${avatarFace(av, 'portrait-chip')} ${esc(p.name)}${badge}</span>`;
-  }).join('');
+  const aliveChips = O.alive.map(p => playerChipHtml(p, { claim:true })).join('');
 
   // 死亡リスト（役職確定済みのみ）
   const deadListHtml = O.deadPlayers.length ? `
@@ -6546,14 +7693,15 @@ function renderODiscuss() {
     <div class="chat-compose">
       ${quickChatPanel()}
       <div class="free-chat-bar">
-        <input type="text" id="discFreeInput" placeholder="${O.isMyDiscTurn?'💬 あなたの番！自由に発言...':'💬 自由に発言できます...'}" maxlength="220">
-        <button class="send-btn" id="discFreeSend">送信</button>
+        <input type="text" id="discFreeInput" placeholder="${actionLocked ? 'P2P再接続後に発言できます' : O.isMyDiscTurn?'💬 あなたの番！自由に発言...':'💬 自由に発言できます...'}" maxlength="220" ${actionLocked ? 'disabled' : ''}>
+        <button class="send-btn" id="discFreeSend" ${actionLocked ? 'disabled' : ''}>送信</button>
       </div>
     </div>` : '';
 
   // 投票開始ボタン
   const myReady = O.voteReadyNames.includes(O.playerName);
-  const readyTotal = O.voteReadyTotal || (O.alive||[]).filter(p=>!p.isCpu).length || (O.alive||[]).length;
+  const readyPending = !!O.voteReadyPending;
+  const readyTotal = Number.isFinite(Number(O.voteReadyTotal)) ? Number(O.voteReadyTotal) : activeHumanCount();
   const voteReadySection = myAlive ? `
     <div class="vote-ready-bar${O.voteReadyAll?' all-ready':''}">
       ${O.voteReadyAll
@@ -6561,8 +7709,8 @@ function renderODiscuss() {
              🗳️ 全員準備完了！投票が始まります...
            </div>`
         : `<div style="display:flex;align-items:center;gap:.6rem;">
-             <button id="btnVoteReady" class="vote-ready-btn ${myReady?'ready':'not-ready'}" ${myReady?'disabled':''}>
-               ${myReady ? '✅ 投票待機中' : '⚡ 今すぐ投票へ'}
+             <button id="btnVoteReady" class="vote-ready-btn ${myReady?'ready':'not-ready'}" ${(myReady || readyPending || actionLocked)?'disabled':''}>
+               ${actionLocked ? '再接続後に投票へ' : myReady ? '✅ 投票待機中' : readyPending ? '受理待ち...' : '⚡ 今すぐ投票へ'}
              </button>
              <span style="color:#64748b;font-size:.8rem;white-space:nowrap;">${O.voteReadyNames.length}/${readyTotal}人</span>
            </div>
@@ -6603,11 +7751,11 @@ function renderODiscuss() {
         </button>
       </div>
     </div>
-    <div class="mobile-action">${voteReadySection}</div>
+    <div class="mobile-action">${voteReadySection}${actionBlock}</div>
     ${renderCoChat()}
     <div class="chat-feed" id="discFeed">${msgs}${typingHtml}${waitHtml}</div>
     ${freeInput}
-    ${O.isMyDiscTurn ? renderTplPicker() : ''}
+    ${O.isMyDiscTurn && !actionLocked ? renderTplPicker() : ''}
   `;
 }
 
@@ -6748,7 +7896,7 @@ function renderOSetup() {
 }
 
 function renderOLobby() {
-  const pRows = O.players.map(p => `<span class="chip">${esc(p.name)}</span>`).join('');
+  const pRows = O.players.map(p => playerChipHtml(p)).join('');
   const total = O.players.length + O.cpuCount;
   const canStart = O.isHost && total >= 4;
   const cpuCtrl = O.isHost ? `
@@ -6760,7 +7908,11 @@ function renderOLobby() {
     </div>
     <p style="color:#475569; font-size:0.8rem; text-align:center; margin-bottom:0.5rem;">
       合計 ${total}人でゲーム（CPU名は自動でランダム設定）
-    </p>` : '';
+    </p>` : `
+    <div class="card" style="text-align:center;background:rgba(15,23,42,.58);border:1px solid rgba(148,163,184,.18);">
+      <p style="color:#94a3b8;font-size:.82rem;margin:0;">現在の予定人数</p>
+      <p style="color:#e2e8f0;font-size:1.05rem;font-weight:800;margin:.25rem 0 0;">合計 ${total}人 <span style="color:#64748b;font-size:.78rem;">人間 ${O.players.length} / CPU ${O.cpuCount||0}</span></p>
+    </div>`;
   return `
     ${ph('🌐','オンラインロビー',`部屋コード：${O.roomCode}`,'#818cf8')}
     <div class="card" style="text-align:center; border:2px solid #4338ca; padding:1.5rem;">
@@ -6841,6 +7993,12 @@ function renderORole() {
 
 function renderONight() {
   const an = O.nightActionNeeded;
+  const actionLocked = p2pActionLocked();
+  const actionPending = !!O.nightActionPending;
+  const actionBlock = renderP2PActionBlockedNotice();
+  const pendingNotice = actionPending
+    ? `<div class="p2p-pending-line">夜行動をホストへ送信しました。受理待ちです。</div>`
+    : '';
   if (O.nightActionDone || !an) {
     let extra = '';
     if (O.seerResult) {
@@ -6880,6 +8038,8 @@ function renderONight() {
     }
     return `
       ${ph('🌙',`第 ${O.day} 夜`,O.seerResult?'占い結果が出ました':O.mediumReveal&&O.myRole==='MEDIUM'?'霊視結果':'村が眠りにつきました…','#60a5fa')}
+      ${renderP2PStatusPanel()}
+      ${actionBlock}
       <div style="text-align:center; padding:1.2rem; background:rgba(99,102,241,.07); border-radius:14px; border:1px solid rgba(99,102,241,.2);">
         <div style="font-size:2.5rem; margin-bottom:.5rem;">🌑</div>
         <p style="color:#94a3b8; font-size:.9rem;">
@@ -6893,21 +8053,27 @@ function renderONight() {
   const tsel = mkSelect('oNightTgt', targets);
   if (action === 'seer') return `
     ${ph('🌙',`第 ${O.day} 夜`,'あなたは占い師です','#818cf8')}
+    ${renderP2PStatusPanel()}
+    ${actionBlock}
+    ${pendingNotice}
     <div style="background:rgba(129,140,248,.07); border:1px solid #818cf833; border-radius:14px; padding:1.2rem; margin:.5rem 0;">
       <p style="color:#94a3b8; font-size:.83rem; line-height:1.7;">🔮 夜の闇の中、あなたはひそかに1人を占います。<br>人狼を見抜き、村を救う情報を手に入れましょう。</p>
     </div>
     <div class="card">
       <h3 style="color:#818cf8; margin-bottom:.7rem;">🔮 誰を占いますか？</h3>
       <label>占う相手</label>${tsel}
-      <button class="btn btn-primary" id="oNightSend" data-action="seer" style="margin-top:.6rem;">✨　占う</button>
+      <button class="btn btn-primary" id="oNightSend" data-action="seer" ${(actionLocked || actionPending) ? 'disabled' : ''} style="margin-top:.6rem;">${actionPending ? '受理待ち...' : '✨　占う'}</button>
     </div>`;
   if (action === 'doctor') {
     const lastNote = an.last_protected
       ? `<p style="color:#64748b;font-size:.78rem;margin:.1rem 0 .25rem;">※ ${esc(an.last_protected)} は昨夜守ったため今夜は選べません</p>`
       : '';
-    const disabled = targets.length ? '' : 'disabled';
+    const disabled = (!targets.length || actionLocked || actionPending) ? 'disabled' : '';
     return `
       ${ph('🌙',`第 ${O.day} 夜`,'あなたは騎士です','#34d399')}
+      ${renderP2PStatusPanel()}
+      ${actionBlock}
+      ${pendingNotice}
       <div style="background:rgba(52,211,153,.07); border:1px solid #34d39933; border-radius:14px; padding:1.2rem; margin:.5rem 0;">
         <p style="color:#94a3b8; font-size:.83rem; line-height:1.7;">💊 今夜、あなたは1人を人狼の襲撃から守ります。<br>自分自身は守れません。役職COした人を軸に、誰が狙われるか読んでください。</p>
       </div>
@@ -6916,7 +8082,7 @@ function renderONight() {
         <p style="color:#64748b;font-size:.78rem;margin:.1rem 0 .25rem;">※ 自分自身は護衛できません。占い師や霊媒師など役職COした人が基本の護衛候補です。</p>
         ${lastNote}
         <label>守る相手</label>${tsel}
-        <button class="btn btn-primary" id="oNightSend" data-action="doctor" ${disabled} style="margin-top:.6rem;">${targets.length?'🛡️　護衛する':'護衛候補がいません'}</button>
+        <button class="btn btn-primary" id="oNightSend" data-action="doctor" ${disabled} style="margin-top:.6rem;">${actionPending ? '受理待ち...' : targets.length?'🛡️　護衛する':'護衛候補がいません'}</button>
       </div>`;
   }
   if (action === 'wolf') {
@@ -6942,20 +8108,20 @@ function renderONight() {
     }).join('');
     return `
       ${ph('🌙', `第 ${O.day} 夜`, '村の様子を確認しています…', '#60a5fa')}
+      ${renderP2PStatusPanel()}
+      ${actionBlock}
+      ${pendingNotice}
       ${allyBar}
       <div class="night-grid">${grid}</div>
-      <button class="btn btn-night" id="oNightSend" data-action="wolf" ${sel?'':'disabled'}
-        style="opacity:${sel?1:.35};">確定 ▶</button>`;
+      <button class="btn btn-night" id="oNightSend" data-action="wolf" ${(sel && !actionLocked && !actionPending)?'':'disabled'}
+        style="opacity:${sel && !actionLocked && !actionPending ? 1 : .35};">${actionPending ? '受理待ち...' : '確定 ▶'}</button>`;
   }
   return '';
 }
 
 function renderODay() {
   const elim = O.eliminatedLastNight;
-  const chips = O.alive.map(p => {
-    const av = getAvatar(p.name, O.players);
-    return `<span class="chip" style="display:inline-flex;align-items:center;">${avatarFace(av, 'portrait-chip')} ${esc(p.name)}</span>`;
-  }).join('');
+  const chips = O.alive.map(p => playerChipHtml(p)).join('');
   const elimCard = elim
     ? `<div class="card-colored vote-drama" style="text-align:center; border:2px solid #ef4444; background:#ef444418; padding:1.5rem;">
         <p style="color:#ef4444;font-size:.8rem;font-weight:700;letter-spacing:.1em;margin:0 0 .4rem;">💀 昨夜の犠牲者</p>
@@ -7012,6 +8178,12 @@ function renderOVote() {
 
   if (O.voteSubmitted || !myAlive) {
     const pct = O.voteTotal > 0 ? Math.round(O.voteDone / O.voteTotal * 100) : 0;
+    const ackDelaySec = O.voteSentAt && !O.voteAckAt ? Math.max(0, Math.round((Date.now() - O.voteSentAt) / 1000)) : 0;
+    const ackWarning = myAlive && O.voteAckWarningAt && !O.voteAckAt
+      ? `<div class="p2p-pending-line" style="border-color:#f59e0b66;background:rgba(245,158,11,.08);color:#fbbf24;">
+          投票の受理確認が遅れています。自動で再同期${O.voteAckRetryAt ? 'と再送' : ''}を行いました。${ackDelaySec ? `送信から${ackDelaySec}秒経過。` : ''}
+        </div>`
+      : '';
     const voteStatusText = !myAlive
       ? '観戦中'
       : O.voteAckAt
@@ -7023,6 +8195,7 @@ function renderOVote() {
       ${renderP2PStatusPanel()}
       <div class="card" style="text-align:center;">
         <p style="color:#64748b; font-size:0.85rem; margin-bottom:0.5rem;">${voteStatusText}</p>
+        ${ackWarning}
         <div style="background:rgba(255,255,255,0.08); border-radius:8px; height:8px; overflow:hidden;">
           <div style="background:#6b21a8; height:100%; width:${pct}%; transition:width 0.4s;"></div>
         </div>
@@ -7033,6 +8206,8 @@ function renderOVote() {
   const targets = O.alive.filter(p => p.name !== O.playerName);
   const selectedTarget = targets.some(p => p.name === O.voteTarget) ? O.voteTarget : '';
   const voteReasonDraft = O.voteReasonDraft || '';
+  const actionLocked = p2pActionLocked();
+  const actionBlock = renderP2PActionBlockedNotice();
 
   // アバター付き投票先グリッド（選択補助）
   const voteGrid = `
@@ -7042,12 +8217,14 @@ function renderOVote() {
         const claim = O.roleClaims[p.name];
         const badge = claim ? `<span style="display:block;margin-top:.12rem;">${roleClaimBadge(claim, true)}</span>` : '';
         const selected = p.name === selectedTarget;
-        return `<button class="vote-avatar-btn" data-name="${esc(p.name)}"
+        const disconnected = isP2PDisconnected(p);
+        return `<button class="vote-avatar-btn${disconnected ? ' disconnected' : ''}" data-name="${esc(p.name)}"
           style="display:flex;flex-direction:column;align-items:center;min-width:68px;padding:.5rem .4rem;
                  background:${selected?'rgba(107,33,168,.32)':'rgba(255,255,255,.06)'};border:${selected?'2px solid #8b5cf6':'1px solid rgba(255,255,255,.12)'};border-radius:12px;
                  cursor:pointer;color:#e2e8f0;">
           ${avatarFace(av, 'portrait-lg')}
           <span style="font-size:.75rem;font-weight:600;margin-top:.2rem;">${esc(p.name)}</span>
+          ${connectionBadge(p)}
           ${(['solo','p2p','online'].includes(mode) && (O.notebook||{})[p.name]) ? `<span style="font-size:.58rem;display:block;color:${O.notebook[p.name]==='suspect'?'#f87171':'#4ade80'};">${O.notebook[p.name]==='suspect'?'🐺怪しい':'🤍信用'}</span>` : ''}
           ${badge}
         </button>`;
@@ -7070,7 +8247,8 @@ function renderOVote() {
         <label for="oVoteReason">投票理由（結果画面に残ります）</label>
         <textarea id="oVoteReason" maxlength="120" placeholder="例：発言が少なく、占い師COへの反応も遅かったため">${esc(voteReasonDraft)}</textarea>
       </div>
-      <div class="mobile-action"><button class="btn btn-primary" id="oVoteSend" style="margin-top:0.6rem;">🗳️　投票する</button></div>
+      ${actionBlock}
+      <div class="mobile-action"><button class="btn btn-primary" id="oVoteSend" ${actionLocked ? 'disabled' : ''} style="margin-top:0.6rem;">🗳️　投票する</button></div>
     </div>
   `;
 }
@@ -7078,12 +8256,14 @@ function renderOVote() {
 function renderOVoteResult() {
   const r = O.voteResult;
   if (!r) return '';
-  const total = Object.values(r.tally).reduce((a,b)=>a+b,0);
-  const bars = Object.entries(r.tally).sort(([,a],[,b])=>b-a).map(([n,c]) => {
-    const pct = Math.round(c/total*16);
+  const tally = r.tally || {};
+  const total = Object.values(tally).reduce((a,b)=>a+Number(b||0),0);
+  const bars = Object.entries(tally).sort(([,a],[,b])=>Number(b||0)-Number(a||0)).map(([n,c]) => {
+    const votes = Number(c || 0);
+    const pct = total > 0 ? Math.max(0, Math.min(16, Math.round(votes/total*16))) : 0;
     const bar = '█'.repeat(pct)+'░'.repeat(16-pct);
-    return `<div class="vote-bar ${n===r.executed?'executed':''}">${esc(n)}：${bar} ${c}票</div>`;
-  }).join('');
+    return `<div class="vote-bar ${n===r.executed?'executed':''}">${esc(n)}：${bar} ${votes}票</div>`;
+  }).join('') || '<div class="vote-bar">得票データなし</div>';
   const nextBtn = O.winner
     ? `<button class="btn btn-primary" id="oGoGameOver">🏆　ゲーム結果を見る</button>`
     : (O.isHost ? `<button class="btn btn-night" id="oNextNight">🌙　夜に進む（ホスト）</button>`
@@ -7122,11 +8302,12 @@ function renderOGameOver() {
     : (O.players || []).map(p => ({ name: p.name, role: undefined, alive: false }));
   const rows = players.map(p => {
     const info = ROLES[p.role] || {};
+    const status = p.disconnected && p.alive ? '📶 切断中' : (p.alive ? '✅ 生存' : '💀 死亡');
     return `<div class="player-row" style="border-left-color:${info.color||'#666'};">
       <span class="pr-icon">${info.icon||'❓'}</span>
       <span class="pr-name">${esc(p.name)}</span>
       <span class="pr-role" style="color:${info.color||'#aaa'};">${info.name||p.role||'不明'}</span>
-      <span class="pr-status">${p.alive?'✅ 生存':'💀 死亡'}</span>
+      <span class="pr-status">${status}</span>
     </div>`;
   }).join('');
   const logHtml = O.log.length
@@ -7235,9 +8416,15 @@ function renderP2PDeviceCheck(peerUnavailable) {
     ? 'PeerJSが未読込です。スマホ/PCがインターネットへ接続できるか確認してください。'
     : 'PeerJS読込OK。部屋コードまたは参加リンクで接続できます。';
   const peerColor = peerUnavailable ? '#f59e0b' : '#34d399';
+  const share = p2pShareInfo(O?.roomCode || O?.pendingP2PCode || '');
+  const urlLine = share.url ? `<br><span style="color:#cbd5e1;">参加リンク: ${esc(share.url)}</span>` : '';
+  const linkHint = (share.isLocal || share.isFile)
+    ? `<div style="margin-top:.48rem;padding:.5rem .58rem;border:1px solid #f59e0b55;background:rgba(245,158,11,.08);border-radius:8px;color:#fde68a;font-size:.76rem;line-height:1.55;">${esc(share.hint)}</div>`
+    : `<div style="margin-top:.48rem;padding:.5rem .58rem;border:1px solid #22c55e44;background:rgba(34,197,94,.07);border-radius:8px;color:#bbf7d0;font-size:.76rem;line-height:1.55;">${esc(share.hint)}</div>`;
   return `<div class="card" style="border:1px solid ${peerColor}44;background:${peerUnavailable?'rgba(245,158,11,.06)':'rgba(52,211,153,.05)'};">
     <p style="color:${peerColor};font-size:.83rem;font-weight:800;margin:0 0 .35rem;">📱 実機P2Pチェック</p>
-    <p style="color:#94a3b8;font-size:.78rem;line-height:1.6;margin:0;">${esc(peerLine)}<br>${esc(pageLine)}</p>
+    <p style="color:#94a3b8;font-size:.78rem;line-height:1.6;margin:0;">${esc(peerLine)}<br>${esc(pageLine)}${urlLine}</p>
+    ${linkHint}
   </div>`;
 }
 
@@ -7251,11 +8438,35 @@ function renderP2PSetup() {
       <p style="color:#fbbf24;font-size:.84rem;font-weight:800;margin:0 0 .25rem;">⚠️ P2P通信ライブラリを読み込めません</p>
       <p style="color:#94a3b8;font-size:.78rem;line-height:1.55;margin:0;">P2PオンラインはPeerJSの読み込みが必要です。接続できない場合は、ソロデモかローカルモードで遊べます。</p>
     </div>` : '';
+  const createError = O.p2pCreateError ? `
+    <div class="card" style="border:1px solid #ef444444;background:rgba(239,68,68,.08);">
+      <p style="color:#fca5a5;font-size:.83rem;font-weight:800;margin:0 0 .25rem;">前回の部屋作成エラー</p>
+      <p style="color:#cbd5e1;font-size:.78rem;line-height:1.55;margin:0;">${esc(O.p2pCreateError)}</p>
+    </div>` : '';
+  if (sub === 'host_creating') {
+    const attempt = Math.max(1, O.p2pCreateAttempt || 1);
+    return `
+      ${ph('🌐','部屋作成中','3桁の部屋コードを確保しています','#34d399')}
+      ${peerWarn}
+      ${deviceCheck}
+      ${createError}
+      <div class="card" style="text-align:center;border:1px solid #10b98144;background:rgba(16,185,129,.06);">
+        <div style="font-size:2.4rem;margin-bottom:.5rem;">⏳</div>
+        <p style="color:#cbd5e1;font-size:.9rem;font-weight:800;margin:0 0 .35rem;">ホスト部屋を準備中</p>
+        <p style="color:#94a3b8;font-size:.8rem;line-height:1.55;margin:0;">コード候補: <b style="color:#34d399;letter-spacing:.18em;">${O.roomCode||'---'}</b></p>
+        <p class="p2p-badge" style="justify-content:center;margin-top:.55rem;"><span class="p2p-dot"></span>試行 ${attempt}/12</p>
+      </div>
+      <button class="btn btn-ghost" id="goHome">← キャンセル</button>`;
+  }
   if (sub === 'host_wait') {
-    const pRows = (O.players||[]).map(p=>`<span class="chip">${esc(p.name)}</span>`).join('');
+    const pRows = (O.players||[]).map(p=>playerChipHtml(p)).join('');
     const total = (O.players||[]).length + (O.cpuCount||0);
     const canStart = total >= 4;
     const joinLink = p2pJoinUrl(O.roomCode);
+    const share = p2pShareInfo(O.roomCode);
+    const linkHint = share.hint
+      ? `<p style="color:${share.isLocal || share.isFile ? '#fde68a' : '#94a3b8'};font-size:.72rem;line-height:1.55;margin:.45rem 0 0;">${esc(share.hint)}</p>`
+      : '';
     const joinLinkHtml = joinLink ? `
       <div class="card" style="border:1px solid #10b98144;background:rgba(16,185,129,.06);">
         <p style="color:#34d399;font-size:.83rem;font-weight:800;margin:0 0 .4rem;">📱 実機参加リンク</p>
@@ -7265,6 +8476,7 @@ function renderP2PSetup() {
           <button class="btn btn-ghost" id="p2pCopyLink" style="margin:0;padding:.62rem .4rem;font-size:.86rem;">コピー</button>
         </div>
         <p style="color:#64748b;font-size:.72rem;line-height:1.55;margin:.45rem 0 0;">スマホでこのリンクを開くと、P2P参加画面に入り部屋コードが自動入力されます。</p>
+        ${linkHint}
       </div>` : '';
     return `
       ${ph('🌐','ホスト待機中','部屋コードを仲間に伝えてください','#34d399')}
@@ -7308,6 +8520,7 @@ function renderP2PSetup() {
     ${ph('🌐','P2Pオンライン','サーバー不要でどこからでも対戦！','#34d399')}
     ${peerWarn}
     ${deviceCheck}
+    ${createError}
     <div class="card">
       <label>あなたの名前</label>
       <input type="text" id="p2pName" value="${esc(O.playerName||'')}" placeholder="名前を入力">
@@ -7466,13 +8679,19 @@ function toggleNote(name) {
   render();
 }
 function wolfSend(text) {
-  wsSend({type:'wolf_chat_msg', text});
-  // ローカルにも追加して即表示
-  O.wolfChatMsgs.push({name: O.playerName, text});
-  speakChatMessage(O.playerName, text);
+  if (p2pActionLocked()) { render(); return false; }
+  if (O.phase === 'wolf_chat' && (O.wolfChatReady || O.wolfChatReadyPending)) return false;
+  if (!wsSend({type:'wolf_chat_msg', text})) return false;
+  // P2Pホストは送信処理中に自分へ即時エコーされるため、同一発言は1回だけ表示する。
+  if (appendIncomingChatOnce(O.wolfChatMsgs, {name: O.playerName, text})) {
+    speakChatMessage(O.playerName, text);
+  }
   render();
+  return true;
 }
 function wolfTplTarget(idx) {
+  if (p2pActionLocked()) { render(); return; }
+  if (O.phase === 'wolf_chat' && (O.wolfChatReady || O.wolfChatReadyPending)) return;
   const t = TPL.wolf_night[idx];
   const targets = O.wolfChatMsgs.length > 0
     ? O.alive.filter(p => p.name !== O.playerName)
@@ -7489,6 +8708,7 @@ let mode = 'pre_opening'; // pre_opening | opening | home | local | online | sol
 initState();
 applyP2PLaunchParams();
 installChatVoiceUnlock();
+installP2PResumeHooks();
 render();
 </script>
 </body>
