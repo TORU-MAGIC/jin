@@ -3749,6 +3749,7 @@ const SoloEngine = (() => {
     _timers.forEach(clearTimeout); _timers = [];
     if (R && R._humanTurnTimer) { clearTimeout(R._humanTurnTimer); R._humanTurnTimer = null; }
     if (R && R._discFallback)   { clearTimeout(R._discFallback);   R._discFallback = null; }
+    if (R && R._voteFallback)   { clearTimeout(R._voteFallback);   R._voteFallback = null; }
   }
   function shuffle(a)       { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
   function rand(a)          { return a[Math.floor(Math.random()*a.length)]; }
@@ -3809,6 +3810,7 @@ const SoloEngine = (() => {
 
     const cpuWolves = wolves.filter(p=>p.isCpu);
     const vill = alive().filter(p=>p.role!=='WEREWOLF');
+    let nextNightDelay = 900;
     if (cpuWolves.length && vill.length) {
       const tgt = BRAIN.wolfNightTarget(R) || topAcc(vill) || rand(vill);
       let t = 1000;
@@ -3817,12 +3819,17 @@ const SoloEngine = (() => {
           text: personagizeWolfNight(w, tgt.name) }));
         t += 1300 + Math.floor(Math.random()*600);
       });
+      nextNightDelay = t + 500;
+    }
+    const humanWolfAlive = alive().some(p => !p.isCpu && p.role === 'WEREWOLF');
+    if (!humanWolfAlive) {
+      later(nextNightDelay, () => { if (R.phase === 'wolf_chat') startNight(); });
     }
   }
 
   function beginNightFlow() {
     if (!['role', 'vote_result'].includes(R.phase)) return false;
-    R.players[0].role==='WEREWOLF' ? startWolfChat() : startNight();
+    alive().some(p => !p.isCpu && p.role === 'WEREWOLF') ? startWolfChat() : startNight();
     return true;
   }
 
@@ -4018,8 +4025,37 @@ const SoloEngine = (() => {
   }
 
   // ── 投票フェーズ ──────────────────────────────────────
+  function soloVoteComplete(al) {
+    const aliveList = al || alive();
+    const human = R.players[0];
+    const humanDone = !human || !human.alive || R.humanVoted;
+    return humanDone && aliveList.every(p => R.votes[p.name] !== undefined);
+  }
+
+  function autoFillMissingCpuVotes() {
+    const al = alive();
+    al.filter(p => p.isCpu && R.votes[p.name] === undefined).forEach(cpu => {
+      let tgt = BRAIN.vote(R, cpu);
+      if (!tgt) {
+        const others = al.filter(p => p.name !== cpu.name);
+        tgt = others.length ? rand(others) : null;
+      }
+      if (tgt) {
+        R.votes[cpu.name] = tgt.name;
+        R.voteReasons[cpu.name] = BRAIN.voteReason(R, cpu, tgt);
+      }
+    });
+    return al;
+  }
+
+  function maybeTallySoloVotes(delay=400) {
+    if (R.phase !== 'vote' || R.tallyDone) return;
+    if (soloVoteComplete()) later(delay, tallyVotes);
+  }
+
   function startVote() {
     R.phase = 'vote'; R.votes = {}; R.voteReasons = {}; R.humanVoted = false; R.tallyDone = false;
+    if (R._voteFallback) { clearTimeout(R._voteFallback); R._voteFallback = null; }
     if (R._discFallback) { clearTimeout(R._discFallback); R._discFallback = null; } // 議論フォールバックを確実に停止
     const al = alive();
     if (!R.players[0].alive) R.humanVoted = true; // 死亡プレイヤーは投票不要
@@ -4034,11 +4070,18 @@ const SoloEngine = (() => {
         }
         const done = Object.keys(R.votes).length;
         emit({ type:'vote_progress', done, total:al.length });
-        if (R.humanVoted && Object.keys(R.votes).length >= al.length)
-          later(400, tallyVotes);
+        maybeTallySoloVotes(400);
       });
     });
-    if (!cpus.length) { /* only human, wait for vote */ }
+    R._voteFallback = setTimeout(() => {
+      R._voteFallback = null;
+      if (R.phase !== 'vote' || R.tallyDone) return;
+      if (R.players[0]?.alive && !R.humanVoted) return;
+      const live = autoFillMissingCpuVotes();
+      emit({ type:'vote_progress', done:Object.keys(R.votes).length, total:live.length });
+      maybeTallySoloVotes(250);
+    }, Math.max(9000, 2600 + cpus.length * 1500));
+    if (!cpus.length) maybeTallySoloVotes(500);
   }
 
   function tallyVotes() {
@@ -4070,6 +4113,8 @@ const SoloEngine = (() => {
       }
     }
     const win = checkWin();
+    R.phase = win ? 'game_over' : 'vote_result';
+    R.winner = win || null;
     emit({
       type: 'vote_result',
       executed, executed_role: execP?.role, tally: count,
@@ -4097,6 +4142,8 @@ const SoloEngine = (() => {
     return null;
   }
   function doGameOver(winner, victim) {
+    R.phase = 'game_over';
+    R.winner = winner;
     emit({
       type: 'game_over', winner,
       players: R.players.map(p=>({name:p.name,role:p.role,alive:p.alive})),
@@ -4249,11 +4296,11 @@ const SoloEngine = (() => {
         R.humanVoted = true;
         const done = Object.keys(R.votes).length;
         emit({ type:'vote_progress', done, total:al.length });
-        const cpusDone = al.filter(p=>p.isCpu).every(p=>R.votes[p.name]!==undefined);
-        if (cpusDone) later(500, tallyVotes);
+        maybeTallySoloVotes(500);
         break;
       }
       case 'next_night':
+        if (R.phase === 'vote' && O.phase === 'vote_result') R.phase = 'vote_result';
         later(300, beginNightFlow);
         break;
     }
