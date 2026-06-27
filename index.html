@@ -2,13 +2,19 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="人狼ゲーム">
+<meta name="theme-color" content="#06080d">
 <title>🐺 人狼ゲーム</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   background: #06080d;
   min-height: 100vh;
+  min-height: 100dvh;
   font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Segoe UI', sans-serif;
   color: #e2e8f0;
   overflow-x: hidden;
@@ -37,10 +43,14 @@ body::after {
 #app {
   max-width: 480px;
   margin: 0 auto;
-  padding: 1rem 1rem 3rem;
+  padding: 1rem 1rem calc(3rem + env(safe-area-inset-bottom));
   min-height: 100vh;
+  min-height: 100dvh;
   animation: fadeIn 0.25s ease;
   position: relative;
+}
+body.fullscreen-active #app {
+  padding-top: calc(0.8rem + env(safe-area-inset-top));
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -101,6 +111,23 @@ p  { line-height: 1.6; }
 .btn-success { background: linear-gradient(135deg, #064e3b, #0369a1); color: #fff; }
 .btn-night   { background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid #4338ca; }
 .btn-ghost   { background: rgba(255,255,255,0.06); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); }
+
+.fullscreen-start-card {
+  border: 1px solid rgba(14,165,233,.38);
+  background: rgba(8,47,73,.38);
+  box-shadow: 0 14px 34px rgba(2,132,199,.12);
+}
+.fullscreen-start-card .btn {
+  margin: 0;
+  background: linear-gradient(135deg, #0f766e, #1d4ed8);
+}
+.fullscreen-start-note {
+  color: #94a3b8;
+  font-size: .74rem;
+  line-height: 1.55;
+  margin: .55rem 0 0;
+  text-align: center;
+}
 
 /* Phase header */
 .ph {
@@ -2523,6 +2550,93 @@ function roleClaimBadge(role, compact=false) {
 
 function val(id) { const e = document.getElementById(id); return e ? e.value : ''; }
 function on(id, fn) { const e = document.getElementById(id); if (e) e.addEventListener('click', fn); }
+let _fullscreenRequesting = false;
+
+function fullscreenElement() {
+  if (typeof document === 'undefined') return null;
+  return document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement || null;
+}
+
+function isStandaloneDisplay() {
+  if (typeof window === 'undefined') return false;
+  const standalone = window.navigator && window.navigator.standalone === true;
+  const mediaStandalone = typeof window.matchMedia === 'function'
+    && (window.matchMedia('(display-mode: fullscreen)').matches || window.matchMedia('(display-mode: standalone)').matches);
+  return standalone || mediaStandalone;
+}
+
+function fullscreenSupported() {
+  if (typeof document === 'undefined') return false;
+  const el = document.documentElement;
+  return !!(el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen);
+}
+
+function updateFullscreenBodyClass() {
+  if (typeof document === 'undefined') return;
+  document.body?.classList.toggle('fullscreen-active', !!fullscreenElement() || isStandaloneDisplay());
+}
+
+async function enterGameFullscreen(silent=false) {
+  if (typeof document === 'undefined') return false;
+  updateFullscreenBodyClass();
+  if (fullscreenElement() || isStandaloneDisplay()) return true;
+  if (_fullscreenRequesting) return false;
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+  if (!req) {
+    if (!silent) alert('このiPhoneではブラウザの制限で全画面化できない場合があります。ホーム画面に追加して起動すると、全画面に近い表示で遊べます。');
+    return false;
+  }
+  _fullscreenRequesting = true;
+  try {
+    const result = el.requestFullscreen
+      ? el.requestFullscreen({ navigationUI: 'hide' })
+      : req.call(el);
+    if (result && typeof result.then === 'function') await result;
+    updateFullscreenBodyClass();
+    return true;
+  } catch (e) {
+    if (!silent) alert('全画面表示を開始できませんでした。iPhoneではSafariの共有メニューから「ホーム画面に追加」で起動すると安定します。');
+    return false;
+  } finally {
+    _fullscreenRequesting = false;
+  }
+}
+
+function startFullscreenFromGesture() {
+  enterGameFullscreen(true);
+}
+
+function shouldShowFullscreenStartPrompt() {
+  if (fullscreenElement() || isStandaloneDisplay()) return false;
+  if (mode === 'home') return true;
+  if (mode === 'local') return S.phase === 'setup';
+  if (mode === 'online') return O.phase === 'setup';
+  if (mode === 'solo') return O.phase === 'solo_setup';
+  if (mode === 'p2p') return O.phase === 'p2p_setup';
+  return false;
+}
+
+function renderFullscreenStartPrompt() {
+  const supported = fullscreenSupported();
+  const note = supported
+    ? 'iPhone/スマホは最初のタップで画面を広くします。'
+    : 'iPhoneはホーム画面から起動すると画面を広く使えます。';
+  return `<div class="card fullscreen-start-card">
+    <button class="btn" id="btnFullscreenStart">📱　全画面で開始</button>
+    <p class="fullscreen-start-note">${esc(note)}</p>
+  </div>`;
+}
+
+function installFullscreenHooks() {
+  if (typeof document === 'undefined' || window._fullscreenHooksInstalled) return;
+  window._fullscreenHooksInstalled = true;
+  ['fullscreenchange', 'webkitfullscreenchange', 'msfullscreenchange'].forEach(type => {
+    try { document.addEventListener(type, updateFullscreenBodyClass); } catch(e) {}
+  });
+  updateFullscreenBodyClass();
+}
+
 function normalizeRoomCode(raw) {
   const digits = String(raw ?? '').replace(/\D/g, '');
   return digits ? digits.slice(0, 3).padStart(3, '0') : '';
@@ -2956,10 +3070,16 @@ function saveNames() {
 }
 
 function bindEvents() {
+  on('btnFullscreenStart', async () => {
+    await enterGameFullscreen(false);
+    render();
+  });
+
   // SETUP
   on('dec', () => { if (S.playerCount > 4) { saveNames(); S.playerCount--; render(); } });
   on('inc', () => { if (S.playerCount < MAX_PLAYERS) { saveNames(); S.playerCount++; render(); } });
   on('start', () => {
+    startFullscreenFromGesture();
     saveNames();
     const names = S.playerNames.slice(0, S.playerCount).map(n => n.trim());
     if (names.some(n => !n))             return alert('名前をすべて入力してください');
@@ -3150,6 +3270,7 @@ function bindEvents() {
 
   // PRE-OPENING tap → unlock audio & start story
   on('preOpeningTap', () => {
+    startFullscreenFromGesture();
     unlockAudio();
     _openingAudio = playMusic(_pickSong()); // 直接参照を保存（bgmAudio が .catch() で null になっても止められるように）
     O_opening = { idx: 0, text: '' };
@@ -3162,14 +3283,14 @@ function bindEvents() {
   on('openingSkip', () => { clearTimeout(openingTimer); fadeOutMusic(900, () => { mode = 'home'; render(); }); });
 
   // HOME
-  on('goLocal',  () => { initState(); mode = 'local'; render(); });
-  on('goOnline', () => { mode = 'online'; O.phase = 'setup'; render(); });
-  on('goSolo',   () => { initOnline(); mode = 'solo'; O.phase = 'solo_setup'; O.soloTotal = 5; render(); });
+  on('goLocal',  () => { startFullscreenFromGesture(); initState(); mode = 'local'; render(); });
+  on('goOnline', () => { startFullscreenFromGesture(); mode = 'online'; O.phase = 'setup'; render(); });
+  on('goSolo',   () => { startFullscreenFromGesture(); initOnline(); mode = 'solo'; O.phase = 'solo_setup'; O.soloTotal = 5; render(); });
   on('goCodex',  () => { mode = 'codex'; render(); });
   on('codexBack',() => { mode = 'home'; render(); });
 
   // P2P
-  on('goP2P', () => { initOnline(); mode = 'p2p'; O.phase = 'p2p_setup'; O.p2pSub = 'choose'; O.cpuCount = 0; render(); });
+  on('goP2P', () => { startFullscreenFromGesture(); initOnline(); mode = 'p2p'; O.phase = 'p2p_setup'; O.p2pSub = 'choose'; O.cpuCount = 0; render(); });
   on('p2pGoJoin',   () => { O.p2pSub = 'join'; render(); });
   on('p2pBackSetup',() => { O.p2pSub = 'choose'; render(); });
   on('p2pCopyLink', async () => {
@@ -3206,6 +3327,7 @@ function bindEvents() {
     render();
   });
   on('p2pCreate', () => {
+    startFullscreenFromGesture();
     const name = (val('p2pName')||'').trim();
     if (!name) { alert('名前を入力してください'); return; }
     O.playerName = name; O.isHost = true; O.players = [{ pid:0, name }];
@@ -3231,6 +3353,7 @@ function bindEvents() {
     });
   });
   on('p2pJoin', () => {
+    startFullscreenFromGesture();
     const name = (val('p2pName')||'').trim();
     const code = normalizeRoomCode(val('p2pCode'));
     if (!name) { alert('名前を入力してください'); return; }
@@ -3268,6 +3391,7 @@ function bindEvents() {
   on('soloDiff_normal', () => { O.soloDiff='normal'; render(); });
   on('soloDiff_hard',   () => { O.soloDiff='hard';   render(); });
   on('soloStart', () => {
+    startFullscreenFromGesture();
     const name = (val('soloName')||'').trim() || 'あなた';
     O.playerName = name;
     O.pid = 0;
@@ -3288,6 +3412,7 @@ function bindEvents() {
   });
 
   on('oCreate', () => {
+    startFullscreenFromGesture();
     const name = (val('oName') || '').trim();
     const addr = (val('oAddr') || '').trim();
     if (!name) { alert('名前を入力してください'); return; }
@@ -3296,6 +3421,7 @@ function bindEvents() {
   });
 
   on('oJoin', () => {
+    startFullscreenFromGesture();
     const name = (val('oName') || '').trim();
     const addr = (val('oAddr') || '').trim();
     const code = normalizeRoomCode(val('oCode'));
@@ -8634,6 +8760,10 @@ function render() {
   else if (mode === 'p2p'  && O.phase === 'p2p_setup')    app.innerHTML = renderP2PSetup();
   else                                                     app.innerHTML = renderOnline();
 
+  if (shouldShowFullscreenStartPrompt()) {
+    app.insertAdjacentHTML('afterbegin', renderFullscreenStartPrompt());
+  }
+
   // 入力値を復元
   const discInput = document.getElementById('discFreeInput');
   if (discInput && _discVal) { discInput.value = _discVal; }
@@ -8707,6 +8837,7 @@ function wolfTplTarget(idx) {
 let mode = 'pre_opening'; // pre_opening | opening | home | local | online | solo | p2p
 initState();
 applyP2PLaunchParams();
+installFullscreenHooks();
 installChatVoiceUnlock();
 installP2PResumeHooks();
 render();
