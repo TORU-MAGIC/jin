@@ -513,8 +513,14 @@ details summary:hover { color: #94a3b8; }
 .vote-ready-btn.not-ready{background:linear-gradient(135deg,#065f46,#0369a1);color:#fff;}
 .vote-ready-dots{display:flex;gap:.25rem;flex-wrap:wrap;margin-top:.3rem;}
 /* ── CO quick button ── */
-.co-quick-btns{display:flex;flex-wrap:wrap;gap:.3rem;margin:.3rem 0;}
-.co-btn{display:inline-flex;align-items:center;gap:.2rem;background:rgba(129,140,248,.14);border:1px solid #818cf855;color:#a5b4fc;font-size:.78rem;padding:.28rem .6rem;border-radius:8px;cursor:pointer;}
+.co-quick-panel{background:rgba(129,140,248,.09);border:1px solid rgba(129,140,248,.24);border-radius:8px;padding:.46rem;margin:0 0 .42rem;}
+.co-quick-head{display:flex;align-items:center;justify-content:space-between;gap:.4rem;color:#a5b4fc;font-size:.76rem;font-weight:900;margin-bottom:.34rem;}
+.co-quick-status{color:#64748b;font-size:.68rem;font-weight:700;white-space:nowrap;}
+.co-quick-btns{display:flex;flex-wrap:wrap;gap:.3rem;margin:.3rem 0 0;}
+.co-quick-panel select{width:100%;margin:0 0 .32rem;padding:.42rem .55rem;font-size:.8rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:7px;color:#e2e8f0;}
+.co-btn{display:inline-flex;align-items:center;gap:.2rem;background:rgba(129,140,248,.14);border:1px solid #818cf855;color:#a5b4fc;font-size:.78rem;padding:.34rem .58rem;border-radius:8px;cursor:pointer;font-weight:800;}
+.co-btn.primary{background:rgba(251,191,36,.14);border-color:#fbbf2466;color:#fde68a;}
+.co-btn.fake{background:rgba(124,58,237,.14);border-color:#7c3aed66;color:#c4b5fd;}
 .co-btn:active{background:rgba(129,140,248,.3);}
 /* ── Stealth night target grid ── */
 .night-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin:1rem 0;}
@@ -1281,6 +1287,81 @@ function quickChatPanel(inputId='discFreeInput', targetId='quickChatTarget') {
       <button class="quick-fill" data-chat-input="${inputId}" data-chat-template="役職COがある人は、結果と理由を教えてください。">CO確認</button>
       <button class="quick-fill" data-chat-input="${inputId}" data-chat-template="誰が誰を疑っているか、一度整理したいです。">整理</button>
       <button class="quick-fill" data-chat-input="${inputId}" data-chat-template="今日は投票先を早めに決めたいです。候補を出しましょう。">投票相談</button>
+    </div>`;
+}
+
+function coQuickPanel(inputId='discFreeInput') {
+  const role = O.myRole || '';
+  const aliveTargets = (O.alive || []).filter(p => p.name !== O.playerName).map(p => ({ name:p.name }));
+  const deadTargets = (O.deadPlayers || []).map(d => ({ name:d.name }));
+  const already = O.roleClaims?.[O.playerName];
+  const status = already ? `${ROLES[already]?.name || '役職'}CO済` : '未CO';
+  const mkSelect = (id, targets, label) => targets.length
+    ? `<select id="${id}" aria-label="${esc(label)}">${targets.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('')}</select>`
+    : '';
+  const mkBtn = (label, template, targetId='', cls='') =>
+    `<button class="co-btn ${cls}" data-chat-input="${inputId}" ${targetId ? `data-chat-target="${targetId}"` : ''} data-chat-template="${esc(template)}">${label}</button>`;
+  let selectHtml = '';
+  let buttons = [];
+
+  if (role === 'SEER') {
+    selectHtml = mkSelect('coQuickTarget', aliveTargets, '占い結果の対象');
+    buttons = [
+      mkBtn('🔮 占い師CO', '占い師COします。占い結果を公開します。', '', 'primary'),
+      ...(aliveTargets.length ? [
+        mkBtn('○ 白結果', '占い師COします。{n}さんは人狼ではありませんでした。', 'coQuickTarget'),
+        mkBtn('● 黒結果', '占い師COします。{n}さんは人狼でした。', 'coQuickTarget'),
+      ] : []),
+    ];
+  } else if (role === 'MEDIUM') {
+    selectHtml = mkSelect('coQuickDeadTarget', deadTargets, '霊媒結果の対象');
+    buttons = [
+      mkBtn('👁️ 霊媒CO', '霊媒師COします。処刑結果を報告します。', '', 'primary'),
+      ...(deadTargets.length ? [
+        mkBtn('● 人狼結果', '霊媒師COします。{n}さんは人狼でした。', 'coQuickDeadTarget'),
+        mkBtn('○ 村側結果', '霊媒師COします。{n}さんは人狼ではありませんでした。', 'coQuickDeadTarget'),
+      ] : []),
+    ];
+  } else if (role === 'DOCTOR') {
+    buttons = [
+      mkBtn('💊 騎士CO', '騎士COします。護衛先と理由を整理して出します。', '', 'primary'),
+      mkBtn('🛡️ 護衛主張', '騎士COします。昨夜の護衛先を公開します。', '', 'primary'),
+    ];
+  } else if (role === 'NEKOMATA') {
+    buttons = [
+      mkBtn('🐱 猫又CO', '猫又COします。私を処刑すると道連れが出ます。', '', 'primary'),
+      mkBtn('⚠️ 吊り回避', '猫又COします。ここで私を吊るのは村にとって危険です。', '', 'primary'),
+    ];
+  } else if (role === 'SHARED') {
+    buttons = [
+      mkBtn('🤝 共有CO', '共有者COします。村の進行を整理します。', '', 'primary'),
+      mkBtn('📌 進行役CO', '共有者COします。今日は投票先とCO状況を整理します。', '', 'primary'),
+    ];
+  } else if (role === 'WEREWOLF' || role === 'MADMAN') {
+    selectHtml = mkSelect('coQuickFakeTarget', aliveTargets, '偽占い結果の対象');
+    buttons = [
+      mkBtn('🎭 偽占いCO', '占い師COします。占い結果を公開します。', '', 'fake'),
+      ...(aliveTargets.length ? [
+        mkBtn('偽○ 白', '占い師COします。{n}さんは人狼ではありませんでした。', 'coQuickFakeTarget', 'fake'),
+        mkBtn('偽● 黒', '占い師COします。{n}さんは人狼でした。', 'coQuickFakeTarget', 'fake'),
+      ] : []),
+      mkBtn('偽💊 騎士', '騎士COします。護衛先と理由を整理して出します。', '', 'fake'),
+    ];
+  } else {
+    buttons = [
+      mkBtn('📣 CO確認', '役職COがある人は、結果と理由を教えてください。'),
+      mkBtn('👤 村人宣言', '私は役職COはありません。発言と投票で村に貢献します。'),
+    ];
+  }
+
+  return `
+    <div class="co-quick-panel">
+      <div class="co-quick-head">
+        <span>📣 COショートカット</span>
+        <span class="co-quick-status">${esc(status)}</span>
+      </div>
+      ${selectHtml}
+      <div class="co-quick-btns">${buttons.join('')}</div>
     </div>`;
 }
 
@@ -2409,6 +2490,20 @@ function syncAlivePresence() {
       isCpu: p.isCpu ?? src.isCpu
     };
   });
+  if (!isOnlinePlayerAlive()) {
+    O.isMyDiscTurn = false;
+    O.tplStep = null;
+    O.tplTarget = null;
+    O.voteReadyPending = false;
+  }
+}
+
+function isOnlinePlayerAlive(name=O.playerName) {
+  return (O.alive || []).some(p => (p.name || p) === name);
+}
+
+function canCurrentPlayerDiscuss() {
+  return O.phase === 'discuss' && isOnlinePlayerAlive();
 }
 
 function activeHumanCount() {
@@ -4458,6 +4553,7 @@ function bindEvents() {
   document.querySelectorAll('.tpl-send').forEach(btn => {
     btn.addEventListener('click', () => {
       if (p2pActionLocked()) { render(); return; }
+      if (!canCurrentPlayerDiscuss()) { render(); return; }
       const msg = btn.dataset.msg;
       if (!msg) return;
       if (!wsSend({type:'disc_message', text: msg})) return;
@@ -4510,6 +4606,7 @@ function bindEvents() {
     btn.addEventListener('click', () => {
       if (p2pActionLocked()) { render(); return; }
       if (O.phase === 'wolf_chat' && (O.wolfChatReady || O.wolfChatReadyPending)) return;
+      if (O.phase === 'discuss' && !isOnlinePlayerAlive()) { render(); return; }
       const input = document.getElementById(btn.dataset.chatInput || 'discFreeInput');
       if (!input) return;
       const targetEl = document.getElementById(btn.dataset.chatTarget || '');
@@ -4524,6 +4621,7 @@ function bindEvents() {
   // DISCUSS - フリーテキスト送信
   on('discFreeSend', () => {
     if (p2pActionLocked()) { render(); return; }
+    if (!canCurrentPlayerDiscuss()) { render(); return; }
     const input = document.getElementById('discFreeInput');
     const text = (input ? input.value : '').trim();
     if (!text) return;
@@ -4557,6 +4655,7 @@ function bindEvents() {
   document.querySelectorAll('[data-agree-name]').forEach(btn => {
     btn.addEventListener('click', () => {
       if (p2pActionLocked()) { render(); return; }
+      if (!canCurrentPlayerDiscuss()) { render(); return; }
       if (!O.isMyDiscTurn) return;
       const name = btn.dataset.agreeName;
       const agree_templates = [
@@ -5239,6 +5338,10 @@ const SoloEngine = (() => {
       case 'disc_message': {
         if (R.phase !== 'discuss') break;
         const human = R.players[0];
+        if (!human || !human.alive) {
+          emit({ type:'error', msg:'死亡者は議論に発言できません' });
+          break;
+        }
         // BRAIN によるクレーム＆疑い解析（人間発言から CO・かばう・疑うを学習）
         BRAIN.parseClaim(R, human.name, data.text);
         R.discMsgs.push({ name:human.name, text:data.text });
@@ -7692,6 +7795,15 @@ const P2PEngine = (() => {
 
   function handleDiscMsg(pname, text) {
     if (R.phase !== 'discuss') return;
+    const speaker = (R.players || []).find(p => p.name === pname);
+    if (!speaker || !speaker.alive || speaker.isCpu) {
+      pushP2PEvent('disc_message_invalid', `${pname || '-'} / dead-or-invalid`);
+      if (pname) {
+        sendTo(pname, { type:'error', msg:'死亡者は議論に発言できません' });
+        sendResyncTo(pname);
+      }
+      return;
+    }
     BRAIN.parseClaim(R, pname, text); // 人間発言から CO・かばう・疑うを学習
     R.discMsgs.push({ name:pname, text });
     broadcast({ type:'disc_message', name:pname, text });
@@ -8502,7 +8614,12 @@ function handleServer(data) {
     case 'disc_turn':
       O.currentSpeaker = data.name; O.isMyDiscTurn = false; O.tplStep = null; break;
     case 'your_disc_turn':
-      O.isMyDiscTurn = true; O.tplStep = 'cat'; O.tplTarget = null; break;
+      if (isOnlinePlayerAlive()) {
+        O.isMyDiscTurn = true; O.tplStep = 'cat'; O.tplTarget = null;
+      } else {
+        O.isMyDiscTurn = false; O.tplStep = null; O.tplTarget = null;
+      }
+      break;
     case 'disc_message':
       appendDiscussMessageOnce({name: data.name, text: data.text});
       O.currentSpeaker = null; break;
@@ -8823,9 +8940,10 @@ function renderODiscuss() {
     </div>`;
 
   // フリーテキスト入力（生存者なら常に表示）
-  const myAlive = O.alive.some(p=>p.name===O.playerName);
+  const myAlive = isOnlinePlayerAlive();
   const freeInput = myAlive ? `
     <div class="chat-compose">
+      ${coQuickPanel()}
       ${quickChatPanel()}
       <div class="free-chat-bar">
         <input type="text" id="discFreeInput" placeholder="${actionLocked ? 'P2P再接続後に発言できます' : O.isMyDiscTurn?'💬 あなたの番！自由に発言...':'💬 自由に発言できます...'}" maxlength="220" ${actionLocked ? 'disabled' : ''}>
@@ -9743,6 +9861,36 @@ function renderSoloSetup() {
 }
 
 // ========== UPDATED RENDER ==========
+let _lastChatLatestKey = '';
+
+function chatLatestKey() {
+  return [
+    mode,
+    O.phase || '',
+    O.day || 0,
+    O.discRound || 0,
+    (O.discMsgs || []).length,
+    (O.wolfChatMsgs || []).length,
+    Object.keys(O.roleClaims || {}).length,
+  ].join('|');
+}
+
+function captureChatFeedScrolls() {
+  const out = {};
+  ['discFeed', 'wolfFeed', 'coFeed'].forEach(id => {
+    const feed = document.getElementById(id);
+    if (feed) out[id] = feed.scrollTop;
+  });
+  return out;
+}
+
+function restoreChatFeedScrolls(scrolls) {
+  Object.entries(scrolls || {}).forEach(([id, top]) => {
+    const feed = document.getElementById(id);
+    if (feed) feed.scrollTop = Math.min(top, Math.max(0, feed.scrollHeight - feed.clientHeight));
+  });
+}
+
 function scrollChatFeedsToLatest() {
   ['discFeed', 'wolfFeed', 'coFeed'].forEach(id => {
     const feed = document.getElementById(id);
@@ -9750,8 +9898,11 @@ function scrollChatFeedsToLatest() {
   });
 }
 
-function scheduleChatLatestScroll() {
+function scheduleChatLatestScroll(force=false) {
   if (!['discuss', 'wolf_chat'].includes(O.phase)) return;
+  const key = chatLatestKey();
+  if (!force && key === _lastChatLatestKey) return;
+  _lastChatLatestKey = key;
   const run = () => scrollChatFeedsToLatest();
   if (typeof requestAnimationFrame === 'function') {
     requestAnimationFrame(() => {
@@ -9763,11 +9914,32 @@ function scheduleChatLatestScroll() {
   }
 }
 
+function restorePageScrollLater(y) {
+  if (!Number.isFinite(y)) return;
+  const run = () => window.scrollTo(0, y);
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(run);
+    setTimeout(run, 40);
+  } else {
+    setTimeout(run, 0);
+  }
+}
+
 function render() {
   const app = document.getElementById('app');
   if (!app) return;
   QUALITY.suppressRender = true;
   try {
+  const _chatPhases = ['discuss','wolf_chat'];
+  const _wasChatPhase = _chatPhases.includes(O.phase);
+  const _chatKeyBefore = chatLatestKey();
+  const _feedScrolls = captureChatFeedScrolls();
+  const _hadChatFeeds = Object.keys(_feedScrolls).length > 0;
+  const _pageScrollY = window.scrollY || window.pageYOffset || 0;
+  const _activeEl = document.activeElement;
+  const _activeInputId = ['discFreeInput','wolfFreeInput'].includes(_activeEl?.id) ? _activeEl.id : '';
+  const _activeSelStart = _activeInputId ? _activeEl.selectionStart : null;
+  const _activeSelEnd = _activeInputId ? _activeEl.selectionEnd : null;
   // チャット入力中のテキストを保持（CPUターンで再描画されても消えないように）
   const _discVal  = document.getElementById('discFreeInput')?.value  || '';
   const _wolfVal  = document.getElementById('wolfFreeInput')?.value  || '';
@@ -9800,16 +9972,30 @@ function render() {
   if (discInput && _discVal) { discInput.value = _discVal; }
   const wolfInput = document.getElementById('wolfFreeInput');
   if (wolfInput && _wolfVal) { wolfInput.value = _wolfVal; }
+  const activeInput = _activeInputId ? document.getElementById(_activeInputId) : null;
+  if (activeInput && !activeInput.disabled) {
+    try {
+      activeInput.focus({ preventScroll:true });
+      if (Number.isFinite(_activeSelStart) && Number.isFinite(_activeSelEnd)) {
+        activeInput.setSelectionRange(_activeSelStart, _activeSelEnd);
+      }
+    } catch(e) {}
+  }
   const voteSelect = document.getElementById('oVoteTgt');
   if (voteSelect && O.voteTarget) voteSelect.value = O.voteTarget;
   const voteReason = document.getElementById('oVoteReason');
   if (voteReason && O.voteReasonDraft) voteReason.value = O.voteReasonDraft;
 
   // 議論・チャット中は画面トップに飛ばさない（上下スクロール防止）
-  const chatPhases = ['discuss','wolf_chat'];
-  if (!chatPhases.includes(O.phase)) window.scrollTo(0, 0);
+  const _isChatPhase = _chatPhases.includes(O.phase);
+  if (!_isChatPhase) window.scrollTo(0, 0);
   bindEvents();
-  scheduleChatLatestScroll();
+  if (_isChatPhase) {
+    const changed = chatLatestKey() !== _chatKeyBefore;
+    if (changed || !_hadChatFeeds) scheduleChatLatestScroll(true);
+    else restoreChatFeedScrolls(_feedScrolls);
+    if (_wasChatPhase && _hadChatFeeds) restorePageScrollLater(_pageScrollY);
+  }
   QUALITY.lastRenderOkAt = Date.now();
   } catch (err) {
     pushQualityError('render', err);
