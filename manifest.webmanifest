@@ -1,0 +1,19 @@
+{
+  "name": "人狼ゲーム",
+  "short_name": "人狼",
+  "description": "ソロ、ローカル、P2Pで遊べるリアルタイム人狼ゲーム",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#06080d",
+  "theme_color": "#06080d",
+  "icons": [
+    {
+      "src": "assets/werewolf-solo-portraits-v2-famous.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

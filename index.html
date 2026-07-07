@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="人狼ゲーム">
 <meta name="theme-color" content="#06080d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/werewolf-solo-portraits-v2-famous.png">
 <title>🐺 人狼ゲーム</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,7 +29,7 @@ body::before {
   background:
     linear-gradient(180deg, rgba(4,7,13,.32), rgba(4,7,13,.82) 58%, rgba(4,7,13,.96)),
     radial-gradient(circle at 52% 24%, rgba(234,179,8,.16), transparent 28%),
-    url("assets/village-night-bg.png") center / cover no-repeat;
+    url("assets/village-night-bg-optimized.jpg") center / cover no-repeat;
   transform: scale(1.02);
 }
 body::after {
@@ -127,6 +129,41 @@ p  { line-height: 1.6; }
   line-height: 1.55;
   margin: .55rem 0 0;
   text-align: center;
+}
+.quality-alert {
+  border: 1px solid rgba(251,191,36,.44);
+  background: rgba(69,44,7,.72);
+  box-shadow: 0 14px 34px rgba(251,191,36,.1);
+}
+.quality-alert-title {
+  color: #fde68a;
+  font-size: .9rem;
+  font-weight: 900;
+  margin: 0 0 .25rem;
+}
+.quality-alert-text {
+  color: #fef3c7;
+  font-size: .78rem;
+  line-height: 1.55;
+  margin: 0 0 .65rem;
+}
+.quality-alert-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .45rem;
+}
+.quality-alert-actions .btn {
+  margin: 0;
+  padding: .66rem .5rem;
+  font-size: .84rem;
+}
+.quality-fallback {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1.2rem;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
 }
 
 /* Phase header */
@@ -345,7 +382,7 @@ details summary:hover { color: #94a3b8; }
 .wolf-msg { background: rgba(239,68,68,0.1); border-left: 3px solid #ef444488; }
 .wolf-msg .chat-name { color: #f87171; }
 /* ── Opening Story ── */
-.story-overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(2,6,12,.24),rgba(2,6,12,.92) 68%,#02040a),url("assets/village-night-bg.png") center / cover no-repeat;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;}
+.story-overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(2,6,12,.24),rgba(2,6,12,.92) 68%,#02040a),url("assets/village-night-bg-optimized.jpg") center / cover no-repeat;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;}
 .story-moon{font-size:4.5rem;margin-bottom:1.5rem;}
 .story-text{color:#c8d8f4;font-size:1.1rem;line-height:2;max-width:380px;min-height:4rem;transition:opacity .4s ease;}
 .story-cursor{display:inline-block;width:2px;height:1em;background:#a5b4fc;margin-left:2px;vertical-align:middle;opacity:.7;}
@@ -430,7 +467,7 @@ details summary:hover { color: #94a3b8; }
 .wolf-msg .cm-name{color:#f87171;}
 .seer-claim-msg{background:rgba(129,140,248,.1);border-left:3px solid #818cf888;}
 .my-msg{background:rgba(99,102,241,.12);border-left:3px solid #6b21a8;}
-.portrait{display:inline-block;background-image:url("assets/werewolf-solo-portraits-sawada.png");background-size:400% 400%;background-repeat:no-repeat;background-color:#111827;border:1px solid rgba(255,255,255,.18);box-shadow:0 6px 18px rgba(0,0,0,.35);image-rendering:auto;overflow:hidden;vertical-align:middle;}
+.portrait{display:inline-block;background-image:url("assets/werewolf-solo-portraits-v2-famous-1024.jpg");background-size:400% 400%;background-repeat:no-repeat;background-color:#111827;border:1px solid rgba(255,255,255,.18);box-shadow:0 6px 18px rgba(0,0,0,.35);image-rendering:auto;overflow:hidden;vertical-align:middle;}
 .portrait-chat{width:38px;height:38px;border-radius:50%;}
 .portrait-chip{width:22px;height:22px;border-radius:50%;margin-right:.25rem;flex-shrink:0;}
 .portrait-lg{width:76px;height:76px;border-radius:8px;}
@@ -535,7 +572,50 @@ details summary:hover { color: #94a3b8; }
 .heat-line{font-size:.76rem;color:#cbd5e1;line-height:1.5;border-top:1px solid rgba(255,255,255,.06);padding-top:.36rem;}
 .heat-line:first-child{border-top:none;padding-top:0;}
 .heat-question{background:rgba(15,23,42,.48);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.45rem .55rem;color:#f8fafc;font-size:.76rem;line-height:1.48;}
-@media (min-width:760px){.ai-intel-grid{grid-template-columns:1.1fr .9fr;}.trust-gauge-list{grid-template-columns:1fr 1fr;}}
+.spotlight-panel{background:linear-gradient(135deg,rgba(2,132,199,.13),rgba(234,88,12,.10));border:1px solid rgba(125,211,252,.25);border-radius:8px;padding:.74rem .8rem;margin:.5rem 0;color:#dbeafe;box-shadow:0 16px 36px rgba(0,0,0,.24);backdrop-filter:blur(12px);}
+.spotlight-head{display:flex;align-items:center;justify-content:space-between;gap:.55rem;color:#bae6fd;font-size:.82rem;font-weight:900;margin-bottom:.42rem;}
+.spotlight-tag{display:inline-flex;align-items:center;justify-content:center;min-width:4.2rem;border-radius:999px;background:rgba(14,165,233,.16);border:1px solid rgba(125,211,252,.25);color:#fef3c7;font-size:.7rem;font-weight:900;padding:.16rem .48rem;white-space:nowrap;}
+.spotlight-meter{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.1);margin:.42rem 0 .52rem;}
+.spotlight-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#38bdf8,#facc15,#fb7185);box-shadow:0 0 18px rgba(56,189,248,.24);}
+.spotlight-grid{display:grid;grid-template-columns:1fr;gap:.42rem;margin:.42rem 0;}
+.spotlight-box{background:rgba(15,23,42,.48);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem .56rem;line-height:1.5;min-width:0;}
+.spotlight-box b{display:block;color:#f8fafc;font-size:.73rem;margin-bottom:.12rem;}
+.spotlight-box span{display:block;color:#cbd5e1;font-size:.76rem;}
+.spotlight-question{border-top:1px solid rgba(255,255,255,.08);padding-top:.4rem;margin-top:.4rem;color:#f8fafc;font-size:.78rem;line-height:1.55;}
+.spotlight-note{color:#93c5fd;font-size:.72rem;line-height:1.45;margin-top:.36rem;}
+.contradiction-panel{background:linear-gradient(135deg,rgba(127,29,29,.24),rgba(15,23,42,.72));border:1px solid rgba(248,113,113,.28);border-radius:8px;padding:.72rem .78rem;margin:.5rem 0;color:#fecaca;box-shadow:0 14px 34px rgba(0,0,0,.24);}
+.contradiction-head{display:flex;align-items:center;justify-content:space-between;gap:.55rem;color:#fecaca;font-size:.82rem;font-weight:900;margin-bottom:.42rem;}
+.contradiction-tag{display:inline-flex;align-items:center;border-radius:999px;background:rgba(248,113,113,.13);border:1px solid rgba(248,113,113,.28);color:#fee2e2;font-size:.7rem;font-weight:900;padding:.16rem .5rem;white-space:nowrap;}
+.contradiction-list{display:grid;gap:.38rem;}
+.contradiction-row{display:grid;grid-template-columns:auto 1fr;gap:.48rem;align-items:start;background:rgba(15,23,42,.42);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.48rem .55rem;}
+.contradiction-score{min-width:2.15rem;text-align:center;border-radius:7px;background:rgba(239,68,68,.18);border:1px solid rgba(248,113,113,.28);color:#fecaca;font-size:.72rem;font-weight:900;padding:.14rem .24rem;}
+.contradiction-title{color:#fff;font-size:.78rem;font-weight:900;line-height:1.35;}
+.contradiction-detail{color:#fca5a5;font-size:.72rem;line-height:1.45;margin-top:.08rem;}
+.contradiction-empty{color:#94a3b8;font-size:.76rem;line-height:1.55;background:rgba(15,23,42,.38);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.48rem .55rem;}
+.trial-panel{background:linear-gradient(135deg,rgba(88,28,135,.22),rgba(8,47,73,.16));border:1px solid rgba(216,180,254,.26);border-radius:8px;padding:.76rem .82rem;margin:.5rem 0;color:#e9d5ff;box-shadow:0 16px 38px rgba(0,0,0,.25);position:relative;overflow:hidden;}
+.trial-panel:before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,#a78bfa,#38bdf8,#facc15);opacity:.9;}
+.trial-head{display:flex;align-items:center;justify-content:space-between;gap:.55rem;color:#f5d0fe;font-size:.83rem;font-weight:900;margin-bottom:.48rem;}
+.trial-badge{display:inline-flex;align-items:center;border-radius:999px;background:rgba(168,85,247,.16);border:1px solid rgba(216,180,254,.28);color:#fef9c3;font-size:.7rem;font-weight:900;padding:.16rem .5rem;white-space:nowrap;}
+.trial-topic{background:rgba(15,23,42,.46);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.48rem .56rem;color:#f8fafc;font-size:.78rem;line-height:1.55;margin-bottom:.46rem;}
+.trial-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:.38rem;margin:.42rem 0;}
+.trial-role{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.42rem .46rem;min-width:0;}
+.trial-role b{display:block;color:#c4b5fd;font-size:.68rem;margin-bottom:.08rem;}
+.trial-role span{display:block;color:#f8fafc;font-size:.78rem;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.trial-script{display:grid;gap:.34rem;margin-top:.45rem;}
+.trial-step{display:grid;grid-template-columns:auto 1fr;gap:.4rem;align-items:start;color:#cbd5e1;font-size:.75rem;line-height:1.48;}
+.trial-step i{font-style:normal;background:rgba(56,189,248,.16);border:1px solid rgba(125,211,252,.22);border-radius:7px;color:#bae6fd;font-size:.68rem;font-weight:900;padding:.08rem .3rem;line-height:1.2;}
+.trial-verdict{border-top:1px solid rgba(255,255,255,.08);margin-top:.48rem;padding-top:.42rem;color:#fde68a;font-size:.76rem;line-height:1.52;}
+.secret-mission-panel{background:linear-gradient(135deg,rgba(20,83,45,.20),rgba(67,56,202,.13));border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:.72rem .78rem;margin:.5rem 0;color:#dcfce7;box-shadow:0 14px 34px rgba(0,0,0,.22);}
+.secret-mission-head{display:flex;align-items:center;justify-content:space-between;gap:.55rem;color:#bbf7d0;font-size:.82rem;font-weight:900;margin-bottom:.42rem;}
+.secret-mission-status{display:inline-flex;align-items:center;border-radius:999px;background:rgba(34,197,94,.14);border:1px solid rgba(74,222,128,.28);color:#fef9c3;font-size:.7rem;font-weight:900;padding:.16rem .5rem;white-space:nowrap;}
+.secret-mission-main{background:rgba(15,23,42,.44);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem .56rem;color:#f8fafc;font-size:.78rem;line-height:1.55;}
+.secret-mission-grid{display:grid;grid-template-columns:1fr;gap:.38rem;margin-top:.42rem;}
+.secret-mission-cell{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.42rem .48rem;min-width:0;}
+.secret-mission-cell b{display:block;color:#86efac;font-size:.68rem;margin-bottom:.08rem;}
+.secret-mission-cell span{display:block;color:#cbd5e1;font-size:.75rem;line-height:1.45;}
+.secret-mission-progress{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.09);margin-top:.5rem;}
+.secret-mission-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#38bdf8,#facc15);}
+@media (min-width:760px){.ai-intel-grid{grid-template-columns:1.1fr .9fr;}.trust-gauge-list{grid-template-columns:1fr 1fr;}.spotlight-grid{grid-template-columns:repeat(3,1fr);}.contradiction-list{grid-template-columns:1fr 1fr;}.trial-role-grid{grid-template-columns:repeat(4,1fr);}.secret-mission-grid{grid-template-columns:1fr 1fr 1fr;}}
 .power-panel{background:rgba(15,23,42,.78);border:1px solid rgba(96,165,250,.22);border-radius:8px;padding:.68rem .75rem;margin:.5rem 0;color:#cbd5e1;box-shadow:0 12px 28px rgba(0,0,0,.18);}
 .power-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;color:#93c5fd;font-size:.82rem;font-weight:900;margin-bottom:.42rem;}
 .power-line{font-size:.79rem;line-height:1.65;color:#b6c4d4;margin:.18rem 0;}
@@ -604,20 +684,21 @@ details summary:hover { color: #94a3b8; }
 const CHARACTER_AVATARS = [
   { emoji:'⚙️', label:'ボブ',             hint:'悲観的な工場の裏切り者。トンチンカンな発言で村を揺らす', pos:'0% 0%' },
   { emoji:'📚', label:'井沢',             hint:'冷静な分析役。発言の矛盾を細かく拾う、発狂するのが得意', pos:'33.333% 0%' },
-  { emoji:'🏭', label:'工場長',           hint:'現場を仕切る頑固者。頼れるが押しが強い、ボブに対しては不信感を抱いている', pos:'66.667% 0%' },
+  { emoji:'🏭', label:'工場長',           hint:'目力が強烈な現場の支配者。頼れるが押しが強い、ボブに対しては不信感を抱いている', src:'assets/kojocho-strong-eyes-512.jpg' },
   { emoji:'⛩️', label:'狩野英孝',         hint:'派手な祈祷師風の芸人肌。場の空気をかき回す、スタッフ―', pos:'100% 0%' },
   { emoji:'🎩', label:'マリック',         hint:'奇術師めいた謎の人物。手元と本心を見せない、来てますハンドパワーです', pos:'0% 33.333%' },
   { emoji:'👑', label:'キングカズ',       hint:'不屈のベテラン。沈んだ村の士気を支える', pos:'33.333% 33.333%' },
   { emoji:'🧠', label:'カズレーザー',     hint:'赤い服の切れ者。笑顔で核心を突く', pos:'66.667% 33.333%' },
   { emoji:'🍎', label:'リンゴちゃん',     hint:'華やかな歌い手。声色ひとつで空気を変える', pos:'100% 33.333%' },
-  { emoji:'⚽', label:'柳沢',             hint:'俊敏な元スポーツマン。動きが読みにくい', pos:'0% 66.667%' },
+  { emoji:'🍔', label:'ドナルド',         hint:'陽気すぎるピエロ。かなりトンチンカンな発言で村を明るく壊す', pos:'0% 66.667%' },
   { emoji:'📝', label:'沢枝',             hint:'回りくどいメモ魔。よく喋り、ボブ・工場長・井沢を強く疑う', pos:'33.333% 66.667%' },
   { emoji:'💄', label:'イッコー',         hint:'美意識の高い占い客。細部の違和感に鋭い、どんだけ～ぇ', pos:'66.667% 66.667%' },
   { emoji:'💬', label:'マツコ',           hint:'重厚な観察者。ひと言で議論の流れを変える', pos:'100% 66.667%' },
   { emoji:'🍷', label:'アンジャッシュ渡部', hint:'品の良い情報通。食卓の噂にやけに詳しい', pos:'0% 100%' },
   { emoji:'🎸', label:'ピコ太郎',         hint:'奇抜な吟遊詩人。軽口で疑いを逸らす、ウン、ペンパイナップルアップルペン', pos:'33.333% 100%' },
-  { emoji:'🌘', label:'夜見の番人',       hint:'月明かりの下で村を見張る無口な影', pos:'66.667% 100%' },
-  { emoji:'🌿', label:'月草の薬師',       hint:'薬草を抱えた静かな治療師。誰にも本音を言わない', pos:'100% 100%' },
+  { emoji:'📣', label:'ザコシショウ',     hint:'何でも誇張して叫ぶ暴走芸人。小さな違和感を特大事件にする', pos:'66.667% 100%' },
+  { emoji:'⚠️', label:'出川',             hint:'ヤバいよ、ヤバいよが口癖。ネガティブで危険を大きく見る', pos:'100% 100%' },
+  { emoji:'🥇', label:'吉田沙保里',       hint:'レスリング女王風の闘士。攻撃的な言動と勝負勘で疑いを真正面から押さえ込む', src:'assets/yoshida-saori-wrestling-v2-512.jpg' },
 ];
 
 function getAvatar(name, players) {
@@ -640,6 +721,7 @@ function getAvatar(name, players) {
 function assignOnlineAvatars(players) {
   const total = CHARACTER_AVATARS.length;
   const used = new Set();
+  const nameToIndex = new Map(CHARACTER_AVATARS.map((a, i) => [a.label, i]));
   const shuffled = (() => {
     const arr = Array.from({length: total}, (_, i) => i);
     for (let i=arr.length-1;i>0;i--) {
@@ -654,12 +736,17 @@ function assignOnlineAvatars(players) {
     used.add(idx);
     return idx;
   };
-  (players || []).forEach(p => {
-    const named = CHARACTER_AVATARS.findIndex(a => a.label === p.name);
-    const idx = named >= 0 && !used.has(named) ? named : nextIndex();
-    p.avatarIndex = idx;
-    p.avatarLabel = CHARACTER_AVATARS[idx]?.label || '';
-  });
+  [...(players || [])]
+    .sort((a, b) => Number(!!b?.isCpu) - Number(!!a?.isCpu))
+    .forEach(p => {
+      // オンラインの人間プレイヤーは毎回ランダムな担当キャラにする。
+      // CPUは名前・口調・思考がキャラに紐づくため、名前一致の画像を優先する。
+      const named = p?.isCpu ? nameToIndex.get(p.name) : undefined;
+      const idx = Number.isInteger(named) && !used.has(named) ? named : nextIndex();
+      used.add(idx);
+      p.avatarIndex = idx;
+      p.avatarLabel = CHARACTER_AVATARS[idx]?.label || '';
+    });
   return players;
 }
 
@@ -1576,6 +1663,612 @@ function renderLocalDiscussionHeatPanel() {
   </div>`;
 }
 
+function pressureLabel(score) {
+  if (score >= 82) return '決戦';
+  if (score >= 64) return '吊り候補';
+  if (score >= 44) return '詰め時';
+  return '観察';
+}
+
+function renderClimaxSpotlight(data) {
+  if (!data) return '';
+  const questions = (data.questions || []).slice(0, 2).map(q => `<div class="spotlight-question">${esc(q)}</div>`).join('');
+  const note = data.note ? `<div class="spotlight-note">${esc(data.note)}</div>` : '';
+  return `<div class="spotlight-panel">
+    <div class="spotlight-head"><span>クライマックス議題</span><span class="spotlight-tag">${esc(data.label)} ${data.pressure}/100</span></div>
+    <div class="spotlight-meter"><div class="spotlight-fill" style="width:${data.pressure}%;"></div></div>
+    <div class="spotlight-grid">
+      <div class="spotlight-box"><b>今日の焦点</b><span>${esc(data.targetLine)}</span></div>
+      <div class="spotlight-box"><b>波乱カード</b><span>${esc(data.eventLine)}</span></div>
+      <div class="spotlight-box"><b>反論ポイント</b><span>${esc(data.counterLine)}</span></div>
+    </div>
+    <div class="case-mini-title" style="margin-top:.5rem;">この場を動かす質問</div>
+    ${questions}
+    ${note}
+  </div>`;
+}
+
+function buildClimaxSpotlight() {
+  if (!['day','discuss','vote','vote_result'].includes(O.phase)) return null;
+  const aliveNames = (O.alive || []).map(p => p.name || p).filter(Boolean);
+  if (!aliveNames.length) return null;
+  const intel = analyzeDiscussionIntel();
+  const heat = analyzeDiscussionHeat();
+  const top = intel.ranking?.[0];
+  const second = intel.ranking?.[1];
+  const trusted = [...(intel.rows || [])].sort((a,b)=>b.trustScore-a.trustScore)[0];
+  const claimsByRole = {};
+  Object.entries(O.roleClaims || {}).forEach(([name, role]) => {
+    if (!aliveNames.includes(name)) return;
+    if (!claimsByRole[role]) claimsByRole[role] = [];
+    claimsByRole[role].push(name);
+  });
+  const conflict = Object.entries(claimsByRole).filter(([, names]) => names.length > 1);
+  const lastVote = (O.voteHistory && O.voteHistory.length) ? O.voteHistory[O.voteHistory.length - 1] : O.voteResult;
+  const voteTargets = Object.values(lastVote?.votes || {}).filter(Boolean);
+  const uniqueVoteTargets = new Set(voteTargets).size;
+  const rivalry = activeRivalryPairs(aliveNames)[0];
+  const target = top?.name || rivalry?.to || voteTargets[0] || aliveNames[0];
+  const targetVotes = voteTargets.filter(t => t === target).length;
+  const targetVoters = Object.entries(lastVote?.votes || {}).filter(([, t]) => t === target).map(([v]) => v);
+  const pressure = clampNum(Math.round(
+    heat.heat * .48 +
+    (top?.suspicionScore || 34) * .34 +
+    (conflict.length ? 12 : 0) +
+    (uniqueVoteTargets >= 3 ? 8 : 0) +
+    (rivalry ? 6 : 0) +
+    (O.phase === 'vote' ? 8 : 0)
+  ), 0, 100);
+
+  let eventLine = `${target}さんの発言理由を深掘りし、投票先を固定できるか確認。`;
+  if (conflict[0]) {
+    const [role, names] = conflict[0];
+    eventLine = `${ROLES[role]?.name || role}COが対立。${names.join(' / ')}の結果とCO順を整理。`;
+  } else if (rivalry && (rivalry.from === target || rivalry.to === target)) {
+    eventLine = `${rivalry.from}さんと${rivalry.to}さんの因縁が推理か感情かを切り分ける。`;
+  } else if (targetVotes >= Math.max(2, Math.ceil(aliveNames.length * .25))) {
+    eventLine = `${target}さんに${targetVotes}票が集中。便乗票と身内切りを洗う。`;
+  } else if (uniqueVoteTargets >= 3) {
+    eventLine = `投票が${uniqueVoteTargets}方向に分散。票を割った人の理由を順番に確認。`;
+  } else if ((intel.msgCount || 0) < Math.ceil(aliveNames.length * .6)) {
+    eventLine = '沈黙位置が多め。発言量の少ない人から吊り候補を一人だけ出させる。';
+  } else if (trusted && top && trusted.name !== top.name) {
+    eventLine = `${trusted.name}さんを信用軸に、${target}さんへの疑いが妥当か検証。`;
+  }
+
+  const questions = [];
+  if (top) questions.push(`${target}さんへ: いま一番疑っている相手と、昨日から変わった理由を短く説明。`);
+  if (conflict[0]) questions.push(`${conflict[0][1].join(' / ')}へ: 結果、COタイミング、護衛希望を一人ずつ確認。`);
+  if (targetVoters.length) questions.push(`${targetVoters.slice(0, 3).join(' / ')}へ: ${target}さん投票が便乗ではない理由を言わせる。`);
+  if (trusted && trusted.name !== target) questions.push(`${trusted.name}さんへ: ${target}さんを吊るべきか、残すべきかを明言。`);
+  if (!questions.length) questions.push('全員へ: 今日の吊り候補を一人だけ挙げ、理由を20秒で言わせる。');
+
+  const counterParts = [];
+  counterParts.push(`${target}さんは疑いを「推理」「感情」「便乗」に分けて反論。`);
+  if (second && second.name !== target) counterParts.push(`対抗候補は${second.name}さん。`);
+  if (targetVoters.length) counterParts.push(`投票者: ${targetVoters.slice(0, 3).join(' / ')}`);
+
+  return {
+    pressure,
+    label: pressureLabel(pressure),
+    targetLine: `${target}さんを中心に議論。疑惑${top?.suspicionScore ?? 34}${top?.reason ? ` / ${top.reason}` : ''}`,
+    eventLine,
+    counterLine: counterParts.join(' '),
+    questions,
+    note: 'このパネルは発言、CO、投票、因縁から自動更新されます。場が荒れるほど吊り筋が見えやすくなります。'
+  };
+}
+
+function renderClimaxSpotlightPanel() {
+  return renderClimaxSpotlight(buildClimaxSpotlight());
+}
+
+function buildLocalClimaxSpotlight() {
+  if (!['day','vote','vote_result'].includes(S.phase)) return null;
+  const alivePl = alive();
+  const aliveNames = alivePl.map(p => p.name);
+  if (!aliveNames.length) return null;
+  const heat = analyzeLocalDiscussionHeat();
+  const voteResult = S.voteResult || {};
+  const votes = voteResult.votes || S.votes || {};
+  const voteTargets = Object.values(votes || {}).filter(Boolean);
+  const uniqueVoteTargets = new Set(voteTargets).size;
+  const tallyEntries = Object.entries(voteResult.tally || {}).sort(([, a], [, b]) => b - a);
+  const topVote = tallyEntries.find(([name]) => aliveNames.includes(name)) || tallyEntries[0];
+  const wolfFind = [...(S.seerHistory || [])].reverse().find(r => r.isWolf && aliveNames.includes(r.target));
+  const target = wolfFind?.target || topVote?.[0] || voteTargets[0] || aliveNames[0];
+  const targetVotes = voteTargets.filter(t => t === target).length;
+  const targetVoters = Object.entries(votes || {}).filter(([, t]) => t === target).map(([v]) => v);
+  const deadCount = (S.players || []).filter(p => !p.alive).length;
+  const pressure = clampNum(Math.round(
+    heat.heat * .56 +
+    (wolfFind ? 22 : 0) +
+    Math.min(14, targetVotes * 5) +
+    (uniqueVoteTargets >= 3 ? 8 : 0) +
+    Math.min(10, deadCount * 2)
+  ), 0, 100);
+
+  let eventLine = `${target}さんの投票理由と反論を聞き、今日の吊り候補を固める。`;
+  if (wolfFind) {
+    eventLine = `${target}さんに黒判定。占い師の信用と、黒先の反論を正面から比較。`;
+  } else if (targetVotes >= 2) {
+    eventLine = `${target}さんに票が集まっています。便乗票と身内切りを確認。`;
+  } else if (uniqueVoteTargets >= 3) {
+    eventLine = `投票が${uniqueVoteTargets}方向に割れています。票を変えた理由を順番に確認。`;
+  } else if ((S.day || 1) <= 1) {
+    eventLine = '初日は沈黙と薄い理由が最大の火種。発言量の差を見ます。';
+  }
+
+  const questions = [];
+  if (wolfFind) questions.push(`${target}さんへ: 黒判定への反論と、占い師を偽で見る理由を明言。`);
+  questions.push(`${target}さんへ: いま一番怪しい人と、自分が吊られた時に残したい情報を言う。`);
+  if (targetVoters.length) questions.push(`${targetVoters.slice(0, 3).join(' / ')}へ: ${target}さん投票の決め手を一言で確認。`);
+  if (uniqueVoteTargets >= 3) questions.push('票を割った人へ: 次も同じ相手に入れるか、変えるなら誰かを宣言。');
+
+  const counterParts = [
+    `${target}さんは自分への票を、便乗・推理・感情に分けて反論。`
+  ];
+  if (topVote && topVote[0] !== target) counterParts.push(`票の対抗候補は${topVote[0]}さん。`);
+  if (targetVoters.length) counterParts.push(`投票者: ${targetVoters.slice(0, 3).join(' / ')}`);
+
+  return {
+    pressure,
+    label: pressureLabel(pressure),
+    targetLine: `${target}さんを中心に議論。${targetVotes ? `${targetVotes}票が絡む` : '発言と投票先を確認'}`,
+    eventLine,
+    counterLine: counterParts.join(' '),
+    questions,
+    note: 'ローカルでも、占い結果・投票結果・死亡状況から毎日違う論点が出ます。'
+  };
+}
+
+function renderLocalClimaxSpotlightPanel() {
+  return renderClimaxSpotlight(buildLocalClimaxSpotlight());
+}
+
+function contradictionLabel(score) {
+  if (score >= 86) return '危険';
+  if (score >= 68) return '要追及';
+  if (score >= 48) return '違和感';
+  return '観察';
+}
+
+function buildStatementLedger(msgs, names) {
+  const aliveSet = new Set(names || []);
+  const ledger = {};
+  const ensure = name => {
+    if (!ledger[name]) ledger[name] = { name, suspects:new Set(), trusts:new Set(), mentions:new Set(), claims:new Set(), count:0 };
+    return ledger[name];
+  };
+  const suspectRe = /怪しい|疑|黒|人狼|投票|処刑|吊|矛盾|嘘|騙|不自然|沈黙|発言少な|違和感|怪し/;
+  const trustRe = /信頼|信用|白|村人|安全|守って|かば|村目線|無実|怪しくない|白確|仲間/;
+  (msgs || []).forEach(m => {
+    const speaker = m.name || '';
+    if (!speaker) return;
+    const text = String(m.text || '');
+    const row = ensure(speaker);
+    row.count += 1;
+    const claim = detectExplicitRoleClaim(text);
+    if (claim) row.claims.add(claim);
+    names.forEach(target => {
+      if (target === speaker || !aliveSet.has(target) || !text.includes(target)) return;
+      row.mentions.add(target);
+      const trustHit = trustRe.test(text);
+      const suspectHit = suspectRe.test(text) && !/怪しくない|無実|白っぽい|白い/.test(text);
+      if (trustHit) row.trusts.add(target);
+      if (suspectHit) row.suspects.add(target);
+    });
+  });
+  return ledger;
+}
+
+function renderContradictionScan(data) {
+  if (!data) return '';
+  const tag = contradictionLabel(data.maxScore || 0);
+  const rows = (data.alerts || []).slice(0, 4).map(a => `
+    <div class="contradiction-row">
+      <div class="contradiction-score">${a.score}</div>
+      <div>
+        <div class="contradiction-title">${esc(a.title)}</div>
+        <div class="contradiction-detail">${esc(a.detail)}</div>
+      </div>
+    </div>`).join('');
+  const empty = `<div class="contradiction-empty">${esc(data.emptyLine || '今のところ大きな矛盾は見つかっていません。次の発言と投票理由で変化します。')}</div>`;
+  return `<div class="contradiction-panel">
+    <div class="contradiction-head"><span>矛盾スキャナー</span><span class="contradiction-tag">${tag}</span></div>
+    <div class="contradiction-list">${rows || empty}</div>
+  </div>`;
+}
+
+function buildContradictionScan() {
+  if (!['day','discuss','vote','vote_result'].includes(O.phase)) return null;
+  const names = (O.alive || O.players || []).map(p => p.name || p).filter(Boolean);
+  if (!names.length) return null;
+  const msgs = ((O.intelMsgs && O.intelMsgs.length) ? O.intelMsgs : O.discMsgs) || [];
+  const ledger = buildStatementLedger(msgs, names);
+  const alerts = [];
+  const add = (score, title, detail) => {
+    if (!title || alerts.some(a => a.title === title && a.detail === detail)) return;
+    alerts.push({ score: clampNum(Math.round(score), 0, 100), title, detail });
+  };
+
+  Object.values(ledger).forEach(row => {
+    if (row.claims.size > 1) {
+      add(92, `${row.name}さんのCOが揺れています`, `複数役職を匂わせています: ${[...row.claims].map(r => ROLES[r]?.name || r).join(' / ')}`);
+    }
+    [...row.suspects].forEach(target => {
+      if (row.trusts.has(target)) {
+        add(76, `${row.name}さんの評価がブレています`, `${target}さんを疑う発言と信用する発言が混在。理由を聞く価値あり。`);
+      }
+    });
+  });
+
+  const claimsByRole = {};
+  Object.entries(O.roleClaims || {}).forEach(([name, role]) => {
+    if (!names.includes(name)) return;
+    if (!claimsByRole[role]) claimsByRole[role] = [];
+    claimsByRole[role].push(name);
+  });
+  Object.entries(claimsByRole).forEach(([role, claimers]) => {
+    if (claimers.length > 1) add(82, `${ROLES[role]?.name || role}COが対抗しています`, `${claimers.join(' / ')} の発言順、結果、投票先を比較。`);
+  });
+
+  const lastVote = (O.voteHistory && O.voteHistory.length) ? O.voteHistory[O.voteHistory.length - 1] : O.voteResult;
+  const votes = lastVote?.votes || {};
+  const tally = {};
+  Object.values(votes).forEach(t => { if (t) tally[t] = (tally[t] || 0) + 1; });
+  Object.entries(votes).forEach(([voter, target]) => {
+    if (!target) return;
+    const row = ledger[voter] || { suspects:new Set(), trusts:new Set(), mentions:new Set() };
+    const suspected = [...row.suspects].filter(n => n !== target);
+    if (row.trusts.has(target)) {
+      add(78, `${voter}さんの投票が発言と逆です`, `${target}さんを信用寄りに見せた後で投票しています。`);
+    } else if (suspected.length && !row.suspects.has(target)) {
+      add(66, `${voter}さんの疑い先と投票先がズレています`, `発言では${suspected.slice(0,2).join(' / ')}さんを疑い、票は${target}さんへ。`);
+    } else if (!row.mentions.has(target) && tally[target] >= 2) {
+      add(54, `${voter}さんに便乗票の気配`, `${target}さんへ投票していますが、事前発言で触れた形跡が薄いです。`);
+    }
+  });
+
+  const maxScore = alerts.reduce((m, a) => Math.max(m, a.score), 0);
+  if (!alerts.length && !msgs.length && !Object.keys(votes).length) return null;
+  return {
+    maxScore,
+    alerts: alerts.sort((a,b)=>b.score-a.score).slice(0, 4),
+    emptyLine: msgs.length
+      ? '発言と投票の大きな矛盾はまだ薄めです。次は投票理由とCOの変化を見ます。'
+      : 'まだ発言データが少ないため、矛盾検出は控えめです。'
+  };
+}
+
+function renderContradictionScannerPanel() {
+  return renderContradictionScan(buildContradictionScan());
+}
+
+function buildLocalContradictionScan() {
+  if (!['day','vote','vote_result'].includes(S.phase)) return null;
+  const names = alive().map(p => p.name);
+  if (!names.length) return null;
+  const voteResult = S.voteResult || {};
+  const votes = voteResult.votes || S.votes || {};
+  const reasons = voteResult.voteReasons || S.voteReasons || {};
+  const alerts = [];
+  const add = (score, title, detail) => {
+    if (!title || alerts.some(a => a.title === title && a.detail === detail)) return;
+    alerts.push({ score: clampNum(Math.round(score), 0, 100), title, detail });
+  };
+  const black = [...(S.seerHistory || [])].reverse().find(r => r.isWolf && names.includes(r.target));
+  if (black) {
+    Object.entries(votes).forEach(([voter, target]) => {
+      if (target && target !== black.target) {
+        add(68, `${voter}さんが黒判定を外しています`, `${black.target}さんに黒が出ていますが、投票先は${target}さんです。理由を確認。`);
+      }
+    });
+  }
+  const tally = {};
+  Object.values(votes).forEach(t => { if (t) tally[t] = (tally[t] || 0) + 1; });
+  Object.entries(votes).forEach(([voter, target]) => {
+    const reason = String(reasons[voter] || '').trim();
+    if (target && tally[target] >= 2 && reason.length < 8) {
+      add(52, `${voter}さんの投票理由が薄いです`, `${target}さんへ票が集まる中、理由が短く便乗に見えます。`);
+    }
+    if (target && reason && !reason.includes(target) && reason.length < 18) {
+      add(48, `${voter}さんの理由と投票先が噛み合いません`, `投票先は${target}さんですが、理由文で名前や決め手が弱いです。`);
+    }
+  });
+  const uniqueVoteTargets = new Set(Object.values(votes).filter(Boolean)).size;
+  if (uniqueVoteTargets >= 3) add(50, '票が大きく割れています', `${uniqueVoteTargets}方向に分散。票変え、便乗、身内切りのどれかを整理しましょう。`);
+
+  const maxScore = alerts.reduce((m, a) => Math.max(m, a.score), 0);
+  if (!alerts.length && !Object.keys(votes).length && !(S.seerHistory || []).length) return null;
+  return {
+    maxScore,
+    alerts: alerts.sort((a,b)=>b.score-a.score).slice(0, 4),
+    emptyLine: '投票と占い結果の大きな矛盾はまだ見つかっていません。理由の薄さを次に確認しましょう。'
+  };
+}
+
+function renderLocalContradictionScannerPanel() {
+  return renderContradictionScan(buildLocalContradictionScan());
+}
+
+function trialLabel(score) {
+  if (score >= 82) return '決め打ち裁判';
+  if (score >= 64) return '集中尋問';
+  if (score >= 44) return '公開質問';
+  return '予備審問';
+}
+
+function firstAvailableName(names, blocked=[]) {
+  const block = new Set((blocked || []).filter(Boolean));
+  return (names || []).find(n => n && !block.has(n)) || '';
+}
+
+function renderInferenceTrial(data) {
+  if (!data) return '';
+  const roles = [
+    ['被告', data.target],
+    ['追及', data.accuser],
+    ['弁護', data.defender],
+    ['証人', data.witness],
+  ].map(([label, name]) => `<div class="trial-role"><b>${esc(label)}</b><span>${esc(name || '未定')}</span></div>`).join('');
+  const steps = (data.steps || []).slice(0, 4).map((step, i) => `
+    <div class="trial-step"><i>${i+1}</i><span>${esc(step)}</span></div>`).join('');
+  return `<div class="trial-panel">
+    <div class="trial-head"><span>推理裁判</span><span class="trial-badge">${esc(data.label)} ${data.tension}/100</span></div>
+    <div class="trial-topic">${esc(data.topic)}</div>
+    <div class="trial-role-grid">${roles}</div>
+    <div class="case-mini-title" style="margin-top:.55rem;">裁判の進行</div>
+    <div class="trial-script">${steps}</div>
+    <div class="trial-verdict">${esc(data.verdict)}</div>
+  </div>`;
+}
+
+function buildInferenceTrial() {
+  if (!['day','discuss','vote','vote_result'].includes(O.phase)) return null;
+  const names = (O.alive || O.players || []).map(p => p.name || p).filter(Boolean);
+  if (names.length < 3) return null;
+  const msgs = ((O.intelMsgs && O.intelMsgs.length) ? O.intelMsgs : O.discMsgs) || [];
+  const intel = analyzeDiscussionIntel();
+  const heat = analyzeDiscussionHeat();
+  const scan = buildContradictionScan();
+  const ledger = buildStatementLedger(msgs, names);
+  const lastVote = (O.voteHistory && O.voteHistory.length) ? O.voteHistory[O.voteHistory.length - 1] : O.voteResult;
+  const votes = lastVote?.votes || {};
+  const tallyTop = Object.entries(lastVote?.tally || {}).sort(([,a],[,b]) => b-a)[0];
+  const top = intel.ranking?.[0];
+  const target = top?.name || tallyTop?.[0] || Object.values(votes).find(Boolean) || names[0];
+  const trusted = [...(intel.rows || [])].filter(r => r.name !== target).sort((a,b)=>b.trustScore-a.trustScore)[0];
+  const rivalry = activeRivalryPairs(names).find(p => p.to === target || p.from === target) || activeRivalryPairs(names)[0];
+  const targetVoters = Object.entries(votes).filter(([, t]) => t === target).map(([v]) => v);
+  const accuserFromSpeech = Object.values(ledger).filter(r => r.name !== target && r.suspects.has(target)).sort((a,b)=>b.count-a.count)[0]?.name;
+  const accuser = accuserFromSpeech || targetVoters[0] || rivalry?.from || firstAvailableName(names, [target]);
+  const defenderFromSpeech = Object.values(ledger).filter(r => r.name !== target && r.name !== accuser && r.trusts.has(target)).sort((a,b)=>b.count-a.count)[0]?.name;
+  const defender = defenderFromSpeech || trusted?.name || firstAvailableName(names, [target, accuser]);
+  const witness = targetVoters.find(n => n !== accuser && n !== defender)
+    || (rivalry && firstAvailableName([rivalry.from, rivalry.to], [target, accuser, defender]))
+    || firstAvailableName(names, [target, accuser, defender]);
+  const conflictRoles = {};
+  Object.entries(O.roleClaims || {}).forEach(([name, role]) => {
+    if (!names.includes(name)) return;
+    if (!conflictRoles[role]) conflictRoles[role] = [];
+    conflictRoles[role].push(name);
+  });
+  const conflict = Object.entries(conflictRoles).find(([, claimers]) => claimers.length > 1 && claimers.includes(target));
+  const contradictionMax = scan?.maxScore || 0;
+  const tension = clampNum(Math.round(
+    heat.heat * .38 +
+    (top?.suspicionScore || 36) * .28 +
+    contradictionMax * .22 +
+    (conflict ? 10 : 0) +
+    (targetVoters.length >= 2 ? 6 : 0) +
+    (O.phase === 'vote' ? 6 : 0)
+  ), 0, 100);
+
+  let topic = `${target}さんを今日吊るべきか、残して情報を取るべきかを裁判形式で決めます。`;
+  if (conflict) {
+    topic = `${ROLES[conflict[0]]?.name || conflict[0]}CO裁判: ${conflict[1].join(' / ')} のどちらを信用するか。`;
+  } else if (scan?.alerts?.[0]) {
+    topic = `矛盾裁判: ${scan.alerts[0].title}。${scan.alerts[0].detail}`;
+  } else if (rivalry && (rivalry.from === target || rivalry.to === target)) {
+    topic = `因縁裁判: ${rivalry.from}さんと${rivalry.to}さんの対立が推理か感情かを見極めます。`;
+  } else if ((msgs.length || 0) < Math.ceil(names.length * .65)) {
+    topic = '沈黙裁判: 発言が薄い村で、吊り理由を全員から引き出します。';
+  }
+
+  const steps = [
+    `${accuser || '追及役'}さん: ${target}さんを疑う理由を一つだけ選び、証拠を短く出す。`,
+    `${target}さん: その疑いが推理・感情・便乗のどれかを切り分けて反論する。`,
+    `${witness || '証人役'}さん: 投票、CO、発言のどれが一番信用できる情報かを宣言する。`,
+    `${defender || '弁護役'}さん: ${target}さんを残すメリットがあるか、吊るなら代替候補がいるかを言う。`,
+  ];
+  const verdict = tension >= 64
+    ? '判定条件: 被告の反論が弱い、または追及役の証拠が具体的なら吊り候補に固定。逆に追及理由が薄ければ追及役も疑い返し。'
+    : '判定条件: まだ決め打たず、発言量と投票理由をそろえてから吊り先を固める。';
+
+  return { label: trialLabel(tension), tension, target, accuser, defender, witness, topic, steps, verdict };
+}
+
+function renderInferenceTrialPanel() {
+  return renderInferenceTrial(buildInferenceTrial());
+}
+
+function buildLocalInferenceTrial() {
+  if (!['day','vote','vote_result'].includes(S.phase)) return null;
+  const names = alive().map(p => p.name);
+  if (names.length < 3) return null;
+  const heat = analyzeLocalDiscussionHeat();
+  const scan = buildLocalContradictionScan();
+  const voteResult = S.voteResult || {};
+  const votes = voteResult.votes || S.votes || {};
+  const tallyTop = Object.entries(voteResult.tally || {}).sort(([,a],[,b]) => b-a)[0];
+  const black = [...(S.seerHistory || [])].reverse().find(r => r.isWolf && names.includes(r.target));
+  const target = black?.target || tallyTop?.[0] || Object.values(votes).find(Boolean) || names[0];
+  const targetVoters = Object.entries(votes).filter(([, t]) => t === target).map(([v]) => v);
+  const accuser = targetVoters[0] || firstAvailableName(names, [target]);
+  const defender = firstAvailableName(names, [target, accuser]);
+  const witness = targetVoters.find(n => n !== accuser) || firstAvailableName(names, [target, accuser, defender]);
+  const tension = clampNum(Math.round(
+    heat.heat * .44 +
+    (scan?.maxScore || 0) * .26 +
+    (black ? 18 : 0) +
+    Math.min(12, targetVoters.length * 5)
+  ), 0, 100);
+  let topic = `${target}さんを今日吊るべきか、投票理由を裁判形式で確認します。`;
+  if (black) topic = `黒判定裁判: ${target}さんへの黒を信じるか、占い師を疑うか。`;
+  else if (scan?.alerts?.[0]) topic = `矛盾裁判: ${scan.alerts[0].title}。${scan.alerts[0].detail}`;
+  const steps = [
+    `${accuser || '追及役'}さん: ${target}さん投票の決め手を一言で出す。`,
+    `${target}さん: 自分が吊られた場合に残る情報と、代わりの吊り先を言う。`,
+    `${witness || '証人役'}さん: 票の集まり方が自然か、便乗に見えるかを判断する。`,
+    `${defender || '弁護役'}さん: ${target}さんを残すなら明日の確認方法を提案する。`,
+  ];
+  const verdict = black
+    ? '判定条件: 黒判定への反論が役職や投票と噛み合わなければ吊り寄り。占い師の理由が薄ければ占い師も疑い返し。'
+    : '判定条件: 投票理由が薄い人は次の日の最警戒位置に上げる。';
+  return { label: trialLabel(tension), tension, target, accuser, defender, witness, topic, steps, verdict };
+}
+
+function renderLocalInferenceTrialPanel() {
+  return renderInferenceTrial(buildLocalInferenceTrial());
+}
+
+function renderSecretMission(data) {
+  if (!data) return '';
+  const pct = clampNum(Math.round(data.progress || 0), 0, 100);
+  return `<div class="secret-mission-panel">
+    <div class="secret-mission-head"><span>今日の密命</span><span class="secret-mission-status">${esc(data.status)}</span></div>
+    <div class="secret-mission-main">${esc(data.title)}</div>
+    <div class="secret-mission-grid">
+      <div class="secret-mission-cell"><b>狙い</b><span>${esc(data.goal)}</span></div>
+      <div class="secret-mission-cell"><b>達成条件</b><span>${esc(data.condition)}</span></div>
+      <div class="secret-mission-cell"><b>ヒント</b><span>${esc(data.hint)}</span></div>
+    </div>
+    <div class="secret-mission-progress"><div class="secret-mission-fill" style="width:${pct}%;"></div></div>
+  </div>`;
+}
+
+function missionStatus(done, progress) {
+  if (done) return '達成';
+  if (progress >= 60) return 'あと少し';
+  if (progress > 0) return '進行中';
+  return '未着手';
+}
+
+function buildSecretMission() {
+  if (!['day','discuss','vote','vote_result'].includes(O.phase)) return null;
+  const names = (O.alive || O.players || []).map(p => p.name || p).filter(Boolean);
+  if (names.length < 3) return null;
+  const myName = O.playerName || '';
+  if (!myName || !names.includes(myName)) return null;
+  const msgs = ((O.intelMsgs && O.intelMsgs.length) ? O.intelMsgs : O.discMsgs) || [];
+  const myTexts = msgs.filter(m => m.name === myName).map(m => String(m.text || ''));
+  const intel = analyzeDiscussionIntel();
+  const top = intel.ranking?.find(r => r.name !== myName) || intel.ranking?.[0];
+  const trusted = [...(intel.rows || [])].filter(r => r.name !== myName).sort((a,b)=>b.trustScore-a.trustScore)[0];
+  const scan = buildContradictionScan();
+  const trial = buildInferenceTrial();
+  const lastVote = (O.voteHistory && O.voteHistory.length) ? O.voteHistory[O.voteHistory.length - 1] : O.voteResult;
+  const voted = O.voteTarget || lastVote?.votes?.[myName] || '';
+  const voteReason = String(O.voteReasonDraft || lastVote?.voteReasons?.[myName] || lastVote?.reasons?.[myName] || '').trim();
+  const accuseRe = /怪しい|疑|黒|人狼|吊|処刑|矛盾|不自然|違和感|投票|怪し/;
+  const trustRe = /信頼|信用|白|村人|安全|守|かば|無実|白確|怪しくない/;
+  const saidAbout = (target, re) => target && myTexts.some(t => t.includes(target) && re.test(t));
+
+  let title = '今日の吊り候補を一人だけ明言する';
+  let goal = '議論をふわっと終わらせず、自分の推理軸を村に残す。';
+  let condition = '発言で吊り候補名と理由を出す、または投票理由を8文字以上残す。';
+  let hint = top ? `${top.name}さんを疑うなら、理由を一つに絞ると強いです。` : '最初は発言量、CO、投票先のどれか一つを軸にしましょう。';
+  let target = top?.name || trial?.target || names.find(n => n !== myName);
+  let done = saidAbout(target, accuseRe) || (voted && voteReason.length >= 8);
+  let progress = done ? 100 : (myTexts.length ? 45 : 0);
+
+  if (scan?.alerts?.[0]) {
+    title = `矛盾を一つだけ追及する: ${scan.alerts[0].title}`;
+    goal = '感情論ではなく、発言と投票のズレを村の争点にする。';
+    condition = `${scan.alerts[0].title.replace(/さん.*/, 'さん')}について、矛盾・投票・理由のどれかを発言する。`;
+    hint = scan.alerts[0].detail;
+    done = myTexts.some(t => /矛盾|投票|理由|おかしい|ズレ|便乗/.test(t));
+    progress = done ? 100 : (scan.maxScore >= 68 ? 55 : 25);
+  } else if (trial?.target && trial.target !== myName) {
+    target = trial.target;
+    title = `推理裁判を動かす: ${target}さんへの質問を出す`;
+    goal = '被告役を黙らせず、反論を引き出して投票材料を増やす。';
+    condition = `${target}さんに触れた発言をする、または投票理由で${target}さんを扱う。`;
+    hint = `${trial.accuser || '追及役'}さんの理由が薄ければ、逆に追及役も疑えます。`;
+    done = myTexts.some(t => t.includes(target)) || voted === target;
+    progress = done ? 100 : (myTexts.length ? 40 : 0);
+  } else if (trusted && trusted.name) {
+    target = trusted.name;
+    title = `信用軸を作る: ${target}さんを残す価値を確認する`;
+    goal = '吊る人だけでなく、残す人を決めることで村の視界を広げる。';
+    condition = `${target}さんを信用・白・村目で評価する発言をする。`;
+    hint = '信用先を作ると、人狼の噛み先や誘導が読みやすくなります。';
+    done = saidAbout(target, trustRe);
+    progress = done ? 100 : (myTexts.length ? 35 : 0);
+  }
+
+  if (O.phase === 'vote' || O.phase === 'vote_result') {
+    if (voted && voteReason.length >= 8) {
+      done = true;
+      progress = 100;
+    } else if (voted) {
+      progress = Math.max(progress, 70);
+      condition = '投票理由を8文字以上で残す。';
+      hint = '短すぎる理由は矛盾スキャナーで便乗に見えやすいです。';
+    }
+  }
+
+  return { title, goal, condition, hint, progress, status: missionStatus(done, progress) };
+}
+
+function renderSecretMissionPanel() {
+  return renderSecretMission(buildSecretMission());
+}
+
+function buildLocalSecretMission() {
+  if (!['day','vote','vote_result'].includes(S.phase)) return null;
+  const names = alive().map(p => p.name);
+  if (names.length < 3) return null;
+  const voteResult = S.voteResult || {};
+  const votes = voteResult.votes || S.votes || {};
+  const reasons = voteResult.voteReasons || S.voteReasons || {};
+  const reasonCount = Object.values(reasons || {}).filter(r => String(r || '').trim().length >= 8).length;
+  const black = [...(S.seerHistory || [])].reverse().find(r => r.isWolf && names.includes(r.target));
+  const tallyTop = Object.entries(voteResult.tally || {}).sort(([,a],[,b]) => b-a)[0];
+  const target = black?.target || tallyTop?.[0] || Object.values(votes).find(Boolean) || names[0];
+  let title = '全員の投票理由を残す';
+  let goal = 'ローカルでも「なんとなく投票」を減らし、次の日の推理材料を残す。';
+  let condition = '8文字以上の投票理由をできるだけ多く残す。';
+  let hint = '理由が短い票は便乗に見えます。名前と決め手を入れると強いです。';
+  let progress = names.length ? clampNum(Math.round(reasonCount / names.length * 100), 0, 100) : 0;
+  let done = progress >= 80;
+
+  if (black) {
+    const blackVotes = Object.values(votes).filter(v => v === black.target).length;
+    title = `黒判定を裁く: ${black.target}さんを吊るか残すか決める`;
+    goal = '占い結果を鵜呑みにせず、黒先の反論と占い師の信用を比べる。';
+    condition = `${black.target}さんへの票、または黒判定に触れた理由を残す。`;
+    hint = '黒を吊らない場合は、代わりに誰を吊るのかまで言うと議論が締まります。';
+    progress = clampNum(Math.round((blackVotes / Math.max(1, names.length)) * 70 + (reasonCount ? 30 : 0)), 0, 100);
+    done = progress >= 75;
+  } else if (target) {
+    const targetVotes = Object.values(votes).filter(v => v === target).length;
+    title = `最多票を検証する: ${target}さん票は自然か`;
+    goal = '票が集まった理由を見て、便乗票と本気票を分ける。';
+    condition = `${target}さんへの投票理由を一つ以上残す。`;
+    hint = '票が集まった人より、最後に乗った人の理由を見ると人狼が見えます。';
+    progress = clampNum(Math.round((targetVotes ? 45 : 0) + reasonCount * 18), 0, 100);
+    done = progress >= 80;
+  }
+
+  return { title, goal, condition, hint, progress, status: missionStatus(done, progress) };
+}
+
+function renderLocalSecretMissionPanel() {
+  return renderSecretMission(buildLocalSecretMission());
+}
+
 function renderVoteReasons(reasons) {
   const entries = Object.entries(reasons || {}).filter(([, r]) => r && String(r).trim());
   if (!entries.length) return '';
@@ -2074,6 +2767,39 @@ const RIVALRY_RULES = {
     lines: {
       '沢枝': '井沢は沢枝のメモの多さを、情報を煙に巻く動きとして警戒する。'
     }
+  },
+  'ドナルド': {
+    targets: { '出川': 1.2, 'ザコシショウ': 1.0 },
+    label: '陽気なトンチンカン発言で場を乱す',
+    lines: {
+      '出川': 'ドナルドは出川の不安を笑顔でさらに混ぜ返す。',
+      'ザコシショウ': 'ドナルドは誇張に乗っかって、根拠のない陽気な疑いを広げる。'
+    }
+  },
+  'ザコシショウ': {
+    targets: { 'ドナルド': 1.4, '出川': 1.1 },
+    label: '全部を大事件に誇張して押し切る',
+    lines: {
+      'ドナルド': 'ザコシショウはドナルドの軽さを十倍に誇張して疑う。',
+      '出川': 'ザコシショウは出川の慌て方を特大級に怪しいと騒ぐ。'
+    }
+  },
+  '出川': {
+    targets: { 'ザコシショウ': 1.5, 'ドナルド': 1.0 },
+    label: 'ヤバさに敏感で、危険そうな相手を疑う',
+    lines: {
+      'ザコシショウ': '出川はザコシショウの誇張を本気で怖がり、ヤバい流れだと見る。',
+      'ドナルド': '出川はドナルドの明るすぎる軽さを逆に怖がる。'
+    }
+  },
+  '吉田沙保里': {
+    targets: { 'ボブ': 1.45, '沢枝': 1.2, 'ザコシショウ': 1.1 },
+    label: '真正面から疑いを押さえ込む攻撃型',
+    lines: {
+      'ボブ': '吉田沙保里はボブの裏切り宣言を逃げと見て、正面から詰める。',
+      '沢枝': '吉田沙保里は沢枝の長いメモを受け流さず、要点だけを掴んで押さえ込む。',
+      'ザコシショウ': '吉田沙保里はザコシショウの誇張を勢いで上回り、議論の主導権を取りにいく。'
+    }
   }
 };
 
@@ -2185,15 +2911,89 @@ const CPU_PERSONA_PROFILES = {
     voteReason:['{n}さんは発言のトーンが途中で変わり、場に合わせて演じたように見えました。','{n}さんの返答は整いすぎていて、本音より演技を感じました。'],
     wolfNight:['{n}さんは声の揺れを拾ってきます。今夜は黙ってもらいましょう。']
   },
-  '柳沢': {
-    personality:'follower', thought:'流れとポジション取りを重視し、素早く疑い先へ走るスポーツマン',
-    signature:['今、スペース空きました。','流れに合わせて走ります。'],
-    action:{ mode:'bandwagon', pushProb:0.7, voteProb:0.88, nightProb:0.64, bump:0.9, chaos:0.2 },
-    neutral:['流れを見ましょう。今、ボールを持っているのは誰かです。','無理に決めに行くより、空いたスペースを見たいですね。'],
-    accuse:['{n}さん、今のポジション取りが不自然です。安全地帯に逃げています。','{n}さんは決定機で踏み込まなかった。そこが気になります。'],
-    defend:['僕は逃げてません。流れを見てから動いただけです。'],
-    voteReason:['{n}さんは安全な位置に逃げる動きが多く、潜伏役に見えました。','{n}さんは決める場面で踏み込まず、村の攻め筋をぼかしました。'],
-    wolfNight:['{n}さんはスペースを見つけるのが早い。先にマークを外しましょう。']
+  'ドナルド': {
+    personality:'talkative', thought:'陽気でかなりバカ。根拠のない明るさとトンチンカンな比喩で村をかき回す',
+    signature:['ランランルー、たぶん大丈夫！','ポテトが揚がった気がします！','笑えばだいたい白です！'],
+    action:{ mode:'clown', pushProb:0.86, voteProb:0.68, nightProb:0.74, bump:0.8, chaos:3.4 },
+    neutral:[
+      'ランランルー、僕は考えました。人狼はたぶん腹ペコです。つまりお腹が鳴った人が怪しいです。',
+      'ポテトが冷める前に決めましょう。えっと、何を決めるんでしたっけ。',
+      'みんな笑ってるから白いです。笑ってない人も、たぶん照れてるだけです。'
+    ],
+    accuse:[
+      '{n}さん、今の発言はハンバーガーで言うとパンが三枚あります。つまり怪しいです。',
+      '{n}さんはポテトを一本だけ隠してる顔です。僕には分かります、たぶん。',
+      '{n}さん、笑顔が足りません。人狼は笑顔の練習をサボると聞きました。'
+    ],
+    defend:[
+      '僕を吊ると村のハッピーセットがなくなります。これはかなり大事件です。',
+      '僕は怪しくないです。なぜなら赤と黄色は元気な色だからです。理由になってますよね。'
+    ],
+    voteReason:[
+      '{n}さんは発言がハンバーガーみたいに重なりすぎて、どこが本音か分かりませんでした。',
+      '{n}さんは笑顔が少なく、ポテトを隠している気配がしたので投票します。',
+      'ランランルー、{n}さんが一番腹ペコな人狼に見えました。根拠は薄いです。'
+    ],
+    wolfNight:[
+      'ランランルー、今夜は{n}さんです。理由はハッピーすぎると逆に怖いからです。',
+      '{n}さんを残すとポテトを全部食べられそうです。先にいきましょう。'
+    ]
+  },
+  'ザコシショウ': {
+    personality:'aggressive', thought:'全部を誇張して見る。小さな違和感を巨大事件にして押し切る爆音キャラ',
+    signature:['誇張しすぎました。','ドカーン、これは特大です。','やばすぎるやろ、ええやんええやん。'],
+    action:{ mode:'exaggerate', pushProb:0.94, voteProb:0.86, nightProb:0.8, bump:1.5, chaos:2.9 },
+    neutral:[
+      '今の沈黙、普通の沈黙ちゃいます。超巨大沈黙です。村が揺れました。',
+      '小さい違和感を見逃したら終わりです。僕は全部メガサイズで見ます。',
+      'この村、全員ちょっと怪しいです。誇張して言うと全員ラスボスです。'
+    ],
+    accuse:[
+      '{n}さん、その一言、豆粒くらい怪しいと思ったら山くらい怪しかったです。',
+      '{n}さんのかわし方、誇張なしでも怪しい。誇張したらもう特大人狼です。',
+      '{n}さん、今の間は一秒じゃないです。体感三年の黒い沈黙です。'
+    ],
+    defend:[
+      '僕を疑うのはええやん。でもその疑い、薄すぎて向こう側が見えてます。',
+      '僕は誇張してますが、嘘は盛ってません。そこ間違えたらあかんです。'
+    ],
+    voteReason:[
+      '{n}さんの違和感が小さく見えて実は特大でした。誇張込みで吊り位置です。',
+      '{n}さんは反応が遅すぎます。誇張すると夜が明けるくらい遅かったです。',
+      '{n}さんの発言は薄いのに怪しさだけ濃すぎました。ドカーンと投票します。'
+    ],
+    wolfNight:[
+      '{n}さんは放置したら特大の邪魔になります。今夜ドカーンといきます。',
+      '誇張なしで{n}さんが怖いです。誇張したら村の最終兵器です。消しましょう。'
+    ]
+  },
+  '出川': {
+    personality:'cautious', thought:'ヤバいよ、ヤバいよが口癖。不安が強く、ネガティブに危険を見積もるリアクション役',
+    signature:['ヤバいよ、ヤバいよ。','これ本当にまずいって。','怖い怖い、流れが悪いよ。'],
+    action:{ mode:'panic', pushProb:0.72, voteProb:0.84, nightProb:0.62, bump:1.05, chaos:1.4 },
+    neutral:[
+      'ヤバいよ、ヤバいよ。今の空気、絶対よくないって。誰か隠してる感じがするよ。',
+      '怖い怖い。みんな落ち着いてるけど、落ち着きすぎてるのが一番怖いんだよ。',
+      'これ本当にまずいって。情報が少ない時ほど変な方向に行くから。'
+    ],
+    accuse:[
+      '{n}さん、ヤバいよ、ヤバいよ。今の返し、逃げ道を作ってる感じがしたよ。',
+      '{n}さんは怖いって。発言が安全すぎて逆にヤバいんだよ。',
+      '{n}さん、今の間はまずいよ。考えてから合わせたみたいに見えるよ。'
+    ],
+    defend:[
+      '俺じゃないって、ヤバいよ。ここで俺を吊ったら本当にまずい流れになるよ。',
+      '怖い怖い、疑われるのは分かるけど、俺はこんな目立つ人狼じゃないって。'
+    ],
+    voteReason:[
+      '{n}さんの発言が安全すぎて、ヤバいよヤバいよという感じがしました。',
+      '{n}さんは反応が一歩遅く、流れを見て合わせたようで怖かったです。',
+      'ここを外したらまずいですが、{n}さんを残す方がもっとヤバいと思いました。'
+    ],
+    wolfNight:[
+      'ヤバいよ、{n}さんを残すと本当にまずいよ。今夜いくしかないって。',
+      '{n}さんは怖いって。明日まで残したら流れを変えられるよ。'
+    ]
   },
   '沢枝': {
     personality:'analytical', thought:'くどくて回りくどいメモ魔。疑い深く、ボブ・工場長・井沢とは露骨に相性が悪い',
@@ -2265,6 +3065,40 @@ const CPU_PERSONA_PROFILES = {
     defend:['私を吊る前に、疑いのリズムをもう一回聞いてください。今の流れは雑です。ウン、ペンパイナップル、アップルペン。'],
     voteReason:['{n}さんは発言のリズムが途中で変わり、疑いをかわす動きが見えました。','{n}さんは軽く振る舞いながら、投票の流れだけ慎重に避けていました。'],
     wolfNight:['{n}さんは流れのリズムを読んできます。今夜はテンポを崩しましょう。']
+  },
+  '吉田沙保里': {
+    personality:'aggressive', thought:'レスリングの試合運びで議論を見る攻撃型。逃げ腰の発言を嫌い、勝負勘と圧で疑いを正面から押さえ込む',
+    signature:['そこ、逃がしません。','タックル入ります。','その発言、押さえ込みます。','勝負勘で分かります。'],
+    action:{ mode:'tackle', pushProb:0.98, voteProb:0.92, nightProb:0.78, bump:1.75, chaos:0.65, grudge:{'ボブ':1.45,'沢枝':1.2,'ザコシショウ':1.1} },
+    neutral:[
+      '真正面から取りにいきます。今日は逃げた発言を全部マットに乗せます。',
+      '守りに入った人から崩れます。私はそこを逃がしません。',
+      '曖昧な言い方は押さえ込みます。誰を疑うのか、はっきり言ってください。',
+      '勝負勘で見ます。今の村、腰が引けている人がいます。'
+    ],
+    accuse:[
+      '{n}さん、そのかわし方は逃げです。タックル入ります、真正面から受けてください。',
+      '{n}さんは守りに入りすぎています。そこ、私は押さえ込みます。',
+      '{n}さん、今の発言は足が止まっています。疑いから逃げているように見えます。',
+      '{n}さんの理屈は腰が引けています。ここは攻めて確認します。',
+      '{n}さん、マット際で逃げている感じがします。残すと危険です。'
+    ],
+    defend:[
+      '私を疑うなら正面から来てください。ふわっとした疑いでは崩れません。',
+      '攻撃的に見えるのは認めます。でも逃げている人を捕まえるためです。',
+      'ここで私を吊るのは村の攻め手を失います。理由を出してから来てください。',
+      'その疑いは軽いです。ちゃんと組んでから投げてください。'
+    ],
+    voteReason:[
+      '{n}さんは発言が逃げ腰で、疑いを向けられた時の受け方が弱かったので投票します。',
+      '{n}さんの説明は守りが強く、村として攻める姿勢が見えませんでした。',
+      '{n}さんを残すと議論が逃げ道だらけになります。ここで押さえ込みます。',
+      '勝負勘です。{n}さんはマット際で粘る人外に見えました。'
+    ],
+    wolfNight:[
+      '{n}さんは議論で組み付いてくる相手です。今夜のうちに外します。',
+      '{n}さんを残すと明日こちらが押さえ込まれます。先に勝負を決めます。'
+    ]
   }
 };
 
@@ -2330,6 +3164,10 @@ function personaChooseTarget(R, cpu, candidates, context='vote') {
       case 'source': score = claimed * 1.5 + cover * 0.75 + susp * 0.85; break;
       case 'rhythm': score = Math.random() * 3.2 + (speak % 2 ? 1.0 : 0) + susp * 0.55; break;
       case 'betray': score = Math.random() * 4.0 + (cover > 0 ? 1.2 : 0) + (susp < 1 ? 1.0 : -0.2); break;
+      case 'clown': score = Math.random() * 4.8 + lowTalk * 0.55 + (cover > 0 ? 0.8 : 0) - susp * 0.15; break;
+      case 'exaggerate': score = susp * 1.7 + lowTalk * 0.8 + Math.random() * 2.4 + claimed * 0.35; break;
+      case 'panic': score = susp * 1.15 + cover * 0.7 + claimed * 0.55 + Math.random() * 1.8; break;
+      case 'tackle': score = susp * 1.8 + lowTalk * 0.65 + claimed * 0.6 + Math.random() * 1.2; break;
       default: score = susp + cover * 0.2;
     }
     score += grudge + rivalry;
@@ -2527,7 +3365,10 @@ function esc(s) {
 
 function avatarFace(av, cls='portrait-chat') {
   const safe = av || CHARACTER_AVATARS[0];
-  return `<span class="portrait ${cls}" style="background-position:${safe.pos||'0% 0%'};" title="${esc(safe.label||'')}"><span class="portrait-emoji">${safe.emoji||'👤'}</span></span>`;
+  const style = safe.src
+    ? `background-image:url('${esc(safe.src)}');background-size:cover;background-position:center;`
+    : `background-position:${safe.pos||'0% 0%'};`;
+  return `<span class="portrait ${cls}" style="${style}" title="${esc(safe.label||'')}"><span class="portrait-emoji">${safe.emoji||'👤'}</span></span>`;
 }
 
 function roleClaimInfo(role) {
@@ -2550,6 +3391,113 @@ function roleClaimBadge(role, compact=false) {
 
 function val(id) { const e = document.getElementById(id); return e ? e.value : ''; }
 function on(id, fn) { const e = document.getElementById(id); if (e) e.addEventListener('click', fn); }
+const QUALITY = {
+  errors: [],
+  lastRenderOkAt: 0,
+  suppressRender: false,
+};
+
+function qualityMessage(err) {
+  const raw = err?.message || String(err || 'unknown error');
+  return raw.replace(/\s+/g, ' ').slice(0, 180);
+}
+
+function pushQualityError(source, err) {
+  const item = {
+    at: Date.now(),
+    source: source || 'runtime',
+    message: qualityMessage(err),
+    phase: (typeof O !== 'undefined' && O?.phase) || (typeof S !== 'undefined' && S?.phase) || '',
+    mode: (typeof mode !== 'undefined') ? mode : '',
+    lastType: (typeof O !== 'undefined' && O?.p2pLastType) || '',
+  };
+  QUALITY.errors.unshift(item);
+  QUALITY.errors = QUALITY.errors.slice(0, 6);
+  try { console.error('[quality]', item.source, item.message, err); } catch(e) {}
+}
+
+function qualityDiagnostics() {
+  let p2pDiag = null;
+  try { p2pDiag = (typeof P2PEngine !== 'undefined' && P2PEngine.diagnostics) ? P2PEngine.diagnostics() : null; } catch(e) {}
+  return {
+    app: 'werewolf_game',
+    version: 'commercial-hardening-1',
+    at: new Date().toISOString(),
+    mode: (typeof mode !== 'undefined') ? mode : '',
+    phase: (typeof O !== 'undefined' && O?.phase) || (typeof S !== 'undefined' && S?.phase) || '',
+    day: (typeof O !== 'undefined' && O?.day) || (typeof S !== 'undefined' && S?.day) || 0,
+    myRole: (typeof O !== 'undefined' && O?.myRole) || '',
+    players: (typeof O !== 'undefined' && O?.players || []).map(p => ({name:p.name, isCpu:!!p.isCpu, disconnected:!!p.disconnected})),
+    alive: (typeof O !== 'undefined' && O?.alive || []).map(p => p.name),
+    lastServerType: (typeof O !== 'undefined' && O?.p2pLastType) || '',
+    p2p: p2pDiag,
+    errors: QUALITY.errors,
+    userAgent: (typeof navigator !== 'undefined' && navigator.userAgent) || '',
+  };
+}
+
+function renderQualityBanner() {
+  if (!QUALITY.errors.length) return '';
+  const latest = QUALITY.errors[0];
+  return `<div class="card quality-alert">
+    <p class="quality-alert-title">復旧できる問題を検出しました</p>
+    <p class="quality-alert-text">${esc(latest.source)}: ${esc(latest.message)}<br>ゲーム状態を残したまま画面の復旧を試せます。</p>
+    <div class="quality-alert-actions">
+      <button class="btn btn-success" id="btnQualityRecover">画面を復旧</button>
+      <button class="btn btn-ghost" id="btnQualityCopy">診断コピー</button>
+    </div>
+  </div>`;
+}
+
+function recoverQualityState() {
+  QUALITY.errors = [];
+  try { stopMusic(); } catch(e) {}
+  if (mode === 'p2p') {
+    try { P2PEngine.requestResync(); } catch(e) {}
+  }
+  if (mode === 'solo' && O.phase === 'vote_result') {
+    O.voteSubmitted = false;
+    O.voteAckAt = 0;
+  }
+  render();
+}
+
+async function copyQualityDiagnostics() {
+  const text = JSON.stringify(qualityDiagnostics(), null, 2);
+  const ok = await copyText(text);
+  alert(ok ? '診断情報をコピーしました。' : '診断情報をコピーできませんでした。');
+}
+
+function renderEmergencyFallback(err) {
+  const app = document.getElementById('app');
+  if (!app) return;
+  const msg = qualityMessage(err);
+  app.innerHTML = `<div class="quality-fallback">
+    <div class="card quality-alert" style="width:100%;">
+      <p class="quality-alert-title">画面の描画に失敗しました</p>
+      <p class="quality-alert-text">${esc(msg)}<br>ゲーム状態を保持したまま復旧を試してください。</p>
+      <div class="quality-alert-actions">
+        <button class="btn btn-success" id="btnQualityRecover">画面を復旧</button>
+        <button class="btn btn-ghost" id="btnQualityCopy">診断コピー</button>
+      </div>
+    </div>
+  </div>`;
+  on('btnQualityRecover', recoverQualityState);
+  on('btnQualityCopy', copyQualityDiagnostics);
+}
+
+function installRuntimeQualityGuards() {
+  if (typeof window === 'undefined' || window._qualityGuardsInstalled) return;
+  window._qualityGuardsInstalled = true;
+  window.addEventListener('error', ev => {
+    pushQualityError('runtime', ev.error || ev.message);
+    if (!QUALITY.suppressRender) setTimeout(() => { try { render(); } catch(e) { renderEmergencyFallback(e); } }, 0);
+  });
+  window.addEventListener('unhandledrejection', ev => {
+    pushQualityError('promise', ev.reason || 'unhandled rejection');
+    if (!QUALITY.suppressRender) setTimeout(() => { try { render(); } catch(e) { renderEmergencyFallback(e); } }, 0);
+  });
+}
 let _fullscreenRequesting = false;
 
 function fullscreenElement() {
@@ -2950,6 +3898,10 @@ function renderDay() {
     <p class="sec-label">🧑 生存者 (${alivePl.length}人)</p>
     <div class="chips">${chips}</div>
     ${renderLocalDiscussionHeatPanel()}
+    ${renderLocalClimaxSpotlightPanel()}
+    ${renderLocalContradictionScannerPanel()}
+    ${renderLocalInferenceTrialPanel()}
+    ${renderLocalSecretMissionPanel()}
     <div class="card" style="text-align:center; margin-top:0.8rem;">
       <p style="color:#94a3b8; font-size:0.9rem;">💬 議論の時間です。怪しい人狼を話し合いで見つけましょう！</p>
     </div>
@@ -2971,6 +3923,10 @@ function renderVote() {
       <p style="color:#64748b; font-size:0.85rem; margin:0;">誰を処刑しますか？</p>
     </div>
     ${renderLocalDiscussionHeatPanel()}
+    ${renderLocalClimaxSpotlightPanel()}
+    ${renderLocalContradictionScannerPanel()}
+    ${renderLocalInferenceTrialPanel()}
+    ${renderLocalSecretMissionPanel()}
     <label style="margin-top:0.8rem;">処刑する人を選んでください</label>
     ${mkSelect('voteTgt', targets)}
     <div class="vote-reason-box">
@@ -3011,6 +3967,10 @@ function renderVoteResult() {
     ${renderVoteTimeline(S.voteResult.votes, S.voteResult.voteReasons)}
     ${renderVoteReasons(S.voteResult.voteReasons)}
     ${renderLocalDiscussionHeatPanel()}
+    ${renderLocalClimaxSpotlightPanel()}
+    ${renderLocalContradictionScannerPanel()}
+    ${renderLocalInferenceTrialPanel()}
+    ${renderLocalSecretMissionPanel()}
     <div class="vote-drama" style="text-align:center; padding:1.5rem; border-radius:16px;
          border:2px solid #ef4444; background:linear-gradient(135deg,#1a0505,#2d0a0a); margin:.6rem 0;">
       <p style="color:#f87171; font-size:.78rem; font-weight:700; letter-spacing:.12em; margin:0 0 .5rem;">⚖️ 処刑決定</p>
@@ -3074,6 +4034,8 @@ function bindEvents() {
     await enterGameFullscreen(false);
     render();
   });
+  on('btnQualityRecover', recoverQualityState);
+  on('btnQualityCopy', copyQualityDiagnostics);
 
   // SETUP
   on('dec', () => { if (S.playerCount > 4) { saveNames(); S.playerCount--; render(); } });
@@ -3738,7 +4700,7 @@ function bindEvents() {
 
 // ========== SOLO ENGINE (サーバー不要 / GitHub Pages 対応) ==========
 const SoloEngine = (() => {
-  const CPU_NAMES = CHARACTER_AVATARS.slice(0, MAX_PLAYERS - 1).map(a => a.label);
+  const CPU_NAMES = CHARACTER_AVATARS.slice(0, MAX_PLAYERS).map(a => a.label);
   let R = {};
 
   let _timers = [];
@@ -5814,7 +6776,7 @@ function spawnConfetti(color1, color2) {
 
 // ========== P2P ENGINE (PeerJS サーバーレスオンライン) ==========
 const P2PEngine = (() => {
-  const CPU_NAMES = CHARACTER_AVATARS.slice(0, MAX_PLAYERS - 1).map(a => a.label);
+  const CPU_NAMES = CHARACTER_AVATARS.slice(0, MAX_PLAYERS).map(a => a.label);
   const P2P_STALE_MS = 22000;
   const P2P_SOFT_DISCONNECT_MS = 42000;
   const P2P_CREATE_MAX_ATTEMPTS = 12;
@@ -7907,6 +8869,10 @@ function renderODiscuss() {
     ${renderCaseFile()}
     ${renderAiIntelPanel()}
     ${renderDiscussionHeatPanel()}
+    ${renderClimaxSpotlightPanel()}
+    ${renderContradictionScannerPanel()}
+    ${renderInferenceTrialPanel()}
+    ${renderSecretMissionPanel()}
     ${renderRivalryPanel()}
     ${deadListHtml}
     <hr class="div" style="margin:.4rem 0;">
@@ -8318,6 +9284,10 @@ function renderODay() {
     ${renderCaseFile()}
     ${renderAiIntelPanel()}
     ${renderDiscussionHeatPanel()}
+    ${renderClimaxSpotlightPanel()}
+    ${renderContradictionScannerPanel()}
+    ${renderInferenceTrialPanel()}
+    ${renderSecretMissionPanel()}
     ${renderRivalryPanel()}
     <div class="card" style="text-align:center; margin-top:0.8rem;">
       <p style="color:#94a3b8; font-size:0.9rem;">💬 議論の時間です！</p>
@@ -8410,6 +9380,10 @@ function renderOVote() {
     ${renderCaseFile()}
     ${renderAiIntelPanel()}
     ${renderDiscussionHeatPanel()}
+    ${renderClimaxSpotlightPanel()}
+    ${renderContradictionScannerPanel()}
+    ${renderInferenceTrialPanel()}
+    ${renderSecretMissionPanel()}
     ${renderP2PStatusPanel()}
     <div class="card" style="padding:.8rem;">
       <p style="color:#fbbf24;font-size:.85rem;font-weight:700;margin:0 0 .4rem;">⚖️ 処刑する人を選んでください</p>
@@ -8462,6 +9436,10 @@ function renderOVoteResult() {
     ${renderCaseFile()}
     ${renderAiIntelPanel()}
     ${renderDiscussionHeatPanel()}
+    ${renderClimaxSpotlightPanel()}
+    ${renderContradictionScannerPanel()}
+    ${renderInferenceTrialPanel()}
+    ${renderSecretMissionPanel()}
     ${nextBtn}
   `;
 }
@@ -8787,6 +9765,9 @@ function scheduleChatLatestScroll() {
 
 function render() {
   const app = document.getElementById('app');
+  if (!app) return;
+  QUALITY.suppressRender = true;
+  try {
   // チャット入力中のテキストを保持（CPUターンで再描画されても消えないように）
   const _discVal  = document.getElementById('discFreeInput')?.value  || '';
   const _wolfVal  = document.getElementById('wolfFreeInput')?.value  || '';
@@ -8810,6 +9791,9 @@ function render() {
   if (shouldShowFullscreenStartPrompt()) {
     app.insertAdjacentHTML('afterbegin', renderFullscreenStartPrompt());
   }
+  if (QUALITY.errors.length) {
+    app.insertAdjacentHTML('afterbegin', renderQualityBanner());
+  }
 
   // 入力値を復元
   const discInput = document.getElementById('discFreeInput');
@@ -8826,6 +9810,13 @@ function render() {
   if (!chatPhases.includes(O.phase)) window.scrollTo(0, 0);
   bindEvents();
   scheduleChatLatestScroll();
+  QUALITY.lastRenderOkAt = Date.now();
+  } catch (err) {
+    pushQualityError('render', err);
+    renderEmergencyFallback(err);
+  } finally {
+    QUALITY.suppressRender = false;
+  }
 }
 
 function renderPhase() {
@@ -8884,6 +9875,7 @@ function wolfTplTarget(idx) {
 let mode = 'pre_opening'; // pre_opening | opening | home | local | online | solo | p2p
 initState();
 applyP2PLaunchParams();
+installRuntimeQualityGuards();
 installFullscreenHooks();
 installChatVoiceUnlock();
 installP2PResumeHooks();

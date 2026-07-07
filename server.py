@@ -22,8 +22,8 @@ CONFIGS = {
     17: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
 }
 MAX_PLAYERS = 17
-CPU_NAMES = ['ボブ','井沢','工場長','狩野英孝','マリック','キングカズ','カズレーザー','リンゴちゃん','柳沢','沢枝','イッコー','マツコ','アンジャッシュ渡部','ピコ太郎','ハル','ユキ']
-CHARACTER_COUNT = 16
+CPU_NAMES = ['ボブ','井沢','工場長','狩野英孝','マリック','キングカズ','カズレーザー','リンゴちゃん','ドナルド','沢枝','イッコー','マツコ','アンジャッシュ渡部','ピコ太郎','ザコシショウ','出川','吉田沙保里']
+CHARACTER_COUNT = 17
 DISC_ROUNDS = 2
 READ_PAUSE_MIN = 1.4
 READ_PAUSE_MAX = 7.0
@@ -159,8 +159,9 @@ def assign_avatar_indexes(room):
         used.add(idx)
         return idx
 
-    for _, p in room['players'].items():
-        preferred = name_to_idx.get(p.get('name'))
+    ordered_players = sorted(room['players'].items(), key=lambda item: 0 if item[0] in room['cpu_pids'] else 1)
+    for pid, p in ordered_players:
+        preferred = name_to_idx.get(p.get('name')) if pid in room['cpu_pids'] else None
         if preferred is not None and preferred not in used:
             p['avatarIndex'] = preferred
             used.add(preferred)
