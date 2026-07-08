@@ -522,6 +522,21 @@ details summary:hover { color: #94a3b8; }
 .co-btn.primary{background:rgba(251,191,36,.14);border-color:#fbbf2466;color:#fde68a;}
 .co-btn.fake{background:rgba(124,58,237,.14);border-color:#7c3aed66;color:#c4b5fd;}
 .co-btn:active{background:rgba(129,140,248,.3);}
+.co-dedicated-panel{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:.5rem;margin:0 0 .48rem;}
+.co-dedicated-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;color:#fde68a;font-size:.8rem;font-weight:900;margin-bottom:.38rem;}
+.co-dedicated-note{color:#94a3b8;font-size:.68rem;font-weight:700;white-space:nowrap;}
+.co-oneclick-btn{width:100%;border:1px solid rgba(251,191,36,.55);border-radius:8px;background:linear-gradient(135deg,#b45309,#7c2d12);color:#fff;padding:.66rem .8rem;margin:0 0 .42rem;font-size:.92rem;font-weight:900;cursor:pointer;box-shadow:0 10px 24px rgba(0,0,0,.24);}
+.co-oneclick-btn:active{opacity:.86;transform:translateY(1px);}
+.co-oneclick-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.co-draft-bar{display:flex;gap:.4rem;align-items:stretch;}
+.co-draft{flex:1;min-width:0;min-height:54px;max-height:116px;resize:vertical;padding:.58rem .68rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:8px;color:#f8fafc;font-size:.9rem;line-height:1.45;outline:none;font-family:inherit;}
+.co-draft:focus{border-color:#fbbf24;box-shadow:0 0 0 2px rgba(251,191,36,.12);}
+.co-draft::placeholder{color:#64748b;}
+.co-draft:disabled{opacity:.58;cursor:not-allowed;}
+.co-send-btn{width:5.4rem;border:none;border-radius:8px;background:linear-gradient(135deg,#d97706,#7c2d12);color:#fff;font-size:.86rem;font-weight:900;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.co-send-btn:active{opacity:.84;}
+.co-send-btn:disabled{opacity:.5;cursor:not-allowed;}
+@media (max-width:520px){.co-draft-bar{flex-direction:column}.co-send-btn{width:100%;padding:.62rem .9rem}.co-dedicated-head{align-items:flex-start;flex-direction:column;gap:.15rem}.co-dedicated-note{white-space:normal}}
 /* ── Stealth night target grid ── */
 .night-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin:1rem 0;}
 .night-card{position:relative;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.08);border-radius:14px;padding:.9rem .4rem;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;}
@@ -697,7 +712,7 @@ const CHARACTER_AVATARS = [
   { emoji:'🧠', label:'カズレーザー',     hint:'赤い服の切れ者。笑顔で核心を突く', pos:'66.667% 33.333%' },
   { emoji:'🍎', label:'リンゴちゃん',     hint:'華やかな歌い手。声色ひとつで空気を変える', pos:'100% 33.333%' },
   { emoji:'🍔', label:'ドナルド',         hint:'陽気すぎるピエロ。かなりトンチンカンな発言で村を明るく壊す', pos:'0% 66.667%' },
-  { emoji:'📝', label:'沢枝',             hint:'回りくどいメモ魔。よく喋り、ボブ・工場長・井沢を強く疑う', pos:'33.333% 66.667%' },
+  { emoji:'📝', label:'沢枝',             hint:'読みは「さわえだ」。回りくどいメモ魔。よく喋り、ボブ・工場長・井沢を強く疑う', pos:'33.333% 66.667%' },
   { emoji:'💄', label:'イッコー',         hint:'美意識の高い占い客。細部の違和感に鋭い、どんだけ～ぇ', pos:'66.667% 66.667%' },
   { emoji:'💬', label:'マツコ',           hint:'重厚な観察者。ひと言で議論の流れを変える', pos:'100% 66.667%' },
   { emoji:'🍷', label:'アンジャッシュ渡部', hint:'品の良い情報通。食卓の噂にやけに詳しい', pos:'0% 100%' },
@@ -705,7 +720,35 @@ const CHARACTER_AVATARS = [
   { emoji:'📣', label:'ザコシショウ',     hint:'何でも誇張して叫ぶ暴走芸人。小さな違和感を特大事件にする', pos:'66.667% 100%' },
   { emoji:'⚠️', label:'出川',             hint:'ヤバいよ、ヤバいよが口癖。ネガティブで危険を大きく見る', pos:'100% 100%' },
   { emoji:'🥇', label:'吉田沙保里',       hint:'レスリング女王風の闘士。攻撃的な言動と勝負勘で疑いを真正面から押さえ込む', src:'assets/yoshida-saori-wrestling-v2-512.jpg' },
+  { emoji:'🌸', label:'ラン',             hint:'明るく無邪気な直感派。コウ君、コウ君と呼びながら笑顔で核心を突く小さな観察者', src:'assets/ran-portrait-512.jpg' },
 ];
+
+function fallbackAvatarIndex(name, players) {
+  const total = CHARACTER_AVATARS.length;
+  if (!total) return 0;
+  const idx = (players || []).findIndex(p => (p.name || p) === name);
+  if (idx >= 0) return idx % total;
+  const key = String(name || '');
+  const genericNumber = key.match(/^(?:プレイヤー|ゲスト|P|実機P)\s*([0-9０-９]+)/);
+  if (genericNumber) {
+    const n = parseInt(genericNumber[1].replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)), 10);
+    if (Number.isFinite(n) && n > 0) {
+      let fallback = (n - 1) % total;
+      if (CHARACTER_AVATARS[fallback]?.label === 'ザコシショウ') fallback = (fallback + 1) % total;
+      return fallback;
+    }
+  }
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = ((hash << 5) - hash + key.charCodeAt(i)) | 0;
+  }
+  let fallback = (hash >>> 0) % total;
+  const looksGenericPlayerName = /^(プレイヤー|ゲスト|P\d|実機P)/.test(key);
+  if (looksGenericPlayerName && CHARACTER_AVATARS[fallback]?.label === 'ザコシショウ') {
+    fallback = (fallback + 1) % total;
+  }
+  return fallback;
+}
 
 function getAvatar(name, players) {
   const player = (players||[]).find(p => (p.name||p) === name);
@@ -718,16 +761,14 @@ function getAvatar(name, players) {
   }
   const matched = CHARACTER_AVATARS.find(a => a.label === name);
   if (matched) return matched;
-  const idx = (players||[]).findIndex(p=>(p.name||p)===name);
-  const fallback = CHARACTER_AVATARS.slice(14);
-  if (fallback.length) return fallback[(idx<0?0:idx) % fallback.length];
-  return CHARACTER_AVATARS[(idx<0?0:idx) % CHARACTER_AVATARS.length];
+  return CHARACTER_AVATARS[fallbackAvatarIndex(name, players)];
 }
 
 function assignOnlineAvatars(players) {
   const total = CHARACTER_AVATARS.length;
   const used = new Set();
   const nameToIndex = new Map(CHARACTER_AVATARS.map((a, i) => [a.label, i]));
+  const exactCharacterIndex = p => nameToIndex.get(p?.name);
   const shuffled = (() => {
     const arr = Array.from({length: total}, (_, i) => i);
     for (let i=arr.length-1;i>0;i--) {
@@ -743,11 +784,16 @@ function assignOnlineAvatars(players) {
     return idx;
   };
   [...(players || [])]
-    .sort((a, b) => Number(!!b?.isCpu) - Number(!!a?.isCpu))
+    .sort((a, b) => {
+      const aExact = Number(Number.isInteger(exactCharacterIndex(a)));
+      const bExact = Number(Number.isInteger(exactCharacterIndex(b)));
+      if (aExact !== bExact) return bExact - aExact;
+      return Number(!!b?.isCpu) - Number(!!a?.isCpu);
+    })
     .forEach(p => {
-      // オンラインの人間プレイヤーは毎回ランダムな担当キャラにする。
-      // CPUは名前・口調・思考がキャラに紐づくため、名前一致の画像を優先する。
-      const named = p?.isCpu ? nameToIndex.get(p.name) : undefined;
+      // 名前がキャラ名と一致する場合は、人間/CPUを問わずその画像を予約する。
+      // 例: プレイヤー名が「ボブ」なら、別人にボブ画像を渡さない。
+      const named = exactCharacterIndex(p);
       const idx = Number.isInteger(named) && !used.has(named) ? named : nextIndex();
       used.add(idx);
       p.avatarIndex = idx;
@@ -757,7 +803,7 @@ function assignOnlineAvatars(players) {
 }
 
 // ========== AUDIO SYSTEM ==========
-const SONGS = ['人狼ゲーム1.mp3','人狼ゲーム2.mp3','人狼ゲーム3.mp3','人狼ゲーム5.mp3','月明かりのブレス.mp3'];
+const SONGS = ['人狼ゲーム1.mp3','人狼ゲーム2.mp3','人狼ゲーム3.mp3'];
 let bgmAudio = null;
 let _usedSongs = [];
 let _audioUnlocked = false;
@@ -817,6 +863,10 @@ function _pickSong() {
   return SONGS[idx];
 }
 
+function _safeSong(src) {
+  return SONGS.includes(src) ? src : _pickSong();
+}
+
 function stopMusic() {
   // _openingAudio が bgmAudio と別要素になっている場合（.catch() で bgmAudio が null になった後）も止める
   if (_openingAudio && _openingAudio !== bgmAudio) {
@@ -836,23 +886,37 @@ function stopMusic() {
 }
 
 // 通常再生（プールから取得）
-function playMusic(src, onEnd=null) {
+function playMusic(src, onEnd=null, retryCount=0) {
   stopMusic();
-  const a = _getAudio(src);
+  const safeSrc = _safeSong(src);
+  const a = _getAudio(safeSrc);
   bgmAudio = a;
   a.volume = _bgmMuted ? 0 : 0.55; // ミュート中は音量0で再生（onended は正常発火させる）
   if (onEnd) a.onended = () => { if (bgmAudio===a) { bgmAudio=null; onEnd(); } };
-  a.play().catch(() => { if (bgmAudio===a) bgmAudio=null; });
+  const failover = () => {
+    if (bgmAudio !== a) return;
+    bgmAudio = null;
+    if (retryCount < SONGS.length - 1) playMusic(_pickSong(), onEnd, retryCount + 1);
+  };
+  a.onerror = failover;
+  a.play().catch(failover);
   return a;
 }
 
 // 同期再生: startedAt(ms) の時刻から再生位置を合わせる（同室複数スマホ対応）
-function playMusicSync(src, startedAt, onEnd=null) {
+function playMusicSync(src, startedAt, onEnd=null, retryCount=0) {
   stopMusic();
-  const a = _getAudio(src);
+  const safeSrc = _safeSong(src);
+  const a = _getAudio(safeSrc);
   bgmAudio = a;
   a.volume = _bgmMuted ? 0 : 0.55; // ミュート中は音量0で再生（onended は正常発火させる）
   if (onEnd) a.onended = () => { if (bgmAudio===a) { bgmAudio=null; onEnd(); } };
+  const failover = () => {
+    if (bgmAudio !== a) return;
+    bgmAudio = null;
+    if (retryCount < SONGS.length - 1) playMusicSync(_pickSong(), Date.now() + 150, onEnd, retryCount + 1);
+  };
+  a.onerror = failover;
   // _didPlay フラグで canplay + タイムアウト二重発火（iOSでの2重再生）を防ぐ
   let _didPlay = false;
   const doPlay = () => {
@@ -862,7 +926,7 @@ function playMusicSync(src, startedAt, onEnd=null) {
     if (isFinite(a.duration) && a.duration > 1 && offset < a.duration - 2) {
       try { a.currentTime = offset; } catch(e) {}
     }
-    a.play().catch(() => { if (bgmAudio===a) bgmAudio=null; });
+    a.play().catch(failover);
   };
   // readyState >= 2 (HAVE_CURRENT_DATA) なら即再生、そうでなければ canplay 待ち
   if (a.readyState >= 2) {
@@ -1213,6 +1277,20 @@ function cleanSpeechText(text) {
     .replace(/\s+/g, ' ')
     .trim();
 }
+
+const SPEECH_NAME_READINGS = {
+  '沢枝': 'さわえだ',
+  '人狼': 'じんろう'
+};
+
+function applySpeechReadings(text) {
+  let out = String(text || '');
+  Object.entries(SPEECH_NAME_READINGS).forEach(([name, reading]) => {
+    out = out.split(name).join(reading);
+  });
+  return out;
+}
+
 function speakChatMessage(name, text) {
   if (!_chatVoiceEnabled || !canUseChatVoice()) return;
   const clean = cleanSpeechText(text);
@@ -1229,7 +1307,9 @@ function speakChatMessage(name, text) {
   _lastSpokenChatAt = now;
   try {
     if (typeof window.speechSynthesis.resume === 'function') window.speechSynthesis.resume();
-    const utter = new window.SpeechSynthesisUtterance(`${name}。${clean}`);
+    const spokenName = applySpeechReadings(name);
+    const spokenText = applySpeechReadings(clean);
+    const utter = new window.SpeechSynthesisUtterance(`${spokenName}。${spokenText}`);
     const voice = getChatVoice();
     if (voice) utter.voice = voice;
     utter.lang = 'ja-JP';
@@ -1365,6 +1445,44 @@ function coQuickPanel(inputId='discFreeInput') {
     </div>`;
 }
 
+function selfCoPreset() {
+  const role = O.myRole || '';
+  const presets = {
+    SEER:     { label:'🔮 ワンクリック占い師CO', text:'占い師COします。占い結果を公開します。' },
+    MEDIUM:   { label:'👁️ ワンクリック霊媒師CO', text:'霊媒師COします。処刑結果を報告します。' },
+    DOCTOR:   { label:'💊 ワンクリック騎士CO',   text:'騎士COします。護衛先と理由を整理して出します。' },
+    NEKOMATA: { label:'🐱 ワンクリック猫又CO',   text:'猫又COします。私を処刑すると道連れが出ます。' },
+    SHARED:   { label:'🤝 ワンクリック共有者CO', text:'共有者COします。村の進行を整理します。' },
+    VILLAGER: { label:'👤 ワンクリック村人CO',   text:'村人COします。役職COはありません。発言と投票で村に貢献します。' },
+    WEREWOLF: { label:'🎭 ワンクリック偽占いCO', text:'占い師COします。占い結果を公開します。' },
+    MADMAN:   { label:'🎭 ワンクリック偽占いCO', text:'占い師COします。占い結果を公開します。' },
+  };
+  return presets[role] || { label:'📣 ワンクリックCO', text:'役職COします。情報を整理して出します。' };
+}
+
+function renderCoComposer(actionLocked=false) {
+  const already = O.roleClaims?.[O.playerName];
+  const status = already ? `${ROLES[already]?.name || '役職'}CO済` : 'CO未宣言';
+  const disabled = actionLocked ? 'disabled' : '';
+  const oneClick = selfCoPreset();
+  const placeholder = actionLocked
+    ? 'P2P再接続後にCOできます'
+    : '占い師COします。○○さんは人狼でした。';
+  return `
+    <div class="co-dedicated-panel">
+      <div class="co-dedicated-head">
+        <span>📣 CO専用チャット</span>
+        <span class="co-dedicated-note">${esc(status)} / CO発言だけ別送信</span>
+      </div>
+      <button class="co-oneclick-btn" id="coSelfSend" data-co-text="${esc(oneClick.text)}" ${disabled}>${esc(oneClick.label)}</button>
+      ${coQuickPanel('coDraft')}
+      <div class="co-draft-bar">
+        <textarea id="coDraft" class="co-draft" maxlength="240" placeholder="${esc(placeholder)}" ${disabled}></textarea>
+        <button class="co-send-btn" id="coSend" ${disabled}>CO送信</button>
+      </div>
+    </div>`;
+}
+
 function quickWolfChatPanel() {
   const targets = (O.alive||[]).filter(p=>p.name!==O.playerName);
   const opts = targets.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');
@@ -1418,6 +1536,13 @@ function detectExplicitRoleClaim(text) {
       /共有(?:です|CO|者CO)(?:。|、|!|！|$)/,
       /(?:CO|カミングアウト)(?:します|する|しました)?(?:。|、)?共有者?(?:です|として|だ|。|、|!|！|$)/
     ],
+    VILLAGER: [
+      /(?:私|わたし|自分|僕|俺|うち)(?:が|は|の役職は)?(?:村人|素村)(?:です|だ|でした|である)?(?:。|、|!|！|$)/,
+      /(?:村人|素村)(?:として)?(?:CO|カミングアウト)(?:します|する|しました|です|だ|。|、|!|！|$)/,
+      /(?:村人|素村)CO(?:します|する|しました|です|だ|。|、|!|！|$)/,
+      /(?:私|わたし|自分|僕|俺|うち)?(?:は|が)?役職COはありません(?:。|、|!|！|$)/,
+      /役職なし(?:です|だ|。|、|!|！|$)/
+    ],
   };
   for (const [role, patterns] of Object.entries(rolePatterns)) {
     if (patterns.some(re => re.test(t))) return role;
@@ -1438,11 +1563,11 @@ function renderCoChat() {
         <div class="co-msg-text">${esc(m.text)}</div>
       </div>
     </div>`;
-  }).join('') : `<div class="co-chat-empty">まだCOはありません。COした発言だけがここにまとまります。</div>`;
+  }).join('') : `<div class="co-chat-empty">まだCOはありません。CO専用欄から送った発言もここにまとまります。</div>`;
   return `
     <div class="co-chat-panel">
       <div class="co-chat-head">
-        <span>📣 CO専用チャット</span>
+        <span>📣 CO履歴</span>
         <span class="co-chat-count">${coMsgs.length}件</span>
       </div>
       <div class="co-chat-feed" id="coFeed">${body}</div>
@@ -3194,6 +3319,34 @@ const CPU_PERSONA_PROFILES = {
       '{n}さんは議論で組み付いてくる相手です。今夜のうちに外します。',
       '{n}さんを残すと明日こちらが押さえ込まれます。先に勝負を決めます。'
     ]
+  },
+  'ラン': {
+    personality:'talkative', thought:'明るく無邪気な直感派。難しい理屈より表情、間、言い方の違和感を拾う。気になると「コウ君、コウ君」と呼びかけてから核心を突く',
+    signature:['コウ君、コウ君、なんかへん。','ランはそこ気になる、コウ君。','コウ君、今の言い方、ちょっとちがう。'],
+    action:{ mode:'tone', pushProb:0.72, voteProb:0.68, nightProb:0.52, bump:0.82, chaos:1.1 },
+    neutral:[
+      'コウ君、コウ君。みんなむずかしいこと言ってるけど、ランは言い方を見てます。',
+      'ランはまだ分かんないけど、コウ君、今の空気ちょっとへんだと思う。',
+      'コウ君、笑ってる人と、笑ってない人がいるね。そこ見たいな。'
+    ],
+    accuse:[
+      'コウ君、コウ君。{n}さん、今の言い方ちょっとちがう。ランはそこ気になる。',
+      '{n}さん、答えるまでが少し遅かった気がする。コウ君、なんでかな。',
+      'コウ君、{n}さん、やさしく言ってるけど、隠してる感じがしたよ。'
+    ],
+    defend:[
+      'コウ君、ランはむずかしい作戦はできないけど、見たまま言ってるだけだよ。',
+      'コウ君、コウ君、ランを吊るより、もっとへんな言い方した人を見てほしいな。'
+    ],
+    voteReason:[
+      'コウ君、コウ君。{n}さんの言い方と間が少し気になりました。ランの直感で投票します。',
+      '{n}さんはやさしく見えるけど、コウ君、隠している感じがしたので投票します。',
+      'ランは{n}さんの反応が少しへんだと思いました。コウ君、そこ見たいです。'
+    ],
+    wolfNight:[
+      'コウ君、{n}さんはランの直感を怖がりそう。今夜はそこにするね。',
+      'コウ君、コウ君。{n}さんはみんなに信用されそうだから、先にいなくなってもらうね。'
+    ]
   }
 };
 
@@ -3473,6 +3626,7 @@ function roleClaimInfo(role) {
     MEDIUM:   { icon:'👁️', label:'霊媒師CO', short:'霊', color:'#a78bfa' },
     NEKOMATA: { icon:'🐱', label:'猫又CO',   short:'猫', color:'#fb923c' },
     SHARED:   { icon:'🤝', label:'共有者CO', short:'共', color:'#38bdf8' },
+    VILLAGER: { icon:'👤', label:'村人CO',   short:'村', color:'#22c55e' },
   };
   return map[role] || { icon:'❔', label:'役職CO', short:'CO', color:'#fbbf24' };
 }
@@ -3486,6 +3640,19 @@ function roleClaimBadge(role, compact=false) {
 
 function val(id) { const e = document.getElementById(id); return e ? e.value : ''; }
 function on(id, fn) { const e = document.getElementById(id); if (e) e.addEventListener('click', fn); }
+function submitDiscussText(text, inputToClear=null) {
+  if (p2pActionLocked()) { render(); return false; }
+  if (!canCurrentPlayerDiscuss()) { render(); return false; }
+  const clean = String(text || '').trim();
+  if (!clean) return false;
+  const explicitClaim = detectExplicitRoleClaim(clean);
+  if (!wsSend({type:'disc_message', text: clean})) return false;
+  if (explicitClaim) O.roleClaims[O.playerName] = explicitClaim;
+  if (O.isMyDiscTurn) { O.isMyDiscTurn=false; O.tplStep=null; }
+  if (inputToClear) inputToClear.value = '';
+  render();
+  return true;
+}
 const QUALITY = {
   errors: [],
   lastRenderOkAt: 0,
@@ -4144,6 +4311,7 @@ function bindEvents() {
 
     const roles = shuffle(CONFIGS[S.playerCount] || CONFIGS[6]);
     S.players = names.map((name, i) => ({name, role: roles[i], alive: true}));
+    assignOnlineAvatars(S.players);
     S.revealIdx = 0;
     S.revealShown = false;
     S.phase = 'role_reveal';
@@ -4620,21 +4788,33 @@ function bindEvents() {
 
   // DISCUSS - フリーテキスト送信
   on('discFreeSend', () => {
-    if (p2pActionLocked()) { render(); return; }
-    if (!canCurrentPlayerDiscuss()) { render(); return; }
     const input = document.getElementById('discFreeInput');
-    const text = (input ? input.value : '').trim();
-    if (!text) return;
-    const explicitClaim = detectExplicitRoleClaim(text);
-    if (!wsSend({type:'disc_message', text})) return;
-    if (explicitClaim) O.roleClaims[O.playerName] = explicitClaim;
-    if (O.isMyDiscTurn) { O.isMyDiscTurn=false; O.tplStep=null; }
-    if (input) input.value='';
-    render();
+    submitDiscussText(input ? input.value : '', input);
   });
   { // Enter key for discuss free input
     const fi = document.getElementById('discFreeInput');
     if (fi) fi.addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); document.getElementById('discFreeSend')?.click(); } });
+  }
+
+  // DISCUSS - CO専用チャット送信
+  on('coSend', () => {
+    const input = document.getElementById('coDraft');
+    submitDiscussText(input ? input.value : '', input);
+  });
+  on('coSelfSend', () => {
+    const btn = document.getElementById('coSelfSend');
+    submitDiscussText(btn ? btn.dataset.coText : '', null);
+  });
+  {
+    const coDraft = document.getElementById('coDraft');
+    if (coDraft) {
+      coDraft.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          document.getElementById('coSend')?.click();
+        }
+      });
+    }
   }
 
   // WOLF CHAT - フリーテキスト送信
@@ -4799,7 +4979,7 @@ function bindEvents() {
 
 // ========== SOLO ENGINE (サーバー不要 / GitHub Pages 対応) ==========
 const SoloEngine = (() => {
-  const CPU_NAMES = CHARACTER_AVATARS.slice(0, MAX_PLAYERS).map(a => a.label);
+  const CPU_NAMES = CHARACTER_AVATARS.map(a => a.label);
   let R = {};
 
   let _timers = [];
@@ -4829,6 +5009,7 @@ const SoloEngine = (() => {
 
     const roles = shuffle([...CONFIGS[total]]);
     players.forEach((p,i) => p.role = roles[i]);
+    assignOnlineAvatars(players);
     // CPUにパーソナリティをランダム付与
     players.forEach(p => { if (p.isCpu) applyCpuPersona(p); });
 
@@ -4857,7 +5038,13 @@ const SoloEngine = (() => {
       role: human.role,
       wolf_partners: wolfPartners,
       shared_partners: sharedPartners,
-      players: players.map(p=>({ pid: players.indexOf(p), name: p.name })),
+      players: players.map((p, i)=>({
+        pid: i,
+        name: p.name,
+        isCpu: !!p.isCpu,
+        avatarIndex: p.avatarIndex,
+        avatarLabel: p.avatarLabel
+      })),
       is_host: true,
     });
   }
@@ -6879,7 +7066,7 @@ function spawnConfetti(color1, color2) {
 
 // ========== P2P ENGINE (PeerJS サーバーレスオンライン) ==========
 const P2PEngine = (() => {
-  const CPU_NAMES = CHARACTER_AVATARS.slice(0, MAX_PLAYERS).map(a => a.label);
+  const CPU_NAMES = CHARACTER_AVATARS.map(a => a.label);
   const P2P_STALE_MS = 22000;
   const P2P_SOFT_DISCONNECT_MS = 42000;
   const P2P_CREATE_MAX_ATTEMPTS = 12;
@@ -8943,7 +9130,7 @@ function renderODiscuss() {
   const myAlive = isOnlinePlayerAlive();
   const freeInput = myAlive ? `
     <div class="chat-compose">
-      ${coQuickPanel()}
+      ${renderCoComposer(actionLocked)}
       ${quickChatPanel()}
       <div class="free-chat-bar">
         <input type="text" id="discFreeInput" placeholder="${actionLocked ? 'P2P再接続後に発言できます' : O.isMyDiscTurn?'💬 あなたの番！自由に発言...':'💬 自由に発言できます...'}" maxlength="220" ${actionLocked ? 'disabled' : ''}>

@@ -22,8 +22,8 @@ CONFIGS = {
     17: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
 }
 MAX_PLAYERS = 17
-CPU_NAMES = ['ボブ','井沢','工場長','狩野英孝','マリック','キングカズ','カズレーザー','リンゴちゃん','ドナルド','沢枝','イッコー','マツコ','アンジャッシュ渡部','ピコ太郎','ザコシショウ','出川','吉田沙保里']
-CHARACTER_COUNT = 17
+CPU_NAMES = ['ボブ','井沢','工場長','狩野英孝','マリック','キングカズ','カズレーザー','リンゴちゃん','ドナルド','沢枝','イッコー','マツコ','アンジャッシュ渡部','ピコ太郎','ザコシショウ','出川','吉田沙保里','ラン']
+CHARACTER_COUNT = 18
 DISC_ROUNDS = 2
 READ_PAUSE_MIN = 1.4
 READ_PAUSE_MAX = 7.0
@@ -75,6 +75,27 @@ CPU_T = {
         '了解！{t}さんにしよう',
         '同意します',
         '{t}さんで決まりですね',
+    ],
+}
+
+RAN_CPU_T = {
+    'neutral': [
+        'コウ君、コウ君。みんなむずかしいこと言ってるけど、ランは言い方を見てます。',
+        'ランはまだ分かんないけど、コウ君、今の空気ちょっとへんだと思う。',
+        'コウ君、笑ってる人と、笑ってない人がいるね。そこ見たいな。',
+    ],
+    'accuse': [
+        'コウ君、コウ君。{t}さん、今の言い方ちょっとちがう。ランはそこ気になる。',
+        '{t}さん、答えるまでが少し遅かった気がする。コウ君、なんでかな。',
+        'コウ君、{t}さん、やさしく言ってるけど、隠してる感じがしたよ。',
+    ],
+    'defend': [
+        'コウ君、ランはむずかしい作戦はできないけど、見たまま言ってるだけだよ。',
+        'コウ君、コウ君、ランを吊るより、もっとへんな言い方した人を見てほしいな。',
+    ],
+    'wolf_chat': [
+        'コウ君、{t}さんはランの直感を怖がりそう。今夜はそこにするね。',
+        'コウ君、コウ君。{t}さんはみんなに信用されそうだから、先にいなくなってもらうね。',
     ],
 }
 
@@ -159,9 +180,18 @@ def assign_avatar_indexes(room):
         used.add(idx)
         return idx
 
-    ordered_players = sorted(room['players'].items(), key=lambda item: 0 if item[0] in room['cpu_pids'] else 1)
+    def exact_avatar_idx(item):
+        return name_to_idx.get(item[1].get('name'))
+
+    ordered_players = sorted(
+        room['players'].items(),
+        key=lambda item: (
+            0 if exact_avatar_idx(item) is not None else 1,
+            0 if item[0] in room['cpu_pids'] else 1,
+        ),
+    )
     for pid, p in ordered_players:
-        preferred = name_to_idx.get(p.get('name')) if pid in room['cpu_pids'] else None
+        preferred = exact_avatar_idx((pid, p))
         if preferred is not None and preferred not in used:
             p['avatarIndex'] = preferred
             used.add(preferred)
@@ -179,6 +209,8 @@ def cpu_template(room, cpu_pid, ctx='discuss'):
         non_wolves = [q for pid, q in room['players'].items() if q['alive'] and pid not in wolf_set]
         if non_wolves:
             t = random.choice(non_wolves)['name']
+            if p.get('name') == 'ラン':
+                return random.choice(RAN_CPU_T['wolf_chat']).replace('{t}', t)
             return random.choice(CPU_T['wolf_chat']).replace('{t}', t)
         return '同意します'
 
@@ -192,6 +224,16 @@ def cpu_template(room, cpu_pid, ctx='discuss'):
 
     was_accused = p['name'] in accused
     top_accused = max(accused, key=accused.get) if accused else None
+
+    if p.get('name') == 'ラン':
+        if was_accused and random.random() < 0.7:
+            return random.choice(RAN_CPU_T['defend'])
+        if top_accused and random.random() < 0.45:
+            return random.choice(RAN_CPU_T['accuse']).replace('{t}', top_accused)
+        if alive_others and random.random() < 0.5:
+            t = random.choice(alive_others)[1]['name']
+            return random.choice(RAN_CPU_T['accuse']).replace('{t}', t)
+        return random.choice(RAN_CPU_T['neutral'])
 
     if role in ['WEREWOLF', 'MADMAN']:
         if was_accused:
@@ -663,7 +705,8 @@ async def ws_handler(ws):
             if t == 'create_room':
                 code = gen_code(); room = new_room(code); rooms[code] = room
                 pid = 'h'
-                room['players'][pid] = {'name': data.get('name', 'ホスト'), 'ws': ws, 'role': None, 'alive': True}
+                host_name = str(data.get('name') or 'ホスト').strip()[:24] or 'ホスト'
+                room['players'][pid] = {'name': host_name, 'ws': ws, 'role': None, 'alive': True}
                 room['host'] = pid
                 await ws.send(json.dumps({'type': 'room_created', 'code': code, 'pid': pid,
                                           'is_host': True, 'players': plist(room)}))
@@ -674,13 +717,18 @@ async def ws_handler(ws):
                 room = rooms[code]
                 if room['phase'] != 'lobby':
                     await ws.send(json.dumps({'type': 'error', 'msg': 'ゲームはすでに始まっています'})); continue
+                join_name = str(data.get('name') or 'プレイヤー').strip()[:24] or 'プレイヤー'
+                if any(p.get('name') == join_name for p in room['players'].values()):
+                    await ws.send(json.dumps({'type': 'error', 'msg': '同じ名前のプレイヤーがいます'})); continue
+                if len(room['players']) >= MAX_PLAYERS:
+                    await ws.send(json.dumps({'type': 'error', 'msg': f'最大{MAX_PLAYERS}人までです'})); continue
                 pid = f'p{len(room["players"])+1}'
                 while pid in room['players']: pid += 'x'
-                room['players'][pid] = {'name': data.get('name', 'プレイヤー'), 'ws': ws, 'role': None, 'alive': True}
+                room['players'][pid] = {'name': join_name, 'ws': ws, 'role': None, 'alive': True}
                 await ws.send(json.dumps({'type': 'room_joined', 'code': code, 'pid': pid,
                                           'is_host': False, 'players': plist(room)}))
                 await bcast(room, {'type': 'player_joined', 'players': plist(room),
-                                   'name': data.get('name')}, skip=pid)
+                                   'name': join_name}, skip=pid)
             elif pid and room:
                 await handle(ws, pid, room, data)
     except: pass
