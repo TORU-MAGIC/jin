@@ -637,6 +637,20 @@ details summary:hover { color: #94a3b8; }
 .secret-mission-progress{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.09);margin-top:.5rem;}
 .secret-mission-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#38bdf8,#facc15);}
 @media (min-width:760px){.ai-intel-grid{grid-template-columns:1.1fr .9fr;}.trust-gauge-list{grid-template-columns:1fr 1fr;}.spotlight-grid{grid-template-columns:repeat(3,1fr);}.contradiction-list{grid-template-columns:1fr 1fr;}.trial-role-grid{grid-template-columns:repeat(4,1fr);}.secret-mission-grid{grid-template-columns:1fr 1fr 1fr;}}
+.ai-war-panel{background:linear-gradient(135deg,rgba(14,116,144,.18),rgba(88,28,135,.18),rgba(180,83,9,.10));border:1px solid rgba(125,211,252,.28);border-radius:8px;padding:.76rem .82rem;margin:.5rem 0;color:#e0f2fe;box-shadow:0 18px 42px rgba(0,0,0,.26);position:relative;overflow:hidden;}
+.ai-war-panel:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#22d3ee,#a78bfa,#facc15,#fb7185);}
+.ai-war-head{display:flex;align-items:center;justify-content:space-between;gap:.55rem;color:#cffafe;font-size:.83rem;font-weight:900;margin-bottom:.48rem;}
+.ai-war-badge{display:inline-flex;align-items:center;border-radius:999px;background:rgba(14,165,233,.15);border:1px solid rgba(125,211,252,.28);color:#fef9c3;font-size:.7rem;font-weight:900;padding:.16rem .5rem;white-space:nowrap;}
+.ai-war-grid{display:grid;grid-template-columns:1fr;gap:.42rem;margin:.42rem 0;}
+.ai-war-cell{background:rgba(15,23,42,.48);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.48rem .54rem;min-width:0;}
+.ai-war-cell b{display:block;color:#f8fafc;font-size:.7rem;margin-bottom:.12rem;}
+.ai-war-cell span{display:block;color:#cbd5e1;font-size:.76rem;line-height:1.5;}
+.ai-war-meter{height:9px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.1);margin:.42rem 0 .5rem;}
+.ai-war-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#38bdf8,#facc15,#ef4444);box-shadow:0 0 18px rgba(56,189,248,.22);}
+.ai-war-moves{display:grid;grid-template-columns:1fr;gap:.36rem;margin-top:.46rem;}
+.ai-war-btn{width:100%;text-align:left;border:1px solid rgba(125,211,252,.24);background:rgba(15,23,42,.54);color:#f8fafc;border-radius:8px;padding:.5rem .58rem;font-size:.76rem;font-weight:800;line-height:1.42;cursor:pointer;}
+.ai-war-btn:active{background:rgba(14,165,233,.18);transform:translateY(1px);}
+@media (min-width:760px){.ai-war-grid{grid-template-columns:1.05fr .95fr .9fr;}.ai-war-moves{grid-template-columns:1fr 1fr;}}
 .power-panel{background:rgba(15,23,42,.78);border:1px solid rgba(96,165,250,.22);border-radius:8px;padding:.68rem .75rem;margin:.5rem 0;color:#cbd5e1;box-shadow:0 12px 28px rgba(0,0,0,.18);}
 .power-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;color:#93c5fd;font-size:.82rem;font-weight:900;margin-bottom:.42rem;}
 .power-line{font-size:.79rem;line-height:1.65;color:#b6c4d4;margin:.18rem 0;}
@@ -2299,6 +2313,103 @@ function renderInferenceTrialPanel() {
   return renderInferenceTrial(buildInferenceTrial());
 }
 
+function aiWarMove(label, text, tone='') {
+  return { label, text, tone };
+}
+
+function buildAiWarRoom() {
+  if (!['day','discuss','vote','vote_result'].includes(O.phase)) return null;
+  const names = (O.alive || O.players || []).map(p => p.name || p).filter(Boolean);
+  if (names.length < 3) return null;
+  const myName = O.playerName || '';
+  const role = O.myRole || '';
+  const wolfSide = role === 'WEREWOLF' || role === 'MADMAN';
+  const intel = analyzeDiscussionIntel();
+  const heat = analyzeDiscussionHeat();
+  const scan = buildContradictionScan();
+  const trial = buildInferenceTrial();
+  const rows = intel.rows || [];
+  const top = (intel.ranking || []).find(r => r.name !== myName) || (intel.ranking || [])[0];
+  const second = (intel.ranking || []).find(r => r.name !== myName && r.name !== top?.name);
+  const trusted = [...rows].filter(r => r.name !== myName && r.name !== top?.name).sort((a,b)=>b.trustScore-a.trustScore)[0]
+    || [...rows].filter(r => r.name !== myName).sort((a,b)=>b.trustScore-a.trustScore)[0];
+  const claimsByRole = {};
+  Object.entries(O.roleClaims || {}).forEach(([name, claim]) => {
+    if (!names.includes(name)) return;
+    if (!claimsByRole[claim]) claimsByRole[claim] = [];
+    claimsByRole[claim].push(name);
+  });
+  const conflict = Object.entries(claimsByRole).find(([, claimers]) => claimers.length > 1);
+  const lastVote = (O.voteHistory && O.voteHistory.length) ? O.voteHistory[O.voteHistory.length - 1] : O.voteResult;
+  const votes = lastVote?.votes || {};
+  const voteTargets = Object.values(votes || {}).filter(Boolean);
+  const uniqueVoteTargets = new Set(voteTargets).size;
+  const target = (wolfSide ? trusted?.name : top?.name) || trial?.target || voteTargets[0] || names.find(n => n !== myName) || names[0];
+  const pressure = clampNum(Math.round(
+    (heat?.heat || 24) * .34 +
+    (top?.suspicionScore || 34) * .28 +
+    (scan?.maxScore || 0) * .2 +
+    (conflict ? 12 : 0) +
+    (uniqueVoteTargets >= 3 ? 7 : 0) +
+    (O.phase === 'vote' ? 8 : 0)
+  ), 0, 100);
+
+  const moves = [];
+  const add = (label, text, tone='') => {
+    if (!text || moves.some(m => m.text === text)) return;
+    moves.push(aiWarMove(label, text, tone));
+  };
+
+  let headline = wolfSide ? 'AI勝負手 人狼陣営' : 'AI勝負手 村陣営';
+  let doctrine = wolfSide
+    ? '信用軸を一人に固定させず、候補を二方向に割って村の票を迷わせる。'
+    : 'CO、投票、矛盾の順に絞り、疑いを感情ではなく証拠へ寄せる。';
+  let riskLine = pressure >= 70 ? 'この局面は一言で流れが変わります。発言理由を短く刺すのが強いです。' : 'まだ決め打ち前です。情報を増やす発言で次の投票精度を上げます。';
+
+  if (wolfSide) {
+    if (trusted?.name) add('信用軸を割る', `${trusted.name}さんを白置きしすぎるのは危険です。信用できる理由と、逆に噛まれない理由を一度分けて考えたいです。`, 'split');
+    if (top?.name && second?.name) add('疑い先を二択化', `${top.name}さんだけに集めるより、${second.name}さんとの二択で投票理由を比べたいです。片方に流れすぎるのは怖いです。`, 'split');
+    if (conflict) add('CO対立を長引かせる', `${conflict[1].join('さんと')}さんの${ROLES[conflict[0]]?.name || '役職'}COは、今日すぐ決め打たず結果と投票をもう一日見たいです。`, 'fake');
+    add('投票先を割る', '今日は候補を一人に固定しすぎず、投票理由を出してから最後に合わせたいです。便乗票を見たいです。', 'vote');
+  } else {
+    if (scan?.alerts?.[0]) add('矛盾を刺す', `${scan.alerts[0].title}。${scan.alerts[0].detail} ここを説明できないなら今日の吊り候補に入れたいです。`, 'attack');
+    if (top?.name) add('本命を追及', `${top.name}さん、いま一番疑われている点について、誰のどの発言が一番おかしいと思うか具体的に答えてください。`, 'attack');
+    if (conflict) add('COを整理', `${conflict[1].join('さんと')}さんは、COしたタイミング、結果、今日の投票希望を順番に出してください。`, 'claim');
+    if (trusted?.name && top?.name) add('信用軸に判断を求める', `${trusted.name}さんに聞きたいです。${top.name}さんを吊るべきか、残して情報を見るべきか、理由つきで決めてください。`, 'trust');
+    if (!moves.length && target) add('全員を動かす', `${target}さんを中心に見たいです。全員、今日吊るか残すかを一言で出してください。`, 'focus');
+  }
+
+  if (uniqueVoteTargets >= 3) add('票割れ確認', `前回の票が${uniqueVoteTargets}方向に割れています。票を変える人は、変える理由と新しい候補を先に出してください。`, 'vote');
+  if (moves.length < 3 && top?.name) add('反論要求', `${top.name}さんは、自分を疑っている人の中で一番便乗に見える人を一人だけ挙げてください。`, 'attack');
+
+  return {
+    headline,
+    label: pressure >= 82 ? '決着級' : pressure >= 64 ? '勝負所' : pressure >= 44 ? '詰め時' : '仕込み',
+    pressure,
+    targetLine: target ? `${target}さんを軸に場を動かす` : '発言とCOを整理する',
+    doctrine,
+    riskLine,
+    moves: moves.slice(0, 4)
+  };
+}
+
+function renderAiWarRoomPanel() {
+  const data = buildAiWarRoom();
+  if (!data) return '';
+  const canUseMoves = O.phase === 'discuss' && canCurrentPlayerDiscuss() && !p2pActionLocked();
+  const buttons = canUseMoves ? `<div class="case-mini-title" style="margin-top:.55rem;">勝負手</div>
+    <div class="ai-war-moves">${(data.moves || []).map(m => `<button class="ai-war-btn" data-chat-input="discFreeInput" data-chat-template="${esc(m.text)}">${esc(m.label)}：${esc(m.text)}</button>`).join('')}</div>` : '';
+  return `<div class="ai-war-panel">
+    <div class="ai-war-head"><span>${esc(data.headline)}</span><span class="ai-war-badge">${esc(data.label)} ${data.pressure}/100</span></div>
+    <div class="ai-war-meter"><div class="ai-war-fill" style="width:${data.pressure}%;"></div></div>
+    <div class="ai-war-grid">
+      <div class="ai-war-cell"><b>焦点</b><span>${esc(data.targetLine)}</span></div>
+      <div class="ai-war-cell"><b>作戦</b><span>${esc(data.doctrine)}</span></div>
+      <div class="ai-war-cell"><b>注意</b><span>${esc(data.riskLine)}</span></div>
+    </div>
+    ${buttons}
+  </div>`;
+}
 function buildLocalInferenceTrial() {
   if (!['day','vote','vote_result'].includes(S.phase)) return null;
   const names = alive().map(p => p.name);
@@ -3448,6 +3559,8 @@ function personaSpeechKind(text, targetName) {
 function personagizeSpeech(R, cpu, text) {
   const profile = getCpuPersona(cpu.name);
   if (!profile || !text) return text;
+  // 戦略発言はキャラクターの口調だけを足し、根拠そのものは崩さない。
+  if (R?.aiLastPlan?.[cpu.name]?.text === text) return personaWithSignature(profile, text);
   // 役職COや占い/霊媒結果はゲーム解析に関わるため、内容を崩さずそのまま出す。
   if (detectExplicitRoleClaim(text) || /占い結果|霊媒結果|黒判定|白判定|占いました|霊視|騎士CO|猫又CO|共有者CO|共有CO|占い師CO|霊媒師CO/.test(text)) return text;
   const targetName = personaTargetFromText(R, cpu, text);
@@ -3483,9 +3596,10 @@ function personagizeSpeech(R, cpu, text) {
   return personaWithSignature(profile, tplFill(pickCpuPersonaLine(pool), targetName || 'その人'));
 }
 
-function personagizeVoteReason(cpu, targetName, baseReason) {
+function personagizeVoteReason(cpu, targetName, baseReason, preserveCore=false) {
   const profile = getCpuPersona(cpu.name);
   if (!profile?.voteReason?.length) return baseReason;
+  if (preserveCore) return personaWithSignature(profile, baseReason);
   if (targetName === '沢枝' && ['ボブ','工場長'].includes(cpu.name)) {
     const lines = cpu.name === 'ボブ'
       ? [
@@ -5896,59 +6010,327 @@ const BRAIN = (function(){
     return null;
   }
 
+
+  const ROLE_CLAIM_LIMITS = Object.freeze({ SEER:1, MEDIUM:1, DOCTOR:1, SHARED:2, NEKOMATA:1 });
+  const ROLE_LABELS = Object.freeze({
+    SEER:'占い師', MEDIUM:'霊媒師', DOCTOR:'騎士', SHARED:'共有者', NEKOMATA:'猫又', VILLAGER:'村人'
+  });
+
+  function cpuPrecision(){
+    const sharp = typeof window !== 'undefined' && Number.isFinite(window._soloSharp) ? window._soloSharp : 1;
+    return Math.max(0.55, Math.min(1.45, sharp));
+  }
+  function tinyNoise(){ return Math.random() * Math.max(0.04, 0.35 - cpuPrecision() * 0.16); }
+  function voteTally(R){
+    const tally = {};
+    Object.values(R.votes || {}).forEach(name => { if (name) tally[name] = (tally[name] || 0) + 1; });
+    return tally;
+  }
+  function addCase(row, amount, reason){
+    if (!row) return;
+    row.score += amount;
+    if (reason && !row.reasons.includes(reason) && row.reasons.length < 4) row.reasons.push(reason);
+  }
+  function pickByScore(players, scoreOf){
+    return [...(players || [])]
+      .map(player => ({ player, score:scoreOf(player) }))
+      .sort((a,b) => b.score - a.score || a.player.name.localeCompare(b.player.name))[0]?.player || null;
+  }
+  function publicRoleGroups(R){
+    const live = new Set(alive(R).map(p => p.name));
+    const groups = {};
+    Object.entries(R.claims || {}).forEach(([name, role]) => {
+      if (!live.has(name)) return;
+      if (!groups[role]) groups[role] = [];
+      groups[role].push(name);
+    });
+    return groups;
+  }
+  function claimReliability(R, name, role, groups){
+    let score = 0.85;
+    const group = groups?.[role] || [];
+    const expected = ROLE_CLAIM_LIMITS[role] || 1;
+    const history = R.aiClaimHistory?.[name] || [];
+    if (new Set(history.map(item => item.role)).size > 1) score -= 1.45;
+    if (group.length === expected) score += 0.28;
+    if (group.length > expected) score -= 0.32 * (group.length - expected);
+    if (role === 'SEER') {
+      const co = (R.seerCOs || []).find(item => item.name === name);
+      const results = co?.results || [];
+      score += Math.min(0.4, results.length * 0.12);
+      const seen = {};
+      results.forEach(result => {
+        if (!result?.target) return;
+        if (seen[result.target] !== undefined && seen[result.target] !== result.isWolf) score -= 1.25;
+        seen[result.target] = result.isWolf;
+      });
+    }
+    score -= Math.min(0.7, (R.aiContradictions?.[name] || 0) * 0.15);
+    return Math.max(-1.2, Math.min(1.8, score));
+  }
+  function detectDiscussionStance(text){
+    const value = String(text || '');
+    const explicitTrust = /(人狼|黒)\s*(?:ではない|じゃない|では無|じゃ無)|怪しくない|吊りたくない|疑ってない/.test(value);
+    const suspect = /怪しい|疑|黒|人狼|投票|処刑|吊|矛盾|嘘|騙|不自然|沈黙|発言少な|第一候補|優先/.test(value);
+    const trust = /信頼|信用|白|村人|安全|守|かば|無実|怪しくない|吊りたくない|村目/.test(value);
+    if (trust && (!suspect || explicitTrust)) return 'trust';
+    return suspect ? 'suspect' : 'neutral';
+  }
+  function rememberPublicMessage(R, name, text){
+    initR(R);
+    const clean = String(text || '').trim();
+    if (!clean || !name) return;
+    const last = R.aiPublicMessages[R.aiPublicMessages.length - 1];
+    if (last && last.name === name && last.text === clean && last.day === R.day && last.round === R.discRound) return;
+
+    const explicit = detectExplicitRoleClaim(clean);
+    if (explicit) {
+      const history = R.aiClaimHistory[name] || (R.aiClaimHistory[name] = []);
+      if (!history.length || history[history.length - 1].role !== explicit) {
+        history.push({ role:explicit, day:R.day, round:R.discRound || 1 });
+      }
+    }
+
+    const kind = detectDiscussionStance(clean);
+    const targets = alive(R).filter(player => player.name !== name && clean.includes(player.name)).map(player => player.name);
+    if (!R.aiStances[name]) R.aiStances[name] = {};
+    targets.forEach(target => {
+      if (kind === 'neutral') return;
+      const previous = R.aiStances[name][target];
+      if (previous && previous.kind !== kind && previous.day === R.day) {
+        R.aiContradictions[name] = (R.aiContradictions[name] || 0) + 1;
+      }
+      R.aiStances[name][target] = { kind, day:R.day, round:R.discRound || 1 };
+    });
+
+    R.aiPublicMessages.push({ name, text:clean, day:R.day, round:R.discRound || 1, kind, targets });
+    if (R.aiPublicMessages.length > 120) R.aiPublicMessages.splice(0, R.aiPublicMessages.length - 120);
+  }
+  function buildPublicBoard(R, observer=null){
+    initR(R);
+    const players = alive(R);
+    const byName = new Map(players.map(player => [player.name, {
+      player, name:player.name, score:0, reasons:[], blackEvidence:0, whiteEvidence:0,
+      claim:R.claims?.[player.name] || '', speech:R.speakCount?.[player.name] || 0
+    }]));
+    const groups = publicRoleGroups(R);
+    const rowOf = name => byName.get(name);
+
+    players.forEach(player => {
+      const row = rowOf(player.name);
+      const suspicion = R.suspicion?.[player.name] || 0;
+      const cover = R.coverCount?.[player.name] || 0;
+      const contradictions = R.aiContradictions?.[player.name] || 0;
+      if (suspicion) addCase(row, Math.min(2.2, suspicion * 0.32), '発言からの疑い');
+      if (cover) addCase(row, -Math.min(1.25, cover * 0.26), '擁護されている');
+      if (contradictions) addCase(row, Math.min(2.6, contradictions * 1.15), '発言の整合が崩れた');
+      const history = R.aiClaimHistory?.[player.name] || [];
+      if (new Set(history.map(item => item.role)).size > 1) addCase(row, 1.7, 'COの内容が変わった');
+      if (R.day >= 2 && !row.speech) addCase(row, 0.62, '発言が少ない');
+    });
+
+    Object.entries(groups).forEach(([role, names]) => {
+      const limit = ROLE_CLAIM_LIMITS[role] || 1;
+      if (names.length > limit) {
+        names.forEach(name => addCase(rowOf(name), 0.95 + (names.length - limit) * 0.28, `${ROLE_LABELS[role] || role}COが重複`));
+      } else if (names.length === 1 && role !== 'VILLAGER') {
+        addCase(rowOf(names[0]), -0.12, `単独の${ROLE_LABELS[role] || role}CO`);
+      }
+    });
+
+    Object.entries(R.aiStances || {}).forEach(([speaker, stances]) => {
+      Object.entries(stances || {}).forEach(([target, stance]) => {
+        const row = rowOf(target);
+        if (!row || !stance) return;
+        if (stance.kind === 'suspect') addCase(row, 0.26, `${speaker}の疑い`);
+        if (stance.kind === 'trust') addCase(row, -0.18, `${speaker}の信用`);
+      });
+    });
+    Object.entries(R.aiStances || {}).forEach(([from, stances]) => {
+      Object.entries(stances || {}).forEach(([to, stance]) => {
+        if (stance.kind !== 'trust' || R.aiStances?.[to]?.[from]?.kind !== 'trust') return;
+        addCase(rowOf(from), 0.75, '相互にかばい合い');
+        addCase(rowOf(to), 0.75, '相互にかばい合い');
+      });
+    });
+
+    const reportsByTarget = {};
+    (R.seerCOs || []).forEach(co => {
+      const speaker = players.find(player => player.name === co.name);
+      if (!speaker) return;
+      const reliability = claimReliability(R, co.name, 'SEER', groups);
+      (co.results || []).forEach(result => {
+        const row = rowOf(result.target);
+        if (!row) return;
+        if (!reportsByTarget[result.target]) reportsByTarget[result.target] = { black:[], white:[] };
+        if (result.isWolf) {
+          const amount = Math.max(0.45, 1.45 + reliability * 0.7);
+          row.blackEvidence += amount;
+          reportsByTarget[result.target].black.push(co.name);
+          addCase(row, amount, `${co.name}の黒結果`);
+        } else {
+          const amount = Math.max(0.35, 0.95 + reliability * 0.45);
+          row.whiteEvidence += amount;
+          reportsByTarget[result.target].white.push(co.name);
+          addCase(row, -amount, `${co.name}の白結果`);
+        }
+      });
+    });
+    Object.values(reportsByTarget).forEach(report => {
+      if (!report.black.length || !report.white.length) return;
+      [...report.black, ...report.white].forEach(name => addCase(rowOf(name), 0.9, '占い結果が対立'));
+    });
+
+    const tally = voteTally(R);
+    Object.entries(tally).forEach(([name, count]) => {
+      if (count >= 2) addCase(rowOf(name), Math.min(0.55, count * 0.12), '票が集まっている');
+    });
+    Object.entries(R.votes || {}).forEach(([voter, target]) => {
+      if (R.aiStances?.[voter]?.[target]?.kind === 'trust') addCase(rowOf(voter), 1.05, '信用先への投票');
+    });
+
+    const ranking = [...byName.values()].sort((a,b) => b.score - a.score || a.name.localeCompare(b.name));
+    const trusted = [...byName.values()].sort((a,b) => a.score - b.score || a.name.localeCompare(b.name))[0] || null;
+    return { byName, ranking, trusted, groups, tally, observer:observer?.name || '' };
+  }
+  function shortEvidence(row){
+    if (!row) return '発言と投票のつながりが薄い';
+    return row.reasons.find(reason => !['発言からの疑い', '票が集まっている'].includes(reason))
+      || row.reasons[0] || '発言と投票のつながりが薄い';
+  }
+  function chooseStrategicVoteTarget(R, cpu, candidates=null){
+    initR(R);
+    const pool = (candidates || others(R, cpu)).filter(player => player && player.alive && player.name !== cpu.name);
+    if (!pool.length) return null;
+    const board = buildPublicBoard(R, cpu);
+    const ownBlack = cpu.role === 'SEER'
+      ? pool.filter(player => R.seerKnown?.[player.name] === true) : [];
+    if (ownBlack.length) return pickByScore(ownBlack, player => (board.byName.get(player.name)?.score || 0) + 4 + tinyNoise());
+
+    const isWolf = cpu.role === 'WEREWOLF';
+    const isMad = cpu.role === 'MADMAN';
+    const wolfNames = isWolf ? new Set(alive(R).filter(player => player.role === 'WEREWOLF').map(player => player.name)) : new Set();
+    const legal = pool.filter(player => !wolfNames.has(player.name));
+    if (!legal.length) return null;
+
+    const publicLeader = [...legal].sort((a,b) => (board.tally[b.name] || 0) - (board.tally[a.name] || 0) || a.name.localeCompare(b.name))[0];
+    if (isMad) {
+      return pickByScore(legal, player => {
+        const row = board.byName.get(player.name);
+        return -(row?.score || 0) + (row?.claim ? 0.22 : 0) - (board.tally[player.name] || 0) * 0.08 + tinyNoise();
+      });
+    }
+    if (isWolf) {
+      const plan = R.wolfFakeSeerPlan;
+      return pickByScore(legal, player => {
+        const row = board.byName.get(player.name);
+        let score = (row?.score || 0) * 0.9 + (board.tally[player.name] || 0) * 0.48;
+        if (plan?.fakeTarget === player.name) score += 1.45;
+        if (row?.claim === 'SEER' || row?.claim === 'MEDIUM') score += Math.max(0, row.score) * 0.25;
+        if ((row?.score || 0) < -0.5) score -= 0.7;
+        return score + tinyNoise();
+      });
+    }
+    return pickByScore(legal, player => {
+      const row = board.byName.get(player.name);
+      let score = (row?.score || 0) + Math.max(0, row?.blackEvidence || 0) * 1.25 - Math.max(0, row?.whiteEvidence || 0) * 1.1;
+      score += (board.tally[player.name] || 0) * 0.28;
+      if (publicLeader?.name === player.name && (row?.score || 0) >= ((board.ranking[0]?.score || 0) - 0.7)) score += 0.72;
+      return score + tinyNoise();
+    });
+  }
+  function buildDiscussionPlan(R, cpu){
+    const board = buildPublicBoard(R, cpu);
+    const candidates = others(R, cpu);
+    const target = chooseStrategicVoteTarget(R, cpu, candidates);
+    if (!target) return null;
+    const row = board.byName.get(target.name);
+    const second = board.ranking.find(item => item.name !== cpu.name && item.name !== target.name && candidates.some(player => player.name === item.name));
+    const confidence = Math.max(0.28, Math.min(0.95, 0.52 + ((row?.score || 0) - (second?.score || 0)) / 4));
+    const evidence = shortEvidence(row);
+
+    if (cpu.role === 'SHARED') {
+      return {
+        kind:'lead', target:target.name, confidence:Math.max(0.55, confidence),
+        text:`共有として、今日は${target.name}さんを第一候補に置きます。${evidence}。反対なら別候補と理由をセットで出してください。`
+      };
+    }
+    if (cpu.role === 'WEREWOLF') {
+      const wolves = alive(R).filter(player => player.role === 'WEREWOLF' && player.name !== cpu.name);
+      const exposedMate = wolves.map(player => ({ player, row:board.byName.get(player.name) }))
+        .sort((a,b) => (b.row?.score || 0) - (a.row?.score || 0))[0];
+      if (exposedMate?.row && exposedMate.row.score >= (row?.score || 0) - 0.15) {
+        return {
+          kind:'redirect', target:target.name, confidence:Math.max(0.56, confidence),
+          text:`${exposedMate.player.name}さんを急いで吊る根拠はまだ弱いです。先に${target.name}さんの${evidence}を確認したいです。`
+        };
+      }
+    }
+    if (cpu.role === 'MADMAN') {
+      return {
+        kind:'accuse', target:target.name, confidence,
+        text:`今日は${target.name}さんを優先して見たいです。${evidence}。ここを残す場合の白要素を、誰か具体的に出してください。`
+      };
+    }
+    if ((row?.score || 0) >= 1.05) {
+      return {
+        kind:'accuse', target:target.name, confidence,
+        text:`${target.name}さんを第一候補にします。${evidence}。この点が説明できないなら、投票先をここに寄せたいです。`
+      };
+    }
+    const compare = second ? ` ${second.name}さんとの比較で、どちらを残すべきかも聞きたいです。` : '';
+    return {
+      kind:'question', target:target.name, confidence,
+      text:`いまは${target.name}さんの発言を確認したいです。${evidence}。${compare}`.trim()
+    };
+  }
+  function maybeUseBoardPlan(R, cpu, minConfidence=0.55){
+    const plan = buildDiscussionPlan(R, cpu);
+    if (!plan) return '';
+    const round = R.discRound || 1;
+    const required = minConfidence + (round === 1 ? 0.08 : 0);
+    if (plan.confidence < required) return '';
+    const chance = round >= 2 ? 0.94 : 0.74;
+    if (Math.random() > chance) return '';
+    R.aiLastPlan[cpu.name] = plan;
+    if (plan.target && plan.kind !== 'question') bumpSuspicion(R, plan.target, 0.38);
+    return plan.text;
+  }
+
+
   function chooseSeerNightTarget(R, seer, al){
     initR(R);
-    const pool = (al || alive(R)).filter(p=>p && p.alive && p.name!==seer.name);
+    const pool = (al || alive(R)).filter(player => player && player.alive && player.name !== seer.name);
     if (!pool.length) return null;
     const known = R.seerKnown || {};
-    const unknowns = pool.filter(p=>known[p.name]===undefined);
-    const candidates = unknowns.length ? unknowns : pool;
-    let best = null, bestScore = -Infinity;
-    candidates.forEach(p=>{
-      const claim = R.claims?.[p.name];
-      const claimBonus = claim==='SEER' ? 2.4 : claim==='MEDIUM' ? 1.6 : claim==='DOCTOR' ? 0.8 : claim==='NEKOMATA' ? 0.6 : 0;
-      const suspicion = R.suspicion?.[p.name] || 0;
-      const cover = R.coverCount?.[p.name] || 0;
-      const speak = R.speakCount?.[p.name] || 0;
-      const freshBonus = known[p.name]===undefined ? 1.2 : -1.4;
-      const quietBonus = Math.max(0, 2 - speak) * 0.35;
-      const score = freshBonus + suspicion*1.55 + claimBonus + quietBonus + cover*0.15 + Math.random()*0.45;
-      if (score > bestScore) { bestScore = score; best = p; }
+    const candidates = pool.filter(player => known[player.name] === undefined);
+    const unknowns = candidates.length ? candidates : pool;
+    const board = buildPublicBoard(R, seer);
+    const groups = board.groups;
+    return pickByScore(unknowns, player => {
+      const row = board.byName.get(player.name);
+      const claim = R.claims?.[player.name] || '';
+      const contested = claim && (groups[claim] || []).length > (ROLE_CLAIM_LIMITS[claim] || 1) ? 1.0 : 0;
+      const quiet = Math.max(0, 2 - (R.speakCount?.[player.name] || 0)) * 0.24;
+      return (row?.score || 0) * 1.18 + contested + quiet + tinyNoise();
     });
-    return best || rand(candidates);
   }
+
 
   function chooseDoctorGuardTarget(R, doc, al){
     initR(R);
-    const pool = (al || alive(R)).filter(p=>p && p.alive && p.name!==doc.name && p.name!==R.lastDoctorTarget);
+    const pool = (al || alive(R)).filter(player => player && player.alive && player.name !== doc.name && player.name !== R.lastDoctorTarget);
     if (!pool.length) return null;
-    const inPool = name => pool.find(p=>p.name===name);
-    const trueRoleCO = (list, role) => (list||[]).find(c=>{
-      const p = R.players.find(x=>x.name===c.name);
-      return p && p.alive && p.role===role && inPool(c.name);
+    const board = buildPublicBoard(R, doc);
+    return pickByScore(pool, player => {
+      const row = board.byName.get(player.name);
+      const claim = R.claims?.[player.name] || '';
+      const reliability = claim ? claimReliability(R, player.name, claim, board.groups) : 0;
+      const roleValue = claim === 'SEER' ? 3.4 : claim === 'MEDIUM' ? 2.25 : claim === 'SHARED' ? 1.85 : claim === 'NEKOMATA' ? 0.8 : 0;
+      const publicTrust = Math.max(0, -(row?.score || 0)) * 0.58;
+      const influence = (R.speakCount?.[player.name] || 0) * 0.14 + (R.coverCount?.[player.name] || 0) * 0.48;
+      return roleValue * Math.max(0.28, reliability) + publicTrust + influence + tinyNoise();
     });
-    const claimedRole = role => Object.entries(R.claims||{}).find(([name, claimed])=>claimed===role && inPool(name));
-
-    const trueSeerCO = trueRoleCO(R.seerCOs, 'SEER');
-    if (trueSeerCO) return inPool(trueSeerCO.name);
-    const claimedSeer = claimedRole('SEER');
-    if (claimedSeer) return inPool(claimedSeer[0]);
-    const trueMediumCO = trueRoleCO(R.mediumCOs, 'MEDIUM');
-    if (trueMediumCO) return inPool(trueMediumCO.name);
-    const claimedMedium = claimedRole('MEDIUM');
-    if (claimedMedium) return inPool(claimedMedium[0]);
-
-    let best = null, bestScore = -Infinity;
-    pool.forEach(p=>{
-      const claim = R.claims?.[p.name];
-      const roleBonus = claim==='SEER' ? 3.0 : claim==='MEDIUM' ? 2.2 : claim==='NEKOMATA' ? 1.1 : claim==='DOCTOR' ? 0.7 : 0;
-      const cover = R.coverCount?.[p.name] || 0;
-      const suspicion = R.suspicion?.[p.name] || 0;
-      const speak = R.speakCount?.[p.name] || 0;
-      const score = roleBonus + cover*1.15 + speak*0.12 - suspicion*0.55 + Math.random()*0.65;
-      if (score > bestScore) { bestScore = score; best = p; }
-    });
-    return best || rand(pool);
   }
 
   // ── R 初期化（メモリ追加） ─────────────────────────────
@@ -5964,6 +6346,12 @@ const BRAIN = (function(){
     if (!R.discThisRound) R.discThisRound = new Set();
     if (!R.wolfFakeSeerPlan) R.wolfFakeSeerPlan = null; // 人狼チームの騙り計画 {fakerName, fakeTarget}
     if (!R.voteHistory) R.voteHistory = [];  // [{day, votes:{voter:target}}]
+    if (!R.aiPublicMessages) R.aiPublicMessages = [];
+    if (!R.aiStances) R.aiStances = {};
+    if (!R.aiContradictions) R.aiContradictions = {};
+    if (!R.aiClaimHistory) R.aiClaimHistory = {};
+    if (!R.aiLastPlan) R.aiLastPlan = {};
+    if (!R.aiVotePlans) R.aiVotePlans = {};
     // 旧 accuCount との互換: suspicion を主用に
     if (!R.accuCount) R.accuCount = R.suspicion;
   }
@@ -5983,6 +6371,7 @@ const BRAIN = (function(){
   // ── 発言からCO・結果を抽出（メッセージ解析） ───────────
   function parseClaim(R, name, text){
     if (!text) return;
+    initR(R);
     const hasNegateWolf = /(人狼|黒)\s*(?:ではない|じゃない|では無|じゃ無)/.test(text)
                        || /人狼じゃ(ない|なさそう)/.test(text);
 
@@ -6052,6 +6441,7 @@ const BRAIN = (function(){
       });
     }
     R.speakCount[name] = (R.speakCount[name]||0)+1;
+    rememberPublicMessage(R, name, text);
   }
 
   // ── 人狼チームの「騙り占い師」計画を立てる ─────────────
@@ -6069,13 +6459,20 @@ const BRAIN = (function(){
     // 偽占い対象は村人寄りの一人
     const vill = alive(R).filter(p=>p.role!=='WEREWOLF' && p.name!==faker.name);
     if (!vill.length) return;
-    const fakeTarget = personaChooseTarget(R, faker, vill, 'fake_claim') || rand(vill);
+    const board = buildPublicBoard(R, faker);
+    const personaTarget = personaChooseTarget(R, faker, vill, 'fake_claim');
+    const fakeTarget = pickByScore(vill, player => {
+      const row = board.byName.get(player.name);
+      const personaBonus = personaTarget?.name === player.name ? 0.35 : 0;
+      return -(row?.score || 0) * 0.78 + (R.coverCount?.[player.name] || 0) * 0.35 + personaBonus + tinyNoise();
+    }) || rand(vill);
     R.wolfFakeSeerPlan = { fakerName: faker.name, fakeTarget: fakeTarget.name };
   }
 
   // ── 発言生成（メイン） ─────────────────────────────────
   function speak(R, cpu){
     initR(R);
+    delete R.aiLastPlan[cpu.name];
     const pers = cpu.personality || 'logical';
     const day = R.day;
     const round = R.discRound || 1;
@@ -6085,8 +6482,12 @@ const BRAIN = (function(){
     const al = alive(R);
     applyPersonaQuirk(R, cpu, ot);
 
-    // 寡黙キャラはたまに沈黙風（中立寄り）
-    if (pers==='quiet' && Math.random()<0.45) return personagizeSpeech(R, cpu, rand(TPL.neutral));
+    // 寡黙キャラも、根拠がそろった局面では必要な一言を出す。
+    if (pers==='quiet' && Math.random()<0.28) {
+      const boardLine = maybeUseBoardPlan(R, cpu, 0.62);
+      if (boardLine) return personagizeSpeech(R, cpu, boardLine);
+      return personagizeSpeech(R, cpu, rand(TPL.neutral));
+    }
 
     let text = '';
 
@@ -6168,16 +6569,15 @@ const BRAIN = (function(){
       return tplFill(rand(TPL.cover), threatenedMate.name);
     }
 
-    // 4) 真の占い師COが出ていたら反論（カウンターCO疑い）
-    const trueSeers = R.seerCOs.filter(c=>{
-      const p = R.players.find(x=>x.name===c.name);
-      return p && p.alive && p.role==='SEER';
-    });
-    if (trueSeers.length && Math.random()<0.35) {
-      const target = trueSeers[0].name;
-      bumpSuspicion(R, target, 2);
-      return tplFill(rand(TPL.counter_co.concat([`${target}さんの占い、信用できない 🚨`])), target);
+    // 4) 公開されている占いCOには、結果や発言の筋を見て反論する。
+    const visibleSeer = (R.seerCOs || []).find(c => c.name !== cpu.name && alive(R).some(p => p.name === c.name));
+    if (visibleSeer && Math.random()<0.16) {
+      bumpSuspicion(R, visibleSeer.name, 0.7);
+      return `${visibleSeer.name}さんの占いは、結果と今日の発言をセットで見直したいです。`;
     }
+
+    const boardLine = maybeUseBoardPlan(R, cpu, 0.48);
+    if (boardLine) return boardLine;
 
     // 5) 一般的に村人を疑う（巧妙に）
     if (vill.length) {
@@ -6206,11 +6606,8 @@ const BRAIN = (function(){
 
   // === 占い師 ===
   function speakSeer(R, cpu, pers, day, round, wasAcc, ot){
-    // 偽占い師（人狼側）が既にCOしているか？
-    const fakeSeerExists = R.seerCOs.some(c=>{
-      const p = R.players.find(x=>x.name===c.name);
-      return p && p.alive && p.role!=='SEER';
-    });
+    // 自分以外の占いCOがあれば、真占い師には対抗が見えている。
+    const fakeSeerExists = (R.seerCOs || []).some(c => c.name !== cpu.name && alive(R).some(p => p.name === c.name));
 
     // 既に自分でCO済か
     const alreadyCO = R.claims[cpu.name]==='SEER';
@@ -6274,7 +6671,9 @@ const BRAIN = (function(){
       }
     }
 
-    // CO してない or 報告すべき情報がない → 普通の村人ロール
+    // CO してない or 報告すべき情報がない → 公開情報から村目線の推理を行う
+    const boardLine = maybeUseBoardPlan(R, cpu, 0.62);
+    if (boardLine) return boardLine;
     if (known.length && !alreadyCO && Math.random()<0.25) return rand(TPL.seer_hold);
     if (wasAcc) return rand(TPL.defend);
     if (ot.length && Math.random()<0.35) {
@@ -6287,11 +6686,8 @@ const BRAIN = (function(){
   // === 霊媒師 ===
   function speakMedium(R, cpu, pers, day, round, wasAcc, ot){
     const alreadyCO = R.claims[cpu.name]==='MEDIUM';
-    // 偽霊媒対抗COで必要なら即CO
-    const fakeMediumExists = R.mediumCOs.some(c=>{
-      const p = R.players.find(x=>x.name===c.name);
-      return p && p.alive && p.role!=='MEDIUM';
-    });
+    // 自分以外の霊媒COがあれば、対抗として情報を出す。
+    const fakeMediumExists = (R.mediumCOs || []).some(c => c.name !== cpu.name && alive(R).some(p => p.name === c.name));
     // 処刑があってかつ霊媒結果を持っていたら CO推奨
     const hasResult = R.lastExecuted && R.lastExecutedRole;
     const shouldCO = fakeMediumExists || (hasResult && day>=2) || (pers==='aggressive' && hasResult);
@@ -6308,7 +6704,9 @@ const BRAIN = (function(){
       }
       return rand(TPL.co_medium);
     }
-    // 通常は隠れる
+    // 通常は隠れる。ただし根拠がある局面では村目線の整理をする。
+    const boardLine = maybeUseBoardPlan(R, cpu, 0.62);
+    if (boardLine) return boardLine;
     if (wasAcc) return rand(TPL.defend);
     if (ot.length && Math.random()<0.35) {
       const tgt = topAcc(R, ot) || rand(ot);
@@ -6318,6 +6716,7 @@ const BRAIN = (function(){
   }
 
   // === 騎士 ===
+
   function speakDoctor(R, cpu, pers, day, round, wasAcc, ot){
     const alreadyCO = R.claims[cpu.name]==='DOCTOR';
     // 騎士は基本隠れる。疑われたら防御COする。
@@ -6332,23 +6731,28 @@ const BRAIN = (function(){
       return rand(TPL.co_doctor);
     }
     if (wasAcc) return rand(TPL.defend);
-    // 占い師をかばう（信頼している占い師が居れば）
-    const trueSeer = R.seerCOs.find(c=>{
-      const p = R.players.find(x=>x.name===c.name);
-      return p && p.alive && p.role==='SEER';
-    });
-    if (trueSeer && Math.random()<0.30) {
-      bumpCover(R, trueSeer.name, 1);
-      return tplFill(rand(TPL.cover), trueSeer.name);
+
+    const boardLine = maybeUseBoardPlan(R, cpu, 0.58);
+    if (boardLine) return boardLine;
+
+    // 占い師COは真偽を決め打ちせず、公開結果と発言の整合で守る価値を測る。
+    const board = buildPublicBoard(R, cpu);
+    const visibleSeer = (R.seerCOs || [])
+      .filter(c => alive(R).some(p => p.name === c.name))
+      .sort((a,b) => claimReliability(R, b.name, 'SEER', board.groups) - claimReliability(R, a.name, 'SEER', board.groups))[0];
+    if (visibleSeer && Math.random()<0.30) {
+      bumpCover(R, visibleSeer.name, 0.7);
+      return `${visibleSeer.name}さんの占い結果は、今日の議論で一度は軸にしたいです。`;
     }
     if (ot.length && Math.random()<0.32) {
-      const tgt = topAcc(R, ot) || rand(ot);
+      const tgt = chooseStrategicVoteTarget(R, cpu, ot) || topAcc(R, ot) || rand(ot);
       return tplFill(rand(TPL.accuse), tgt.name);
     }
     return rand([...TPL.neutral, ...TPL.question]);
   }
 
   // === 共有者 ===
+
   function speakShared(R, cpu, pers, day, round, wasAcc, ot){
     const alreadyCO = R.claims[cpu.name]==='SHARED';
     const shouldCO = !alreadyCO && (wasAcc || day>=2 || round>=2 || Math.random()<0.42);
@@ -6356,16 +6760,15 @@ const BRAIN = (function(){
       R.claims[cpu.name] = 'SHARED';
       return rand(TPL.co_shared);
     }
-    const ranked = [...ot].sort((a,b)=>(R.suspicion?.[b.name]||0)-(R.suspicion?.[a.name]||0));
-    const top = ranked.find(p=>(R.suspicion?.[p.name]||0)>0);
-    if (top && Math.random()<0.55) {
-      bumpSuspicion(R, top.name, 0.5);
-      return `${top.name}さんを第一候補で見ています。理由をもう一度整理して投票先を合わせたいです 🤝`;
-    }
-    const trusted = [...ot].sort((a,b)=>(R.coverCount?.[b.name]||0)-(R.coverCount?.[a.name]||0))[0];
-    if (trusted && (R.coverCount?.[trusted.name]||0)>0 && Math.random()<0.38) {
-      bumpCover(R, trusted.name, 0.7);
-      return `${trusted.name}さんは今のところ信用寄りです。ここを軸に議論を組み立てたいです 🤝`;
+
+    const boardLine = maybeUseBoardPlan(R, cpu, 0.34);
+    if (boardLine) return boardLine;
+
+    const board = buildPublicBoard(R, cpu);
+    const top = chooseStrategicVoteTarget(R, cpu, ot);
+    if (top && (board.byName.get(top.name)?.score || 0) > 0.55) {
+      bumpSuspicion(R, top.name, 0.42);
+      return `${top.name}さんを第一候補で見ています。${shortEvidence(board.byName.get(top.name))}を、投票前に説明してください。`;
     }
     if (wasAcc) return rand(TPL.defend);
     return rand([
@@ -6390,6 +6793,8 @@ const BRAIN = (function(){
     if (wasAcc) {
       if (Math.random()<0.65) return rand(TPL.defend);
     }
+    const boardLine = maybeUseBoardPlan(R, cpu, pers==='analytical' ? 0.43 : 0.55);
+    if (boardLine) return boardLine;
     // 直近の占い情報があれば、それに基づいて投票を呼びかけ
     const trueSeers = R.seerCOs.filter(c=>{
       const p = R.players.find(x=>x.name===c.name);
@@ -6469,184 +6874,89 @@ const BRAIN = (function(){
   }
 
   // ── 投票決定（上級者ロジック） ─────────────────────────
+
   function vote(R, cpu){
     initR(R);
-    const al = alive(R);
-    const ot = al.filter(p=>p.name!==cpu.name);
-    if (!ot.length) return null;
-
-    const isWolfTeam = (cpu.role==='WEREWOLF'||cpu.role==='MADMAN');
-
-    if (isWolfTeam) {
-      // 人狼陣営: 仲間に投票しない
-      const wolves = al.filter(p=>p.role==='WEREWOLF');
-      const wolfNames = new Set(wolves.map(p=>p.name));
-      const vill = ot.filter(p=>!wolfNames.has(p.name));
-      if (al.length <= 5) {
-        const endTarget = personaChooseTarget(R, cpu, vill, 'vote') || topAcc(R, vill);
-        if (endTarget) return endTarget;
-      }
-      // 真の占い師（COしてる）を優先的に処刑
-      const trueSeer = R.seerCOs.find(c=>{
-        const p = R.players.find(x=>x.name===c.name);
-        return p && p.alive && p.role==='SEER';
-      });
-      if (trueSeer && vill.find(p=>p.name===trueSeer.name) && Math.random()<0.85) {
-        return vill.find(p=>p.name===trueSeer.name);
-      }
-      // 真の霊媒師を処刑
-      const trueMedium = R.mediumCOs.find(c=>{
-        const p = R.players.find(x=>x.name===c.name);
-        return p && p.alive && p.role==='MEDIUM';
-      });
-      if (trueMedium && vill.find(p=>p.name===trueMedium.name) && Math.random()<0.7) {
-        return vill.find(p=>p.name===trueMedium.name);
-      }
-      // 騙り役の偽結果対象を吊って騙り信用を上げる
-      const plan = R.wolfFakeSeerPlan;
-      if (plan && vill.find(p=>p.name===plan.fakeTarget) && Math.random()<0.6) {
-        return vill.find(p=>p.name===plan.fakeTarget);
-      }
-      // それ以外は最も疑われている村人へ
-      const personaTgt = personaChooseTarget(R, cpu, vill, 'wolf_vote');
-      if (personaTgt && Math.random()<personaActionChance(cpu, 'voteProb', 0.62)) return personaTgt;
-      return topAcc(R, vill) || rand(vill);
+    const candidates = others(R, cpu);
+    if (!candidates.length) return null;
+    const target = chooseStrategicVoteTarget(R, cpu, candidates)
+      || personaChooseTarget(R, cpu, candidates, 'vote')
+      || topAcc(R, candidates)
+      || rand(candidates);
+    if (target) {
+      const board = buildPublicBoard(R, cpu);
+      const row = board.byName.get(target.name);
+      R.aiVotePlans[cpu.name] = {
+        target:target.name, day:R.day, score:row?.score || 0,
+        reason:shortEvidence(row)
+      };
     }
-
-    // ── 村人陣営 ──
-    if (al.length <= 5) {
-      const endSuspect = topAcc(R, ot);
-      if (endSuspect && (R.suspicion[endSuspect.name]||0) >= 1) return endSuspect;
-    }
-    // 1) 占い師の黒判定がある場合は最優先
-    const seerCOAlive = R.seerCOs.filter(c=>{
-      const p = R.players.find(x=>x.name===c.name);
-      return p && p.alive;
-    });
-    // 占い師が1人だけなら信用する
-    if (seerCOAlive.length===1) {
-      const co = seerCOAlive[0];
-      const blackResult = (co.results||[]).find(r=>r.isWolf);
-      if (blackResult) {
-        const tgt = ot.find(p=>p.name===blackResult.target);
-        if (tgt) return tgt;
-      }
-    }
-    // 占い師が複数（騙り合戦）→ より信頼度高い方を信じる
-    if (seerCOAlive.length >= 2) {
-      // 騎士COが守ってる方を信じる、霊媒結果と一致する方など... 簡易版: ランダムで信頼を選ぶ
-      // CPU自身が占い師なら自分を信じる
-      const ownCO = seerCOAlive.find(c=>c.name===cpu.name);
-      if (ownCO) {
-        const blk = (ownCO.results||[]).find(r=>r.isWolf);
-        if (blk) {
-          const t = ot.find(p=>p.name===blk.target);
-          if (t) return t;
-        }
-      }
-      // それ以外は対立してる占い師の片方を吊る（人狼騙りを潰す可能性が高い疑われてる方）
-      const candidates = seerCOAlive.map(c=>ot.find(p=>p.name===c.name)).filter(Boolean);
-      if (candidates.length) {
-        const tgt = topAcc(R, candidates) || rand(candidates);
-        if (tgt) return tgt;
-      }
-    }
-    // 2) 霊媒師の結果（前日処刑者が白だった場合は次日に占い対立してる人を吊る → 上記で対応）
-    // 3) 最も疑われている人へ投票
-    const personaTgt = personaChooseTarget(R, cpu, ot, 'vote');
-    if (personaTgt && Math.random()<personaActionChance(cpu, 'voteProb', 0.58)) return personaTgt;
-    const susp = topAcc(R, ot);
-    if (susp && (R.suspicion[susp.name]||0) >= 1) return susp;
-    return rand(ot);
+    return target;
   }
+
 
   function voteReason(R, cpu, target) {
     initR(R);
     const name = typeof target === 'string' ? target : target?.name;
     if (!name) return '';
-    const susp = R.suspicion?.[name] || 0;
-    const claim = R.claims?.[name];
-    const isWolfTeam = cpu.role === 'WEREWOLF' || cpu.role === 'MADMAN';
-    const blackBySeer = (R.seerCOs || []).some(c => (c.results || []).some(r => r.target === name && r.isWolf));
-    const protectedByTalk = R.coverCount?.[name] || 0;
-    const styled = reason => personagizeVoteReason(cpu, name, reason);
-    if (blackBySeer && !isWolfTeam) return styled(`${name}さんに黒判定が出ているため、情報を信じて投票します。`);
-    if (claim && isWolfTeam) return styled(`${name}さんの${ROLES[claim]?.name || '役職'}COは脅威なので、村の流れに乗せたいです。`);
-    if (claim && !isWolfTeam && susp >= 2) return styled(`${name}さんのCOと発言の筋に違和感があります。`);
-    if (susp >= 3) return styled(`${name}さんへの疑いが重なっており、今日はここを確認したいです。`);
-    if (susp >= 1) return styled(`${name}さんの発言に引っかかる点があり、投票で圧をかけます。`);
-    if (protectedByTalk >= 2 && isWolfTeam) return styled(`${name}さんは信用を集めているので、今のうちに吊り候補へ動かします。`);
-    return styled(isWolfTeam
-      ? `${name}さんなら投票先として自然に見えます。`
+    const board = buildPublicBoard(R, cpu);
+    const row = board.byName.get(name);
+    const isWolfSide = cpu.role === 'WEREWOLF' || cpu.role === 'MADMAN';
+    const styled = reason => personagizeVoteReason(cpu, name, reason, true);
+    if (cpu.role === 'SEER' && R.seerKnown?.[name] === true) {
+      return styled(`${name}さんは自分の占い結果で黒です。盤面を進めるため、今日はここに投票します。`);
+    }
+    if (!isWolfSide && (row?.blackEvidence || 0) > 0.6) {
+      return styled(`${name}さんには公開された黒結果があります。結果を出した人の発言も含めて、今日はここを確認します。`);
+    }
+    if (row?.reasons?.length) {
+      const reason = shortEvidence(row);
+      return styled(isWolfSide
+        ? `${name}さんは${reason}があり、村の投票先として成立します。今日はここへ投票します。`
+        : `${name}さんは${reason}が残っています。発言と投票の整合を確認するため、今日はここに投票します。`);
+    }
+    return styled(isWolfSide
+      ? `${name}さんを残すより、ここで票をまとめる方が自然だと判断しました。`
       : `${name}さんの立ち位置がまだ見えにくいため、情報を増やす投票です。`);
   }
 
   // ── 人狼の夜の襲撃対象（智略つき） ─────────────────────
+
   function wolfNightTarget(R, hunter=null){
     initR(R);
     const al = alive(R);
-    const wolves = al.filter(p=>p.role==='WEREWOLF');
+    const wolves = al.filter(player => player.role === 'WEREWOLF');
     if (!wolves.length) return null;
-    const leadWolf = hunter || wolves.find(p=>p.isCpu && getCpuPersona(p.name)) || wolves[0];
-    const vill = al.filter(p=>p.role!=='WEREWOLF');
+    const wolfNames = new Set(wolves.map(player => player.name));
+    const leadWolf = hunter || wolves.find(player => player.isCpu && getCpuPersona(player.name)) || wolves[0];
+    const vill = al.filter(player => !wolfNames.has(player.name));
     if (!vill.length) return null;
-    if (al.length <= 5) {
-      const endgameTarget = [...vill].sort((a,b)=>{
-        const sa = (R.claims?.[a.name] ? 2 : 0) + (R.coverCount?.[a.name] || 0) - (R.suspicion?.[a.name] || 0) * 0.35;
-        const sb = (R.claims?.[b.name] ? 2 : 0) + (R.coverCount?.[b.name] || 0) - (R.suspicion?.[b.name] || 0) * 0.35;
-        return sb - sa;
-      })[0];
-      if (endgameTarget && Math.random() < 0.86) return endgameTarget;
-    }
 
-    // 1) CO占い師（真物）優先
-    const trueSeer = R.seerCOs.find(c=>{
-      const p = R.players.find(x=>x.name===c.name);
-      return p && p.alive && p.role==='SEER';
-    });
-    if (trueSeer) {
-      const v = vill.find(p=>p.name===trueSeer.name);
-      if (v) return v;
-    }
-    // 2) 真の霊媒師
-    const trueMedium = R.mediumCOs.find(c=>{
-      const p = R.players.find(x=>x.name===c.name);
-      return p && p.alive && p.role==='MEDIUM';
-    });
-    if (trueMedium) {
-      const v = vill.find(p=>p.name===trueMedium.name);
-      if (v) return v;
-    }
-    // 3) 騎士COしている真物
-    const trueDoc = R.docCOs.find(c=>{
-      const p = R.players.find(x=>x.name===c.name);
-      return p && p.alive && p.role==='DOCTOR';
-    });
-    if (trueDoc) {
-      const v = vill.find(p=>p.name===trueDoc.name);
-      if (v && Math.random()<0.6) return v;
-    }
-    // 4) 一切COしてない村人で発言力ある人（疑い役の少ない＝信頼されてそうな村人）を狙う
-    const noClaim = vill.filter(p=>!R.claims[p.name]);
-    if (noClaim.length) {
-      const personaNight = personaChooseTarget(R, leadWolf, noClaim, 'wolf_night');
-      if (personaNight && Math.random()<personaActionChance(leadWolf, 'nightProb', 0.68)) return personaNight;
-      // かばわれてる（信頼されてる）人を優先的に狩る
-      let best = null, bestScore = -Infinity;
-      noClaim.forEach(p=>{
-        const cover = R.coverCount[p.name]||0;
-        const susp = R.suspicion[p.name]||0;
-        const score = cover - susp*0.5;
-        if (score > bestScore) { bestScore = score; best = p; }
+    const board = buildPublicBoard(R, leadWolf);
+    const publicThreats = new Set();
+    (R.seerCOs || []).forEach(co => {
+      (co.results || []).forEach(result => {
+        if (result.isWolf && wolfNames.has(result.target)) publicThreats.add(co.name);
       });
-      if (best) return best;
-    }
-    const personaFallback = personaChooseTarget(R, leadWolf, vill, 'wolf_night');
-    if (personaFallback && Math.random()<personaActionChance(leadWolf, 'nightProb', 0.55)) return personaFallback;
-    return rand(vill);
+    });
+    const personaTarget = personaChooseTarget(R, leadWolf, vill, 'wolf_night');
+    const target = pickByScore(vill, player => {
+      const row = board.byName.get(player.name);
+      const claim = R.claims?.[player.name] || '';
+      const reliability = claim ? claimReliability(R, player.name, claim, board.groups) : 0;
+      const roleValue = claim === 'SEER' ? 3.6 : claim === 'MEDIUM' ? 2.2 : claim === 'SHARED' ? 1.6 : claim === 'DOCTOR' ? 0.8 : 0;
+      const influence = (R.speakCount?.[player.name] || 0) * 0.18 + (R.coverCount?.[player.name] || 0) * 0.72 + Math.max(0, -(row?.score || 0)) * 0.58;
+      let score = roleValue * Math.max(0.35, reliability) + influence;
+      if (publicThreats.has(player.name)) score += 5.2;
+      if (personaTarget?.name === player.name) score += 0.35;
+      if (R.nightReport?.guarded && R.nightReport.target === player.name) score -= 1.2;
+      return score + tinyNoise();
+    });
+    if (target) R.wolfLastTarget = target.name;
+    return target;
   }
 
-  return { initR, parseClaim, speak, vote, voteReason, wolfNightTarget, chooseSeerNightTarget, chooseDoctorGuardTarget, bumpSuspicion, bumpCover };
+  return { initR, parseClaim, speak, vote, voteReason, wolfNightTarget, chooseSeerNightTarget, chooseDoctorGuardTarget, bumpSuspicion, bumpCover, buildPublicBoard, chooseStrategicVoteTarget };
 })();
 
 // ========== PROGRESSION & DETECTIVE SCORE（ソロの成長・中毒性レイヤー） ==========
@@ -9173,6 +9483,7 @@ function renderODiscuss() {
     ${renderNotebook()}
     ${renderCaseFile()}
     ${renderAiIntelPanel()}
+    ${renderAiWarRoomPanel()}
     ${renderDiscussionHeatPanel()}
     ${renderClimaxSpotlightPanel()}
     ${renderContradictionScannerPanel()}
