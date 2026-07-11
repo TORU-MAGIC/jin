@@ -636,6 +636,21 @@ details summary:hover { color: #94a3b8; }
 .secret-mission-cell span{display:block;color:#cbd5e1;font-size:.75rem;line-height:1.45;}
 .secret-mission-progress{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.09);margin-top:.5rem;}
 .secret-mission-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#38bdf8,#facc15);}
+.pre-vote-panel{background:linear-gradient(135deg,rgba(120,53,15,.24),rgba(30,41,59,.66));border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:.74rem .8rem;margin:.5rem 0;color:#fef3c7;box-shadow:0 14px 34px rgba(0,0,0,.22);}
+.pre-vote-head{display:flex;align-items:center;justify-content:space-between;gap:.55rem;color:#fde68a;font-size:.82rem;font-weight:900;margin-bottom:.45rem;}
+.pre-vote-status{display:inline-flex;align-items:center;border-radius:999px;background:rgba(251,191,36,.13);border:1px solid rgba(251,191,36,.28);color:#fef9c3;font-size:.7rem;font-weight:900;padding:.16rem .5rem;white-space:nowrap;}
+.pre-vote-list{display:grid;gap:.34rem;margin:.42rem 0;}
+.pre-vote-row{display:grid;grid-template-columns:minmax(4.5rem,7.4rem) auto 1fr auto;align-items:center;gap:.38rem;background:rgba(15,23,42,.42);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:.4rem .48rem;font-size:.75rem;line-height:1.35;}
+.pre-vote-row.mine{border-color:rgba(251,191,36,.42);background:rgba(251,191,36,.08);}
+.pre-vote-row b{color:#f8fafc;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pre-vote-target{color:#fde68a;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pre-vote-empty{color:#64748b;}
+.pre-vote-change{justify-self:end;color:#fca5a5;font-size:.68rem;font-weight:900;white-space:nowrap;}
+.pre-vote-mine{justify-self:end;color:#86efac;font-size:.68rem;font-weight:900;white-space:nowrap;}
+.pre-vote-form{display:grid;grid-template-columns:1fr auto;gap:.42rem;margin-top:.5rem;}
+.pre-vote-form select{min-width:0;background:rgba(15,23,42,.72);border:1px solid rgba(251,191,36,.24);border-radius:7px;color:#f8fafc;padding:.48rem .55rem;font-size:.78rem;}
+.pre-vote-send{border:1px solid rgba(251,191,36,.38);border-radius:7px;background:linear-gradient(135deg,#92400e,#b45309);color:#fff;font-size:.78rem;font-weight:900;padding:.48rem .62rem;cursor:pointer;white-space:nowrap;}
+.pre-vote-send:disabled{opacity:.46;cursor:default;}
 @media (min-width:760px){.ai-intel-grid{grid-template-columns:1.1fr .9fr;}.trust-gauge-list{grid-template-columns:1fr 1fr;}.spotlight-grid{grid-template-columns:repeat(3,1fr);}.contradiction-list{grid-template-columns:1fr 1fr;}.trial-role-grid{grid-template-columns:repeat(4,1fr);}.secret-mission-grid{grid-template-columns:1fr 1fr 1fr;}}
 .ai-war-panel{background:linear-gradient(135deg,rgba(14,116,144,.18),rgba(88,28,135,.18),rgba(180,83,9,.10));border:1px solid rgba(125,211,252,.28);border-radius:8px;padding:.76rem .82rem;margin:.5rem 0;color:#e0f2fe;box-shadow:0 18px 42px rgba(0,0,0,.26);position:relative;overflow:hidden;}
 .ai-war-panel:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#22d3ee,#a78bfa,#facc15,#fb7185);}
@@ -694,6 +709,24 @@ details summary:hover { color: #94a3b8; }
 .vote-timeline{display:grid;gap:.36rem;margin:.5rem 0;}
 .vote-timeline-row{display:grid;grid-template-columns:minmax(4.2rem,6.8rem) auto 1fr;gap:.42rem;align-items:center;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:.4rem .48rem;font-size:.76rem;}
 .vote-arrow{color:#fbbf24;font-weight:900;text-align:center;}
+.notebook-review-panel{background:linear-gradient(135deg,rgba(79,70,229,.16),rgba(15,23,42,.72));border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:.76rem .82rem;margin:.65rem 0;color:#e9d5ff;box-shadow:0 14px 34px rgba(0,0,0,.22);}
+.notebook-review-head{display:flex;align-items:center;justify-content:space-between;gap:.55rem;color:#ddd6fe;font-size:.84rem;font-weight:900;margin-bottom:.46rem;}
+.notebook-review-badge{display:inline-flex;align-items:center;border-radius:999px;background:rgba(167,139,250,.15);border:1px solid rgba(196,181,253,.28);color:#fef9c3;font-size:.7rem;font-weight:900;padding:.16rem .5rem;white-space:nowrap;}
+.notebook-review-stats{display:flex;flex-wrap:wrap;gap:.32rem;margin:.42rem 0 .5rem;}
+.notebook-review-stat{border:1px solid rgba(255,255,255,.09);border-radius:7px;background:rgba(15,23,42,.4);color:#cbd5e1;font-size:.72rem;padding:.22rem .42rem;}
+.notebook-review-list{display:grid;gap:.34rem;}
+.notebook-review-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.42rem;align-items:center;background:rgba(15,23,42,.42);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:.44rem .5rem;}
+.notebook-review-row.correct{border-color:rgba(74,222,128,.26);background:rgba(34,197,94,.075);}
+.notebook-review-row.wrong{border-color:rgba(248,113,113,.26);background:rgba(239,68,68,.075);}
+.notebook-review-verdict{font-size:1rem;font-weight:900;line-height:1;}
+.notebook-review-row.correct .notebook-review-verdict{color:#86efac;}
+.notebook-review-row.wrong .notebook-review-verdict{color:#fca5a5;}
+.notebook-review-name{min-width:0;color:#f8fafc;font-size:.8rem;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.notebook-review-role{grid-column:2 / -1;color:#94a3b8;font-size:.71rem;line-height:1.35;}
+.notebook-review-mark{border-radius:999px;font-size:.68rem;font-weight:900;padding:.15rem .4rem;white-space:nowrap;}
+.notebook-review-mark.suspect{background:rgba(239,68,68,.16);color:#fecaca;}
+.notebook-review-mark.trust{background:rgba(34,197,94,.14);color:#bbf7d0;}
+.notebook-review-empty{background:rgba(15,23,42,.4);border:1px solid rgba(255,255,255,.08);border-radius:7px;color:#94a3b8;font-size:.78rem;line-height:1.5;padding:.5rem .56rem;}
 .replay-grid{display:grid;gap:.4rem;margin:.55rem 0;}
 .replay-row{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:.48rem .58rem;font-size:.78rem;line-height:1.55;color:#cbd5e1;}
 .mobile-action{margin:.55rem 0;}
@@ -1695,6 +1728,14 @@ function analyzeDiscussionIntel() {
       if (rb) add(target, 'suspicion', Math.round(5 + rb * 3), `${voter}との因縁票`);
     });
   });
+  [...(O.voteHistory || []), O.voteResult].forEach(history => {
+    const preliminary = history?.preVotes || history?.pre_votes || {};
+    const finalVotes = history?.votes || {};
+    Object.entries(preliminary).forEach(([voter, target]) => {
+      if (!aliveNames.includes(voter) || !target || !finalVotes[voter] || finalVotes[voter] === target) return;
+      add(voter, 'suspicion', 8, '仮投票を変更');
+    });
+  });
   Object.entries(O.voteResult?.voteReasons || {}).forEach(([voter, reason]) => {
     const text = String(reason || '');
     aliveNames.forEach(name => {
@@ -2586,6 +2627,45 @@ function renderLocalSecretMissionPanel() {
   return renderSecretMission(buildLocalSecretMission());
 }
 
+function renderPreVotePanel(actionLocked=false) {
+  if (O.phase !== 'discuss') return '';
+  const aliveNames = (O.alive || []).map(p => p.name || p).filter(Boolean);
+  const myName = O.playerName;
+  if (!myName || !aliveNames.includes(myName) || aliveNames.length < 2) return '';
+  const targets = aliveNames.filter(name => name !== myName);
+  const preVotes = O.preVotes || {};
+  const changes = O.preVoteChanges || {};
+  const mine = preVotes[myName] || '';
+  const draft = targets.includes(O.preVoteTargetDraft) ? O.preVoteTargetDraft : mine;
+  const changed = Number(changes[myName] || 0);
+  const canChange = !!mine && changed < 1;
+  const canSend = !actionLocked && !O.preVotePending && (!mine || canChange);
+  const rows = aliveNames.map(name => {
+    const target = preVotes[name] || '';
+    const isMine = name === myName;
+    const changeMark = Number(changes[name] || 0) > 0 ? '<span class="pre-vote-change">票替え</span>' : '';
+    const mineMark = isMine ? '<span class="pre-vote-mine">あなた</span>' : '';
+    return `<div class="pre-vote-row${isMine?' mine':''}">
+      <b>${esc(name)}</b><span>→</span>
+      <span class="${target?'pre-vote-target':'pre-vote-empty'}">${target ? esc(target) : '未宣言'}</span>
+      ${changeMark || mineMark}
+    </div>`;
+  }).join('');
+  const options = [
+    `<option value="" ${draft?'':'selected'}>相手を選択</option>`,
+    ...targets.map(name => `<option value="${esc(name)}" ${draft===name?'selected':''}>${esc(name)}</option>`)
+  ].join('');
+  const label = actionLocked ? '再接続中' : O.preVotePending ? '受理待ち...' : mine ? (canChange ? '票替えを宣言' : '票替え済み') : '仮投票を宣言';
+  return `<section class="pre-vote-panel">
+    <div class="pre-vote-head"><span>🌙 月下の仮投票</span><span class="pre-vote-status">公開 ${Object.keys(preVotes).length}/${aliveNames.length}</span></div>
+    <div class="pre-vote-list">${rows}</div>
+    <div class="pre-vote-form">
+      <select id="preVoteTarget" ${canSend?'':'disabled'}>${options}</select>
+      <button id="preVoteSend" class="pre-vote-send" ${canSend?'':'disabled'}>${label}</button>
+    </div>
+  </section>`;
+}
+
 function renderVoteReasons(reasons) {
   const entries = Object.entries(reasons || {}).filter(([, r]) => r && String(r).trim());
   if (!entries.length) return '';
@@ -3000,16 +3080,18 @@ function renderP2PStatusPanel() {
   </div>`;
 }
 
-function renderVoteTimeline(votes={}, reasons={}) {
+function renderVoteTimeline(votes={}, reasons={}, preVotes={}) {
   const entries = Object.entries(votes || {});
   if (!entries.length) return '';
   return `<div class="power-panel">
-    <div class="power-head"><span>🗳️ 投票タイムライン</span><span style="color:#64748b;font-size:.72rem;">誰が誰へ入れたか</span></div>
+    <div class="power-head"><span>🗳️ 投票タイムライン</span><span style="color:#64748b;font-size:.72rem;">仮投票から最終票まで</span></div>
     <div class="vote-timeline">
       ${entries.map(([voter,target]) => {
         const reason = reasons?.[voter] ? `<div style="grid-column:1 / -1;color:#94a3b8;font-size:.72rem;line-height:1.45;">${esc(reasons[voter])}</div>` : '';
+        const provisional = preVotes?.[voter];
+        const shift = provisional ? `<div style="grid-column:1 / -1;color:${provisional===target?'#86efac':'#fca5a5'};font-size:.71rem;line-height:1.42;">仮投票: ${esc(provisional)}${provisional===target?'（維持）':` → 最終: ${esc(target)}`}</div>` : '';
         const rv = rivalryBias(voter, target) ? `<span style="color:#fca5a5;font-size:.7rem;"> 因縁票</span>` : '';
-        return `<div class="vote-timeline-row"><b>${esc(voter)}</b><span class="vote-arrow">→</span><span>${esc(target)}${rv}</span>${reason}</div>`;
+        return `<div class="vote-timeline-row"><b>${esc(voter)}</b><span class="vote-arrow">→</span><span>${esc(target)}${rv}</span>${shift}${reason}</div>`;
       }).join('')}
     </div>
   </div>`;
@@ -4868,6 +4950,34 @@ function bindEvents() {
     render();
   });
 
+  // DISCUSS - 月下の仮投票
+  const preVoteTargetSelect = document.getElementById('preVoteTarget');
+  if (preVoteTargetSelect) {
+    preVoteTargetSelect.addEventListener('change', () => {
+      O.preVoteTargetDraft = preVoteTargetSelect.value;
+    });
+  }
+  on('preVoteSend', () => {
+    if (p2pActionLocked() || O.phase !== 'discuss') { render(); return; }
+    if (!isOnlinePlayerAlive() || O.preVotePending) return;
+    const target = O.preVoteTargetDraft || val('preVoteTarget');
+    const aliveNames = (O.alive || []).map(p => p.name || p).filter(Boolean);
+    if (!target || target === O.playerName || !aliveNames.includes(target)) return;
+    const current = (O.preVotes || {})[O.playerName] || '';
+    const changes = Number((O.preVoteChanges || {})[O.playerName] || 0);
+    if (current === target) return;
+    if (current && changes >= 1) {
+      alert('仮投票の票替えは1日1回までです。');
+      return;
+    }
+    O.preVotePending = true;
+    if (!wsSend({type:'pre_vote', target})) {
+      O.preVotePending = false;
+      return;
+    }
+    render();
+  });
+
   // DISCUSS - BGMミュートボタン（端末単位。同じ部屋に複数スマホがある時に2重再生防止）
   // ミュートは音量0で再生継続 → onended が正常発火してゲームが止まらない
   on('btnBgmMute', () => {
@@ -5135,6 +5245,7 @@ const SoloEngine = (() => {
       humanNightDone: false, cpuNightDone: false,
       humanWolfChoice: null,
       discMsgs: [], discOrder: [], discIdx: 0, discRound: 1,
+      preVotes: {}, preVoteChanges: {},
       votes: {}, voteReasons: {}, humanVoted: false, tallyDone: false, resolveDone: false,
       accuCount: {}, seerKnown: {}, log: [],
     };
@@ -5317,6 +5428,7 @@ const SoloEngine = (() => {
   function startDiscuss(victim) {
     R.phase = 'discuss'; R.discMsgs = [];
     R.discRound = 1; R.discIdx = 0;
+    R.preVotes = {}; R.preVoteChanges = {};
     R.voteReadySet = new Set();
     R.discOrder = shuffle(alive().map(p=>p.name));
     // 楽曲を先に選んでタイムスタンプを確定（同室デバイス間での同期用）
@@ -5332,9 +5444,21 @@ const SoloEngine = (() => {
       eliminated: victim ? { name:victim.name } : null,
       night_report: R.nightReport,
       alive: alive().map(p=>({ name:p.name })),
+      pre_votes: R.preVotes, pre_vote_changes: R.preVoteChanges,
       song, songStarted,
     });
     later(700, advanceDisc);
+  }
+
+  function publishSoloPreVote(cpu) {
+    if (!cpu || !cpu.alive || !cpu.isCpu || R.phase !== 'discuss' || R.discRound !== 1) return;
+    if (!R.preVotes) R.preVotes = {};
+    if (!R.preVoteChanges) R.preVoteChanges = {};
+    if (R.preVotes[cpu.name]) return;
+    const target = BRAIN.vote(R, cpu);
+    if (!target) return;
+    R.preVotes[cpu.name] = target.name;
+    emit({ type:'pre_vote_update', pre_votes:{...R.preVotes}, pre_vote_changes:{...R.preVoteChanges} });
   }
 
   function advanceDisc() {
@@ -5380,6 +5504,7 @@ const SoloEngine = (() => {
         BRAIN.parseClaim(R, spName, text); // 自分の発言から claims を登録
         R.discMsgs.push({ name:spName, text });
         emit({ type:'disc_message', name:spName, text });
+        publishSoloPreVote(sp);
         R.discIdx++;
         later(readPause(text), advanceDisc); // テキスト長に比例した読む時間を確保
       });
@@ -5463,7 +5588,7 @@ const SoloEngine = (() => {
     R.lastExecuted = executed;
     R.lastExecutedRole = execP?.role;
     if (!R.voteHistory) R.voteHistory = [];
-    R.voteHistory.push({day:R.day, votes:{...R.votes}, tally:{...count}, executed});
+    R.voteHistory.push({day:R.day, votes:{...R.votes}, preVotes:{...R.preVotes}, tally:{...count}, executed});
     // 猫又ルール: 処刑時にランダムな生存者を道連れ
     let nekomataVictim = null;
     if (execP?.role === 'NEKOMATA') {
@@ -5483,6 +5608,7 @@ const SoloEngine = (() => {
       nekomata_victim: nekomataVictim?.name,
       vote_reasons: R.voteReasons,
       votes: R.votes,
+      pre_votes: R.preVotes,
       winner: win,
       players: win ? R.players.map(p=>({name:p.name,role:p.role,alive:p.alive})) : null,
       log: win ? R.log : null,
@@ -5636,6 +5762,31 @@ const SoloEngine = (() => {
         emit({ type:'vote_ready_upd', readyNames:[...R.voteReadySet] });
         _checkVoteReady();
         break;
+      case 'pre_vote': {
+        if (R.phase !== 'discuss') break;
+        const human = R.players[0];
+        const target = byName(data.target);
+        if (!human || !human.alive || !target || !target.alive || target.name === human.name) {
+          emit({ type:'error', msg:'仮投票先は現在の生存者から選んでください。' });
+          break;
+        }
+        if (!R.preVotes) R.preVotes = {};
+        if (!R.preVoteChanges) R.preVoteChanges = {};
+        const current = R.preVotes[human.name] || '';
+        const changes = Number(R.preVoteChanges[human.name] || 0);
+        if (current === target.name) {
+          emit({ type:'pre_vote_update', pre_votes:{...R.preVotes}, pre_vote_changes:{...R.preVoteChanges} });
+          break;
+        }
+        if (current && changes >= 1) {
+          emit({ type:'error', msg:'仮投票の票替えは1日1回までです。' });
+          break;
+        }
+        if (current) R.preVoteChanges[human.name] = changes + 1;
+        R.preVotes[human.name] = target.name;
+        emit({ type:'pre_vote_update', pre_votes:{...R.preVotes}, pre_vote_changes:{...R.preVoteChanges} });
+        break;
+      }
       case 'disc_message': {
         if (R.phase !== 'discuss') break;
         const human = R.players[0];
@@ -6188,6 +6339,14 @@ const BRAIN = (function(){
     Object.entries(R.votes || {}).forEach(([voter, target]) => {
       if (R.aiStances?.[voter]?.[target]?.kind === 'trust') addCase(rowOf(voter), 1.05, '信用先への投票');
     });
+    (R.voteHistory || []).forEach(history => {
+      const preliminary = history.preVotes || history.pre_votes || {};
+      const finalVotes = history.votes || {};
+      Object.entries(preliminary).forEach(([voter, target]) => {
+        if (!target || !finalVotes[voter] || finalVotes[voter] === target) return;
+        addCase(rowOf(voter), 0.9, '仮投票を変更');
+      });
+    });
 
     const ranking = [...byName.values()].sort((a,b) => b.score - a.score || a.name.localeCompare(b.name));
     const trusted = [...byName.values()].sort((a,b) => a.score - b.score || a.name.localeCompare(b.name))[0] || null;
@@ -6346,6 +6505,8 @@ const BRAIN = (function(){
     if (!R.discThisRound) R.discThisRound = new Set();
     if (!R.wolfFakeSeerPlan) R.wolfFakeSeerPlan = null; // 人狼チームの騙り計画 {fakerName, fakeTarget}
     if (!R.voteHistory) R.voteHistory = [];  // [{day, votes:{voter:target}}]
+    if (!R.preVotes) R.preVotes = {};
+    if (!R.preVoteChanges) R.preVoteChanges = {};
     if (!R.aiPublicMessages) R.aiPublicMessages = [];
     if (!R.aiStances) R.aiStances = {};
     if (!R.aiContradictions) R.aiContradictions = {};
@@ -6903,6 +7064,10 @@ const BRAIN = (function(){
     const row = board.byName.get(name);
     const isWolfSide = cpu.role === 'WEREWOLF' || cpu.role === 'MADMAN';
     const styled = reason => personagizeVoteReason(cpu, name, reason, true);
+    const preliminary = R.preVotes?.[cpu.name];
+    if (preliminary && preliminary !== name) {
+      return styled(`${preliminary}さんへの仮投票から、議論で出た情報を踏まえて${name}さんへ変更します。理由は${shortEvidence(row)}です。`);
+    }
     if (cpu.role === 'SEER' && R.seerKnown?.[name] === true) {
       return styled(`${name}さんは自分の占い結果で黒です。盤面を進めるため、今日はここに投票します。`);
     }
@@ -7051,11 +7216,14 @@ const PROGRESS = (() => {
     const wolvesTotal = others.filter(x=>isWolfTeam(x.role)).length;
     const nb = ctx.notebook||{};
     let correctSuspects=0, wrongSuspects=0, correctTrusts=0, wrongTrusts=0, markCount=0;
+    const notebookReview = [];
     others.forEach(x=>{
       const m = nb[x.name]; if(!m) return; markCount++;
       const wolf = isWolfTeam(x.role);
+      const correct = m==='suspect' ? wolf : !wolf;
       if(m==='suspect'){ wolf?correctSuspects++:wrongSuspects++; }
       else if(m==='trust'){ wolf?wrongTrusts++:correctTrusts++; }
+      notebookReview.push({ name:x.name, role:x.role, mark:m, wolf, correct });
     });
     const roleOf = n => { const f=(ctx.players||[]).find(x=>x.name===n); return f?f.role:null; };
     let voteHits=0;
@@ -7104,6 +7272,8 @@ const PROGRESS = (() => {
       gamesPlayed:p.gamesPlayed, wins:p.wins,
       winRate: p.gamesPlayed?Math.round(p.wins/p.gamesPlayed*100):0,
       achTotal:ACHIEVEMENTS.length, achHave:p.achievements.length,
+      notebookReview,
+      notebookStats:{ markCount, correctSuspects, wrongSuspects, correctTrusts, wrongTrusts },
     };
   }
 
@@ -7190,6 +7360,40 @@ function renderNotebook(){
   </details>`;
 }
 
+function renderNotebookReview(g) {
+  const review = Array.isArray(g?.notebookReview) ? g.notebookReview : [];
+  const stats = g?.notebookStats || {};
+  const correct = review.filter(row => row.correct).length;
+  const suspects = review.filter(row => row.mark === 'suspect');
+  const trusts = review.filter(row => row.mark === 'trust');
+  if (!review.length) {
+    return `<section class="notebook-review-panel">
+      <div class="notebook-review-head"><span>🕵️ 捜査ノート答え合わせ</span><span class="notebook-review-badge">記録なし</span></div>
+      <div class="notebook-review-empty">今回はメモがありません。次のゲームでは怪しい人・信用できる人を残してみましょう。</div>
+    </section>`;
+  }
+  const rows = review.map(row => {
+    const info = ROLES[row.role] || {};
+    const markLabel = row.mark === 'suspect' ? '🐺 怪しい' : '🤍 信用';
+    const roleLabel = info.name || row.role || '役職不明';
+    const verdict = row.correct ? '✓ 正解' : '× 外れ';
+    return `<div class="notebook-review-row ${row.correct?'correct':'wrong'}">
+      <span class="notebook-review-verdict">${verdict}</span>
+      <span class="notebook-review-name">${esc(row.name)}</span>
+      <span class="notebook-review-mark ${esc(row.mark)}">${markLabel}</span>
+      <span class="notebook-review-role">実際の役職：${info.icon || '❓'} ${esc(roleLabel)}</span>
+    </div>`;
+  }).join('');
+  return `<section class="notebook-review-panel">
+    <div class="notebook-review-head"><span>🕵️ 捜査ノート答え合わせ</span><span class="notebook-review-badge">正解 ${correct}/${review.length}</span></div>
+    <div class="notebook-review-stats">
+      <span class="notebook-review-stat">怪しい：${stats.correctSuspects || 0}正解 / ${stats.wrongSuspects || 0}外れ</span>
+      <span class="notebook-review-stat">信用：${stats.correctTrusts || 0}正解 / ${stats.wrongTrusts || 0}外れ</span>
+    </div>
+    <div class="notebook-review-list">${rows}</div>
+  </section>`;
+}
+
 // ソロ専用リザルト（推理スコア・XP・ランク・実績・デイリー）
 function renderSoloRecap(){
   const g = O.gameRecap;
@@ -7236,6 +7440,7 @@ function renderSoloRecap(){
     </div>
     ${daily}
     ${achHtml}
+    ${renderNotebookReview(g)}
     ${renderEndgameReplay(players)}
     <p class="sec-label">📋 全員の役職</p>
     ${rows}
@@ -7540,6 +7745,8 @@ const P2PEngine = (() => {
       night_report:R.nightReport || null,
       eliminated:R.nightReport?.victim ? {name:R.nightReport.victim} : null,
       disc_msgs:R.discMsgs || [],
+      pre_votes:R.preVotes || {},
+      pre_vote_changes:R.preVoteChanges || {},
       disc_round:R.discRound || 1,
       disc_total_rounds:2,
       current_speaker:R.waitingForHuman || null,
@@ -7901,6 +8108,9 @@ const P2PEngine = (() => {
       case 'disc_message':
         if (pname) handleDiscMsg(pname, data.text);
         break;
+      case 'pre_vote':
+        if (pname) handlePreVote(pname, data.target);
+        break;
       case 'vote':
         if (pname) {
           pushP2PEvent('vote_received', `${pname} -> ${data.target || ''}`);
@@ -7969,6 +8179,7 @@ const P2PEngine = (() => {
       humanWolfChoice:null, resolveDone:false,
       wolfDoneSet:new Set(),
       discMsgs:[], discOrder:[], discIdx:0, discRound:1,
+      preVotes:{}, preVoteChanges:{},
       waitingForHuman: null, _discFallback: null,
       votes:{}, voteReasons:{}, humanVotedSet:new Set(), autoVotes:new Set(), tallyDone:false,
       accuCount:{}, seerKnown:{}, log:[], syncSeq:0, peerLastSeen:R.peerLastSeen || {},
@@ -8212,6 +8423,7 @@ const P2PEngine = (() => {
 
   function startDiscuss(victim) {
     R.phase='discuss'; R.discRound=1; R.discMsgs=[];
+    R.preVotes={}; R.preVoteChanges={};
     R.waitingForHuman=null;
     R.voteReadySet = new Set();
     R.voteReadyAll = false;
@@ -8222,7 +8434,7 @@ const P2PEngine = (() => {
     markP2PDisconnectedReady();
     if (R._discFallback) clearTimeout(R._discFallback);
     R._discFallback = setTimeout(()=>{ if(R.phase==='discuss'){R.phase='voting';startVote();} }, 5*60*1000);
-    broadcast({type:'discuss_start',round:1,total_rounds:2,eliminated:elim,night_report:R.nightReport,alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel,disconnected:!!p.disconnected,disconnectedAt:p.disconnectedAt||null})),readyTotal:p2pAliveHumans().length,song,songStarted});
+    broadcast({type:'discuss_start',round:1,total_rounds:2,eliminated:elim,night_report:R.nightReport,alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel,disconnected:!!p.disconnected,disconnectedAt:p.disconnectedAt||null})),readyTotal:p2pAliveHumans().length,pre_votes:R.preVotes,pre_vote_changes:R.preVoteChanges,song,songStarted});
     R.discOrder=shuffle([...al]);
     R.discIdx=0;
     later(600,advanceDisc);
@@ -8272,6 +8484,7 @@ const P2PEngine = (() => {
         BRAIN.parseClaim(R, player.name, txt);
         R.discMsgs.push({ name:player.name, text:txt });
         broadcast({ type:'disc_message', name:player.name, text:txt });
+        publishP2PPreVote(player);
         R.discIdx++;
         later(readPause(txt), advanceDisc); // テキスト長に比例した読む時間を確保
       });
@@ -8312,13 +8525,57 @@ const P2PEngine = (() => {
     }
   }
 
+  function broadcastPreVoteUpdate() {
+    broadcast({ type:'pre_vote_update', pre_votes:{...(R.preVotes || {})}, pre_vote_changes:{...(R.preVoteChanges || {})} });
+  }
+
+  function publishP2PPreVote(cpu) {
+    if (!cpu || !cpu.alive || !cpu.isCpu || R.phase !== 'discuss' || R.discRound !== 1) return;
+    if (!R.preVotes) R.preVotes = {};
+    if (R.preVotes[cpu.name]) return;
+    const target = BRAIN.vote(R, cpu);
+    if (!target) return;
+    R.preVotes[cpu.name] = target.name;
+    broadcastPreVoteUpdate();
+  }
+
+  function handlePreVote(pname, targetName) {
+    const voter = byName(pname);
+    const target = byName(targetName);
+    const valid = R.phase === 'discuss' && voter && voter.alive && !voter.isCpu && target && target.alive && target.name !== pname;
+    if (!valid) {
+      pushP2PEvent('pre_vote_invalid', `${pname || '-'} -> ${targetName || '-'}`);
+      if (pname) {
+        sendTo(pname, { type:'error', msg:'仮投票先は現在の生存者から選んでください。' });
+        sendResyncTo(pname);
+      }
+      return;
+    }
+    if (!R.preVotes) R.preVotes = {};
+    if (!R.preVoteChanges) R.preVoteChanges = {};
+    const current = R.preVotes[pname] || '';
+    const changes = Number(R.preVoteChanges[pname] || 0);
+    if (current === target.name) {
+      broadcastPreVoteUpdate();
+      return;
+    }
+    if (current && changes >= 1) {
+      sendTo(pname, { type:'error', msg:'仮投票の票替えは1日1回までです。' });
+      return;
+    }
+    if (current) R.preVoteChanges[pname] = changes + 1;
+    R.preVotes[pname] = target.name;
+    pushP2PEvent('pre_vote', `${pname} -> ${target.name}`);
+    broadcastPreVoteUpdate();
+  }
+
   // ── 投票 ─────────────────────────────────────────────
   function startVote() {
     R.phase='vote'; R.votes={}; R.voteReasons={}; R.humanVotedSet=new Set(); R.autoVotes=new Set(); R.tallyDone=false;
     if (R._discFallback) { clearTimeout(R._discFallback); R._discFallback = null; } // 議論フォールバックを停止
     const al=alive();
     al.filter(p=>!p.isCpu && p.disconnected).forEach(p=>autoVoteForDisconnected(p.name));
-    broadcast({type:'vote_start',alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel,disconnected:!!p.disconnected,disconnectedAt:p.disconnectedAt||null}))});
+    broadcast({type:'vote_start',alive:al.map(p=>({name:p.name,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel,disconnected:!!p.disconnected,disconnectedAt:p.disconnectedAt||null})),pre_votes:R.preVotes || {},pre_vote_changes:R.preVoteChanges || {}});
     if (Object.keys(R.votes||{}).length) broadcast({type:'vote_progress',done:Object.keys(R.votes).length,total:al.length});
     const cpus=al.filter(p=>p.isCpu);
     cpus.forEach((cpu,i)=>later(900+i*600,()=>{
@@ -8398,7 +8655,7 @@ const P2PEngine = (() => {
     // 霊媒師用に処刑情報を保存
     R.lastExecuted=executed; R.lastExecutedRole=execP?.role;
     if (!R.voteHistory) R.voteHistory = [];
-    R.voteHistory.push({day:R.day, votes:{...R.votes}, tally:{...tally}, executed});
+    R.voteHistory.push({day:R.day, votes:{...R.votes}, preVotes:{...R.preVotes}, tally:{...tally}, executed});
     // 猫又ルール: 処刑時にランダムな生存者を道連れ
     let nekomataVictim=null;
     if (execP?.role==='NEKOMATA') {
@@ -8415,12 +8672,14 @@ const P2PEngine = (() => {
       nekomataVictim:nekomataVictim?.name,
       voteReasons:{...R.voteReasons},
       votes:{...R.votes},
+      preVotes:{...R.preVotes},
     };
     broadcast({
       type:'vote_result', executed, executed_role:execP?.role, tally,
       nekomata_victim:nekomataVictim?.name,
       vote_reasons:R.voteReasons,
       votes:R.votes,
+      pre_votes:R.preVotes,
       winner:win,
       players:win?R.players.map(p=>({name:p.name,role:p.role,alive:p.alive,disconnected:!!p.disconnected,disconnectedAt:p.disconnectedAt||null,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})):null,
       log:win?R.log:null,
@@ -8820,6 +9079,7 @@ function initOnline() {
     wolfChatMsgs: [], wolfChatReady: false, wolfChatReadyPending: false, wolfPartnerNames: [],
     // Discussion
     discMsgs: [], intelMsgs: [], discRound: 1, discTotalRounds: 2,
+    preVotes: {}, preVoteChanges: {}, preVotePending: false, preVoteTargetDraft: '',
     currentSpeaker: null, isMyDiscTurn: false,
     tplStep: null,   // null|'cat'|'tgt_accuse'|'tgt_agree'|'tgt_seer'|'msg_neutral'|'msg_accuse'|'msg_defend'|'msg_agree'|'msg_seer'
     tplTarget: null,
@@ -8910,6 +9170,7 @@ function handleServer(data) {
         O.notebook = {}; O._scored = false; O.gameRecap = null;
         O.myVotes = []; O.mySeerHits = 0; O.myGuardSuccess = 0; O._myLastGuard = null;
         O.intelMsgs = []; O.voteHistory = []; O.lastVoteResult = null;
+        O.preVotes = {}; O.preVoteChanges = {}; O.preVotePending = false; O.preVoteTargetDraft = '';
         if (!data.p2p_seq) { O.p2pSyncSeq = 0; O.p2pSyncAt = 0; }
       }
       syncAlivePresence();
@@ -8944,6 +9205,10 @@ function handleServer(data) {
       if (mode === 'p2p') O.isHost = !!data.is_host;
       O.nightReport = data.night_report || O.nightReport || null;
       O.eliminatedLastNight = data.eliminated || O.eliminatedLastNight || null;
+      O.preVotes = data.pre_votes || {};
+      O.preVoteChanges = data.pre_vote_changes || {};
+      O.preVotePending = false;
+      O.preVoteTargetDraft = O.preVotes[O.playerName] || '';
       O.voteReadyNames = data.vote_ready_names || [];
       O.voteReadyTotal = data.vote_ready_total ?? O.voteReadyTotal ?? 0;
       O.voteReadyAll = !!data.vote_ready_all;
@@ -9000,6 +9265,7 @@ function handleServer(data) {
             nekomataVictim: vr.nekomataVictim,
             voteReasons: vr.voteReasons || {},
             votes: vr.votes || {},
+            preVotes: vr.preVotes || vr.pre_votes || {},
           };
           O.lastVoteResult = O.voteResult;
         }
@@ -9058,6 +9324,10 @@ function handleServer(data) {
       clearP2PActionAckWatchdog();
       O.discMsgs = []; O.discRound = data.round; O.discTotalRounds = data.total_rounds;
       O.eliminatedLastNight = data.eliminated; O.nightReport = data.night_report || null; O.alive = data.alive;
+      O.preVotes = data.pre_votes || {};
+      O.preVoteChanges = data.pre_vote_changes || {};
+      O.preVotePending = false;
+      O.preVoteTargetDraft = O.preVotes[O.playerName] || '';
       syncAlivePresence();
       // 戦績: 騎士の護衛成功を夜明けの結果から推定（守った夜に死者ゼロ＝成功）
       if (O.myRole==='DOCTOR' && O._myLastGuard) {
@@ -9120,6 +9390,12 @@ function handleServer(data) {
     case 'disc_message':
       appendDiscussMessageOnce({name: data.name, text: data.text});
       O.currentSpeaker = null; break;
+    case 'pre_vote_update':
+      O.preVotes = data.pre_votes || {};
+      O.preVoteChanges = data.pre_vote_changes || {};
+      O.preVotePending = false;
+      O.preVoteTargetDraft = O.preVotes[O.playerName] || '';
+      break;
     case 'day_start':
       O.eliminatedLastNight = data.eliminated; O.alive = data.alive;
       syncAlivePresence();
@@ -9169,10 +9445,10 @@ function handleServer(data) {
     case 'vote_result':
       clearVoteAckWatchdog();
       clearP2PActionAckWatchdog();
-      O.voteResult = {executed: data.executed, role: data.executed_role, tally: data.tally, nekomataVictim: data.nekomata_victim, voteReasons: data.vote_reasons || {}, votes: data.votes || {}};
+      O.voteResult = {executed: data.executed, role: data.executed_role, tally: data.tally, nekomataVictim: data.nekomata_victim, voteReasons: data.vote_reasons || {}, votes: data.votes || {}, preVotes: data.pre_votes || {}};
       O.lastVoteResult = O.voteResult;
       O.voteHistory = O.voteHistory || [];
-      O.voteHistory.push({day: O.day, executed: data.executed, tally: data.tally || {}, votes: data.votes || {}, reasons: data.vote_reasons || {}});
+      O.voteHistory.push({day: O.day, executed: data.executed, tally: data.tally || {}, votes: data.votes || {}, preVotes: data.pre_votes || {}, reasons: data.vote_reasons || {}});
       O.winner = data.winner;
       if (data.players && data.players.length > 0) {
         O.finalPlayers = data.players.map(p => ({
@@ -9228,6 +9504,7 @@ function handleServer(data) {
       O.nightActionPending = false;
       O.wolfChatReadyPending = false;
       O.voteReadyPending = false;
+      O.preVotePending = false;
       clearP2PActionAckWatchdog();
       alert(data.msg || data.message);
       if (data.fatal && mode === 'p2p') {
@@ -9490,6 +9767,7 @@ function renderODiscuss() {
     ${renderInferenceTrialPanel()}
     ${renderSecretMissionPanel()}
     ${renderRivalryPanel()}
+    ${renderPreVotePanel(actionLocked)}
     ${deadListHtml}
     <hr class="div" style="margin:.4rem 0;">
     ${myRoleReminder()}
@@ -10039,7 +10317,7 @@ function renderOVoteResult() {
     ${ph('⚖️',`第${O.day}日 処刑結果`,'村人会議の結論が出ました','#f87171')}
     ${renderP2PStatusPanel()}
     <div class="card"><p class="sec-label" style="margin-top:0;">📊 得票数</p>${bars}</div>
-    ${renderVoteTimeline(r.votes, r.voteReasons)}
+    ${renderVoteTimeline(r.votes, r.voteReasons, r.preVotes)}
     ${renderVoteReasons(r.voteReasons)}
     <div class="vote-drama" style="text-align:center; padding:1.5rem; border-radius:16px;
          border:2px solid #ef4444; background:linear-gradient(135deg,#1a0505,#2d0a0a); margin:.6rem 0;">

@@ -120,6 +120,7 @@ def new_room(code):
         'last_doctor_target': None,
         'last_executed': None, 'last_executed_role': None,
         'votes': {}, 'vote_reasons': {}, 'vote_pending': set(), 'log': [],
+        'pre_votes': {}, 'pre_vote_changes': {},
         'vote_ready': set(),
         'desired_cpu': 0,
     }
@@ -424,6 +425,8 @@ async def start_discussion(room, elim=None, night_report=None):
     room['phase'] = 'discuss'
     room['disc_msgs'] = []
     room['disc_round'] = 1
+    room['pre_votes'] = {}
+    room['pre_vote_changes'] = {}
     room['vote_ready'] = set()
     alive_pids = [pid for pid, p in room['players'].items() if p['alive']]
     alive_human_pids = [pid for pid in alive_pids if pid not in room['cpu_pids']]
@@ -436,6 +439,7 @@ async def start_discussion(room, elim=None, night_report=None):
         'alive': [public_player(room, pid, p) for pid, p in room['players'].items() if p['alive']],
         'round': 1, 'total_rounds': DISC_ROUNDS,
         'readyTotal': len(alive_human_pids),
+        'pre_votes': room['pre_votes'], 'pre_vote_changes': room['pre_vote_changes'],
     })
     await _next_disc(room)
 
@@ -482,10 +486,45 @@ async def _cpu_discuss(room, cpu_pid):
     msg = cpu_template(room, cpu_pid)
     await _post_disc_msg(room, cpu_pid, msg)
 
+def _cpu_pre_vote_target(room, cpu_pid):
+    p = room['players'].get(cpu_pid)
+    if not p or not p.get('alive'):
+        return None
+    wolf_set = {pid for pid, q in room['players'].items() if q['role'] == 'WEREWOLF'}
+    alive_others = [(pid, q) for pid, q in room['players'].items() if q['alive'] and pid != cpu_pid]
+    if not alive_others:
+        return None
+    accused = {}
+    for m in room['disc_msgs']:
+        for _, q in alive_others:
+            if q['name'] in m['text'] and any(w in m['text'] for w in ['怪しい', '疑', '投票', '処刑']):
+                accused[q['name']] = accused.get(q['name'], 0) + 1
+    if p['role'] in ['WEREWOLF', 'MADMAN']:
+        candidates = [q for pid, q in alive_others if pid not in wolf_set]
+        return (max(accused, key=accused.get) if accused else None) or (random.choice(candidates)['name'] if candidates else None)
+    return (max(accused, key=accused.get) if accused else None) or random.choice(alive_others)[1]['name']
+
+async def _publish_cpu_pre_vote(room, cpu_pid):
+    if room['phase'] != 'discuss' or room['disc_round'] != 1:
+        return
+    p = room['players'].get(cpu_pid)
+    if not p or not p.get('alive') or cpu_pid not in room['cpu_pids']:
+        return
+    if p['name'] in room['pre_votes']:
+        return
+    target = _cpu_pre_vote_target(room, cpu_pid)
+    if not target:
+        return
+    room['pre_votes'][p['name']] = target
+    await bcast(room, {'type': 'pre_vote_update', 'pre_votes': dict(room['pre_votes']),
+                       'pre_vote_changes': dict(room['pre_vote_changes'])})
+
 async def _post_disc_msg(room, pid, text, advance_turn=True):
     p = room['players'][pid]
     room['disc_msgs'].append({'name': p['name'], 'text': text})
     await bcast(room, {'type': 'disc_message', 'name': p['name'], 'text': text})
+    if pid in room['cpu_pids']:
+        await _publish_cpu_pre_vote(room, pid)
     if not advance_turn:
         return
     room['disc_step'] += 1
@@ -499,7 +538,9 @@ async def start_vote(room):
     room['vote_reasons'] = {}
     room['vote_pending'] = {pid for pid, p in room['players'].items() if p['alive']}
     await bcast(room, {'type': 'vote_start',
-                       'alive': [public_player(room, pid, p) for pid, p in room['players'].items() if p['alive']]})
+                       'alive': [public_player(room, pid, p) for pid, p in room['players'].items() if p['alive']],
+                       'pre_votes': dict(room.get('pre_votes', {})),
+                       'pre_vote_changes': dict(room.get('pre_vote_changes', {}))})
     for pid in list(room['vote_pending']):
         if pid in room['cpu_pids']:
             asyncio.create_task(_cpu_vote(room, pid))
@@ -561,7 +602,8 @@ async def _tally_votes(room):
     msg = {'type': 'vote_result', 'executed': executed, 'executed_role': erole,
            'tally': tally, 'winner': winner, 'nekomata_victim': nekomata_victim,
            'vote_reasons': room.get('vote_reasons', {}),
-           'votes': dict(room.get('votes', {}))}
+           'votes': dict(room.get('votes', {})),
+           'pre_votes': dict(room.get('pre_votes', {}))}
     if winner:
         msg['players'] = [public_player(room, pid, p, include_role=True)
                           for pid, p in room['players'].items()]
@@ -657,6 +699,31 @@ async def handle(ws, pid, room, data):
         order = room['disc_order']
         is_turn = room['disc_step'] < len(order) and order[room['disc_step']] == pid
         await _post_disc_msg(room, pid, text, advance_turn=is_turn)
+
+    elif t == 'pre_vote':
+        if room['phase'] != 'discuss': return
+        p = room['players'].get(pid)
+        target = data.get('target')
+        valid_targets = {q['name'] for q in room['players'].values() if q.get('alive')}
+        if p and p.get('name') in valid_targets:
+            valid_targets.discard(p['name'])
+        if not p or not p.get('alive') or pid in room['cpu_pids'] or target not in valid_targets:
+            await send1(room, pid, {'type': 'error', 'msg': '仮投票先は現在の生存者から選んでください。'})
+            return
+        current = room['pre_votes'].get(p['name'])
+        changes = int(room['pre_vote_changes'].get(p['name'], 0))
+        if current == target:
+            await bcast(room, {'type': 'pre_vote_update', 'pre_votes': dict(room['pre_votes']),
+                               'pre_vote_changes': dict(room['pre_vote_changes'])})
+            return
+        if current and changes >= 1:
+            await send1(room, pid, {'type': 'error', 'msg': '仮投票の票替えは1日1回までです。'})
+            return
+        if current:
+            room['pre_vote_changes'][p['name']] = changes + 1
+        room['pre_votes'][p['name']] = target
+        await bcast(room, {'type': 'pre_vote_update', 'pre_votes': dict(room['pre_votes']),
+                           'pre_vote_changes': dict(room['pre_vote_changes'])})
 
     elif t == 'vote_ready':
         if room['phase'] != 'discuss': return
