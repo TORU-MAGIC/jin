@@ -1040,6 +1040,11 @@ const ROLES = {
     ability: '【夜の能力】なし（人狼が誰かも分からない）',
     winCon: '【勝利条件】人狼陣営が勝てば自分も勝ち（自分は死んでもOK）',
     tips: ['偽占い師として「○○が人狼でした」と嘘の結果をCOするのが定番戦術。', '本物の占い師とわざと対立し、村人にどちらが本物か迷わせよう。', '人狼が疑われたら、さりげなく庇って投票先をそらそう。', '自分が吊られても人狼が生き残れば勝ち。身を挺して人狼を守る動きが強い。', '騙りで占い結果を出すと、本物の占い師を炙り出す効果もある。', '人狼の邪魔をしないよう、襲撃されそうな立ち回りも時には有効。'] },
+  MADMAN_ACTIVE: { name: '狂人（能動型）', icon: '🌀', team: 'wolf', color: '#ec4899',
+    desc: '人狼陣営に属する能動型の狂人。占い・霊媒では人間と出るが、毎晩「洗脳」で生存者1人の翌日の投票を別の生存者へ強制できる。洗脳された本人だけが投票直後に気づき、誰に操られたかは分からない。',
+    ability: '【夜の能力】洗脳：生存者1人の翌日の投票先を、別の生存者へ強制する（毎晩使用可能）',
+    winCon: '【勝利条件】人狼陣営が勝利すれば勝ち。占い結果・霊媒結果はいずれも人間。',
+    tips: ['洗脳は毎晩使える。票が割れそうな日に、村の中心人物の票を動かすと強い。', '洗脳された人は投票直後に自覚する。対象は「洗脳されたCO」ができるため、議論の流れも同時に作ろう。', '全員に公開されるのは「操作票:1件」だけ。誰の票か、誰に操作されたかは公開されない。', '洗脳されたCOには証明手段がない。自分で偽COを出して、本物の被害者を嘘つきに見せることもできる。', '占い師・霊媒師からは人間判定。役職を騙りつつ、洗脳で票を一票だけ押し込むのが基本。'] },
   MEDIUM:   { name: '霊媒師', icon: '👁️', team: 'village', color: '#a78bfa',
     desc: '処刑された人が人狼だったか否かを、その夜に知ることができる村人陣営の役職。占い師と並ぶ second 情報源として村を導きます。',
     ability: '【夜の能力】前日に処刑された人が人狼だったかを知る',
@@ -1051,6 +1056,10 @@ const ROLES = {
     winCon: '【勝利条件】人狼を全員処刑できれば勝ち（村人陣営）',
     tips: ['COすると人狼が「道連れ」を恐れて夜襲を躊躇うことがある。', '処刑時は無関係の村人も道連れになる諸刃の剣。CO時期は慎重に。', '「私を吊ると道連れが出るぞ」と主張し、投票先をそらす盾戦術が有効。', '道連れの相手はランダム。自分が囮になって人狼を減らす動きも狙える。', '人狼側からは最も処刑しづらい役職。生き残って終盤まで圧をかけよう。', '夜に襲われた場合は人狼を確実に1体減らせるので、村にとって大きな保険。'] },
 };
+
+function isWolfSideRole(role) {
+  return role === 'WEREWOLF' || role === 'MADMAN' || role === 'MADMAN_ACTIVE';
+}
 
 const ROLE_STRATEGIES = {
   WEREWOLF: [
@@ -1066,6 +1075,13 @@ const ROLE_STRATEGIES = {
     '終盤: 人狼っぽい人を直接守りすぎない。村人を疑わせる発言で投票先を散らす方が強い。',
     '黒出し: 発言力のある村人や共有者以外の役職候補に黒を出すと、村の議論時間を奪いやすい。',
     '注意: 人狼が誰かは分からないため、真の人狼に黒を出す事故もある。投票の流れを見てすぐ修正する。'
+  ],
+  MADMAN_ACTIVE: [
+    '基本: 洗脳は毎晩使える。処刑候補になりそうな人へ、普段は別の候補に投票しそうな人の票を押し込む。',
+    '情報戦: 投票結果では「操作票:1件」しか公開されない。誰の票かを断定できないため、議論を複数の候補へ散らしておく。',
+    '洗脳CO: 本物の被害者は投票直後にCOできるが、証明はできない。自分も偽の洗脳COを出して、村に「どちらが本物か」を考えさせる。',
+    '偽装: 自分へ疑いが集まったら、洗脳COに話題を寄せて人狼本体への視線を外す。',
+    '注意: 占い・霊媒では人間と出る。処刑されそうでも、偽役職COや洗脳COで一日を作る価値がある。'
   ],
   VILLAGER: [
     '序盤: 「誰を疑うか」だけでなく「なぜそう思うか」を短く残す。理由がある村人は吊られにくい。',
@@ -1464,7 +1480,7 @@ function coQuickPanel(inputId='discFreeInput') {
       mkBtn('🤝 共有CO', '共有者COします。村の進行を整理します。', '', 'primary'),
       mkBtn('📌 進行役CO', '共有者COします。今日は投票先とCO状況を整理します。', '', 'primary'),
     ];
-  } else if (role === 'WEREWOLF' || role === 'MADMAN') {
+  } else if (isWolfSideRole(role)) {
     selectHtml = mkSelect('coQuickFakeTarget', aliveTargets, '偽占い結果の対象');
     buttons = [
       mkBtn('🎭 偽占いCO', '占い師COします。占い結果を公開します。', '', 'fake'),
@@ -1480,6 +1496,12 @@ function coQuickPanel(inputId='discFreeInput') {
       mkBtn('👤 村人宣言', '私は役職COはありません。発言と投票で村に貢献します。'),
     ];
   }
+
+  const brainwashTarget = O.brainwashNotice?.forcedTarget || '';
+  const brainwashText = brainwashTarget
+    ? `洗脳されたCOです。今日の投票は ${brainwashTarget} さんへ強制されました。誰にやられたかは分かりません。`
+    : '洗脳されたCOです。投票が自分の意思と違う先へ操作されました。誰にやられたかは分かりません。';
+  buttons.push(mkBtn('🌀 洗脳されたCO', brainwashText, '', 'brainwash'));
 
   return `
     <div class="co-quick-panel">
@@ -1502,7 +1524,8 @@ function selfCoPreset() {
     SHARED:   { label:'🤝 ワンクリック共有者CO', text:'共有者COします。村の進行を整理します。' },
     VILLAGER: { label:'👤 ワンクリック村人CO',   text:'村人COします。役職COはありません。発言と投票で村に貢献します。' },
     WEREWOLF: { label:'🎭 ワンクリック偽占いCO', text:'占い師COします。占い結果を公開します。' },
-    MADMAN:   { label:'🎭 ワンクリック偽占いCO', text:'占い師COします。占い結果を公開します。' },
+    MADMAN:        { label:'🎭 ワンクリック偽占いCO', text:'占い師COします。占い結果を公開します。' },
+    MADMAN_ACTIVE: { label:'🎭 ワンクリック偽占いCO', text:'占い師COします。占い結果を公開します。' },
   };
   return presets[role] || { label:'📣 ワンクリックCO', text:'役職COします。情報を整理して出します。' };
 }
@@ -1597,9 +1620,17 @@ function detectExplicitRoleClaim(text) {
   return null;
 }
 
+function detectBrainwashClaim(text) {
+  const t = String(text || '').replace(/\s+/g, '');
+  return /洗脳(?:された|され|被害)|操作票|票(?:が|を).{0,12}(?:操作|強制)/.test(t);
+}
+
 function renderCoChat() {
   const coMsgs = (O.discMsgs || [])
-    .map((m, idx) => ({ ...m, idx, claim: detectExplicitRoleClaim(m.text) }))
+    .map((m, idx) => {
+      const roleClaim = detectExplicitRoleClaim(m.text);
+      return { ...m, idx, claim: roleClaim || (detectBrainwashClaim(m.text) ? 'BRAINWASHED' : null) };
+    })
     .filter(m => !!m.claim);
   const body = coMsgs.length ? coMsgs.map(m => {
     const av = getAvatar(m.name, O.players);
@@ -2364,7 +2395,7 @@ function buildAiWarRoom() {
   if (names.length < 3) return null;
   const myName = O.playerName || '';
   const role = O.myRole || '';
-  const wolfSide = role === 'WEREWOLF' || role === 'MADMAN';
+  const wolfSide = isWolfSideRole(role);
   const intel = analyzeDiscussionIntel();
   const heat = analyzeDiscussionHeat();
   const scan = buildContradictionScan();
@@ -3117,6 +3148,38 @@ function renderEndgameReplay(players) {
   </div>`;
 }
 
+function renderBrainwashRevelation(history) {
+  const entries = (history || []).filter(entry => entry && entry.voter && (entry.forcedTarget || entry.forced_target || entry.target));
+  if (!entries.length) return '';
+  const rows = entries.map(entry => {
+    const day = Number(entry.day) || '?';
+    const actor = entry.actor || '狂人（能動型）';
+    const voter = entry.voter;
+    const intended = entry.intendedTarget || entry.intended_target || '未選択';
+    const forced = entry.forcedTarget || entry.forced_target || entry.target || '不明';
+    const changed = entry.changed !== false && intended !== forced;
+    const tally = entry.tally || {};
+    const impact = changed
+      ? esc(forced) + ' さんへ +1票、' + esc(intended) + ' さんから -1票'
+      : '本来の投票先も ' + esc(forced) + ' さんで、集計上の票数変化はなし';
+    const outcome = entry.executed ? '処刑結果: <strong>' + esc(entry.executed) + '</strong> さん' : '';
+    const total = Object.keys(tally).length ? '最終票数: ' + esc(forced) + ' ' + Number(tally[forced] || 0) + '票 / ' + esc(intended) + ' ' + Number(tally[intended] || 0) + '票' : '';
+    const meta = [outcome, total].filter(Boolean).join(' / ');
+    const metaHtml = meta ? '<div style="color:#94a3b8;">' + meta + '</div>' : '';
+    return `<div style="margin:.45rem 0;padding:.65rem .72rem;border:1px solid #ec489955;border-radius:8px;background:rgba(236,72,153,.08);font-size:.79rem;line-height:1.6;color:#e2e8f0;">
+      <div style="font-weight:900;color:#f9a8d4;">第${day}日投票: ${esc(actor)} が洗脳を実行</div>
+      <div><strong>${esc(voter)}</strong> さんの本来の投票 <span style="color:#94a3b8;">${esc(intended)}</span> → 強制先 <strong style="color:#f9a8d4;">${esc(forced)}</strong></div>
+      <div style="color:#fbcfe8;">影響: ${impact}</div>
+      ${metaHtml}
+    </div>`;
+  }).join('');
+  return `<div class="power-panel" style="border-color:#ec489955;background:rgba(236,72,153,.06);">
+    <div class="power-head"><span>🌀 洗脳の真相</span><span style="color:#f9a8d4;font-size:.72rem;">ゲーム終了後に公開</span></div>
+    <p style="margin:.15rem 0 .5rem;color:#cbd5e1;font-size:.77rem;line-height:1.55;">狂人（能動型）が行った票操作の全記録です。ゲーム中は非公開だった情報を、勝敗確定後に答え合わせできます。</p>
+    ${rows}
+  </div>`;
+}
+
 function renderLocalReplay() {
   const lines = [];
   (S.log || []).slice(-8).forEach(l => lines.push(l));
@@ -3134,18 +3197,18 @@ const MAX_PLAYERS = 17;
 const CONFIGS = {
   4:  ['WEREWOLF','SEER','VILLAGER','VILLAGER'],
   5:  ['WEREWOLF','SEER','DOCTOR','VILLAGER','VILLAGER'],
-  6:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','VILLAGER','VILLAGER'],
-  7:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN','VILLAGER','VILLAGER'],
-  8:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
-  9:  ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','MADMAN','VILLAGER','VILLAGER'],
-  10: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
-  11: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
-  12: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
-  13: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
-  14: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
-  15: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
-  16: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
-  17: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+  6:  ['WEREWOLF','SEER','DOCTOR','MADMAN_ACTIVE','VILLAGER','VILLAGER'],
+  7:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN_ACTIVE','VILLAGER','VILLAGER'],
+  8:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER'],
+  9:  ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','MADMAN_ACTIVE','VILLAGER','VILLAGER'],
+  10: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER'],
+  11: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER'],
+  12: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER'],
+  13: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+  14: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+  15: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+  16: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+  17: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
 };
 
 const RIVALRY_RULES = {
@@ -3735,6 +3798,11 @@ function initState() {
     wolfTarget: null,
     _wolfLocalSel: null,     // ステルス選択（グリッドタップ）
     doctorTarget: null,
+    brainwash: null,         // {voter, target, day}
+    brainwashApplied: false,
+    brainwashDetail: null,
+    brainwashHistory: [],
+    lastBrainwashVoter: null,
     lastDoctorTarget: null,  // 前夜に守った対象（連続護衛禁止）
     lastExecuted: null,      // 直前に処刑されたプレイヤー名（霊媒師用）
     lastExecutedRole: null,  // 直前処刑者の役職（霊媒師用）
@@ -3788,6 +3856,10 @@ function nightSteps() {
   // 騎士・人狼（初日から行動可能）
   const docs = aliveByRole('DOCTOR');
   if (docs.length) steps.push({type:'doctor', actor: docs[0]});
+  const activeMadmen = aliveByRole('MADMAN_ACTIVE');
+  const brainwashTargets = activeMadmen.length ? alive().filter(p=>p.name!==activeMadmen[0].name && p.name!==S.lastBrainwashVoter) : [];
+  if (activeMadmen.length && brainwashTargets.length >= 2)
+    steps.push({type:'brainwash', actor: activeMadmen[0], targets:brainwashTargets});
   const wolves = aliveByRole('WEREWOLF');
   if (wolves.length) steps.push({type:'wolf', actors: wolves});
   return steps;
@@ -3821,8 +3893,9 @@ function roleClaimInfo(role) {
     DOCTOR:   { icon:'💊', label:'騎士CO',   short:'騎', color:'#34d399' },
     MEDIUM:   { icon:'👁️', label:'霊媒師CO', short:'霊', color:'#a78bfa' },
     NEKOMATA: { icon:'🐱', label:'猫又CO',   short:'猫', color:'#fb923c' },
-    SHARED:   { icon:'🤝', label:'共有者CO', short:'共', color:'#38bdf8' },
-    VILLAGER: { icon:'👤', label:'村人CO',   short:'村', color:'#22c55e' },
+    SHARED:      { icon:'🤝', label:'共有者CO',       short:'共', color:'#38bdf8' },
+    VILLAGER:    { icon:'👤', label:'村人CO',         short:'村', color:'#22c55e' },
+    BRAINWASHED: { icon:'🌀', label:'洗脳されたCO',   short:'洗脳', color:'#f472b6' },
   };
   return map[role] || { icon:'❔', label:'役職CO', short:'CO', color:'#fbbf24' };
 }
@@ -4230,6 +4303,7 @@ function renderNight() {
   if (step.type === 'seer')    return renderSeer(step.actor);
   if (step.type === 'medium')  return renderMedium(step.actor);
   if (step.type === 'doctor')  return renderDoctor(step.actor);
+  if (step.type === 'brainwash') return renderBrainwash(step.actor);
   if (step.type === 'wolf')    return renderWolf(step.actors);
   return '';
 }
@@ -4239,7 +4313,7 @@ function renderMedium(actor) {
   if (S.nightSub === 'pass') return hdr + passScreen(actor.name,'霊媒師','mediumReady','👁️　霊視する','#a78bfa');
   const role = S.lastExecutedRole;
   const info = ROLES[role] || {};
-  const isWolf = (role === 'WEREWOLF' || role === 'MADMAN');
+  const isWolf = role === 'WEREWOLF';
   const c = isWolf ? '#ef4444' : '#22c55e';
   return `${hdr}
     <div class="card-colored" style="text-align:center; border:2px solid ${c}; background:${c}18;">
@@ -4302,6 +4376,25 @@ function renderDoctor(actor) {
     </div>`;
 }
 
+function renderBrainwash(actor) {
+  const hdr = ph('🌙', `第 ${S.day} 夜`, '票の流れを静かに操ります…', '#ec4899');
+  if (S.nightSub === 'pass') {
+    return hdr + passScreen(actor.name, '狂人（能動型）', 'brainwashReady', '🌀　洗脳を行う', '#ec4899');
+  }
+  const targets = alive().filter(p => p.name !== actor.name && p.name !== S.lastBrainwashVoter);
+  const disabled = targets.length < 2 ? 'disabled' : '';
+  return `${hdr}
+    <div class='card-colored' style='border:1px solid #ec489966;background:rgba(236,72,153,.09);'>
+      <h3 style='color:#f9a8d4;margin:.1rem 0 .45rem;'>🌀 洗脳</h3>
+      <p style='color:#cbd5e1;font-size:.82rem;line-height:1.65;margin:.2rem 0 .65rem;'>翌日の投票で、1人の票を別の生存者へ強制します。投票結果には使った日だけ「操作票:1件」と表示されます。</p>
+      <label>票を操作する人</label>
+      ${mkSelect('brainwashVoter', targets)}
+      <label style='margin-top:.55rem;'>強制する投票先</label>
+      ${mkSelect('brainwashVoteTarget', targets)}
+      <p style='color:#94a3b8;font-size:.72rem;line-height:1.45;margin:.5rem 0 0;'>※ 同じ人を選ぶことはできません。対象本人だけが投票直後に気づきます。</p>
+      <button class='btn btn-primary' id='brainwashConfirm' ${disabled} style='margin-top:.65rem;background:linear-gradient(135deg,#be185d,#7e22ce);'>${targets.length >= 2 ? '🌀　洗脳を確定する' : '洗脳できる対象がいません'}</button>
+    </div>`;
+}
 function renderWolf(actors) {
   const wolfNames = actors.map(a => esc(a.name)).join('・');
   const hdr = ph('🌙',`第 ${S.day} 夜`,'村の様子を確認しています...','#60a5fa');
@@ -4396,7 +4489,7 @@ function renderVote() {
 }
 
 function renderVoteResult() {
-  const {executed, tally, nekomataVictim} = S.voteResult;
+  const {executed, tally, nekomataVictim, brainwashCount=0} = S.voteResult;
   const total = Object.values(tally).reduce((a,b)=>a+b,0);
 
   const bars = Object.entries(tally)
@@ -4415,6 +4508,9 @@ function renderVoteResult() {
     ? `<div style="margin-top:.8rem;padding:.6rem;background:rgba(251,146,60,.1);border:1px solid #fb923c44;border-radius:10px;color:#fb923c;font-size:.82rem;text-align:center;">
         🐱 猫又の道連れ: <strong>${esc(nekomataVictim)}</strong> も倒れた！
        </div>` : '';
+  const brainwashHtml = brainwashCount
+    ? '<div style="margin-top:.55rem;padding:.58rem;background:rgba(236,72,153,.1);border:1px solid #ec489955;border-radius:8px;color:#f9a8d4;font-size:.82rem;text-align:center;font-weight:800;">🌀 操作票: 1件</div>'
+    : '';
 
   return `
     ${ph('⚖️',`第${S.day}日 処刑結果`,'村人会議の結論が出ました','#f87171')}
@@ -4437,6 +4533,7 @@ function renderVoteResult() {
       <div style="font-size:.88rem; color:#64748b; margin-bottom:.8rem;">役職は…ゲームオーバー時に公開</div>
     </div>
     ${nekHtml}
+    ${brainwashHtml}
     ${nextBtn}
   `;
 }
@@ -4471,6 +4568,7 @@ function renderGameOver() {
       </p>
     </div>
     ${renderLocalReplay()}
+    ${renderBrainwashRevelation(S.brainwashHistory)}
     <p class="sec-label">📋 全員の役職</p>
     ${rows}
     ${logHtml}
@@ -4565,6 +4663,23 @@ function bindEvents() {
     render();
   });
 
+  // NIGHT - active madman
+  on('brainwashReady', () => { S.nightSub = 'select'; render(); });
+  on('brainwashConfirm', () => {
+    const step = S.nightSteps[S.nightStepIdx];
+    const actor = step?.actor;
+    const voter = val('brainwashVoter');
+    const target = val('brainwashVoteTarget');
+    const candidates = alive().filter(p => p.name !== actor?.name && p.name !== S.lastBrainwashVoter).map(p => p.name);
+    if (!actor || !candidates.includes(voter) || !candidates.includes(target)) return alert('洗脳する相手を選び直してください');
+    if (voter === target) return alert('票を操作する人と、強制する投票先は別の人にしてください');
+    S.brainwash = { voter, target, day:S.day, actor:actor.name };
+    S.lastBrainwashVoter = voter;
+    S.nightStepIdx++;
+    S.nightSub = 'pass';
+    render();
+  });
+
   // NIGHT - wolf (ステルスグリッド)
   on('wolfReady',   () => { S.nightSub = 'select'; S._wolfLocalSel = null; render(); });
   on('wolfConfirm', () => {
@@ -4628,6 +4743,8 @@ function bindEvents() {
     S.voteReasons = {};
     S.voteIdx = 0;
     S.voteResult = null;
+    S.brainwashApplied = false;
+    S.brainwashDetail = null;
     S.phase = 'vote';
     render();
   });
@@ -4636,8 +4753,25 @@ function bindEvents() {
   on('castVote', () => {
     const alivePl = alive();
     const voter = alivePl[S.voteIdx];
-    S.votes[voter.name] = val('voteTgt');
-    S.voteReasons[voter.name] = (val('voteReason') || '').trim() || `${val('voteTgt')}さんの発言と立ち位置が気になりました。`;
+    const requestedTarget = val('voteTgt');
+    const brainwash = S.brainwash;
+    const forced = !!(brainwash && !S.brainwashApplied && brainwash.voter === voter.name
+      && alivePl.some(p => p.name === brainwash.target) && brainwash.target !== voter.name);
+    const finalTarget = forced ? brainwash.target : requestedTarget;
+    S.votes[voter.name] = finalTarget;
+    S.voteReasons[voter.name] = (val('voteReason') || '').trim() || (requestedTarget + 'さんの発言と立ち位置が気になりました。');
+    if (forced) {
+      S.brainwashApplied = true;
+      S.brainwashDetail = {
+        day: S.day,
+        actor: brainwash.actor || '',
+        voter: voter.name,
+        intendedTarget: requestedTarget,
+        forcedTarget: finalTarget,
+        changed: requestedTarget !== finalTarget,
+      };
+      alert('🌀 洗脳の影響：あなたの票は ' + finalTarget + ' さんへ操作されました。誰にやられたかは分かりません。');
+    }
     S.voteIdx++;
 
     if (S.voteIdx >= alivePl.length) {
@@ -4653,6 +4787,7 @@ function bindEvents() {
       // 霊媒師用に処刑情報を記録
       S.lastExecuted = executed;
       S.lastExecutedRole = execP.role;
+      if (S.brainwashDetail) S.brainwashHistory.push({...S.brainwashDetail, tally:{...tally}, executed});
       // 猫又ルール: 処刑された場合、ランダムに生存者を1人道連れ
       let nekomataVictim = null;
       if (execP.role === 'NEKOMATA') {
@@ -4663,7 +4798,7 @@ function bindEvents() {
           log(`第${S.day}日: 猫又の道連れで ${nekomataVictim.name} も倒れました`);
         }
       }
-      S.voteResult = {executed, tally, nekomataVictim: nekomataVictim?.name, voteReasons: S.voteReasons, votes: S.votes};
+      S.voteResult = {executed, tally, nekomataVictim: nekomataVictim?.name, voteReasons: S.voteReasons, votes: S.votes, brainwashCount:S.brainwashApplied ? 1 : 0};
       S.winner = checkWin();
       S.phase = 'vote_result';
     }
@@ -4680,6 +4815,8 @@ function bindEvents() {
     // 騎士護衛対象のリセット（当夜から新たな護衛対象を選べる。lastDoctorTargetは記録済み）
     S.doctorTarget = null;
     S.wolfTarget = null;
+    S.brainwash = null;
+    S.brainwashApplied = false;
     S._wolfLocalSel = null;
     S.phase = 'night';
     render();
@@ -5125,14 +5262,24 @@ function bindEvents() {
     const btn = document.getElementById('oNightSend');
     const action = btn ? btn.dataset.action : null;
     // wolf: ステルスグリッドから選択、それ以外: ドロップダウン
-    const target = (action === 'wolf') ? (O._wolfNightSel || '') : val('oNightTgt');
-    if (!action || !target) return;
+    const brainwashVoter = action === 'brainwash' ? val('oBrainwashVoter') : '';
+    const brainwashTarget = action === 'brainwash' ? val('oBrainwashTarget') : '';
+    const target = (action === 'wolf') ? (O._wolfNightSel || '') : (action === 'brainwash' ? brainwashVoter : val('oNightTgt'));
+    const voteTarget = action === 'brainwash' ? brainwashTarget : '';
+    if (!action || !target || (action === 'brainwash' && !voteTarget)) return;
     const needed = O.nightActionNeeded || {};
     const allowedTargets = (needed.targets || []).map(t => t.name);
     if (needed.action && needed.action !== action) return;
-    if (allowedTargets.length && !allowedTargets.includes(target)) {
+    const selectedTargets = action === 'brainwash' ? [target, voteTarget] : [target];
+    if (allowedTargets.length && selectedTargets.some(name => !allowedTargets.includes(name))) {
       alert('選択できる相手を選び直してください');
       return;
+    }
+    if (action === 'brainwash') {
+      if (target === voteTarget || target === O.playerName || voteTarget === O.playerName || (needed.last_brainwashed && target === needed.last_brainwashed)) {
+        alert('洗脳する人と強制する投票先は別々に選び、前夜の対象は選ばないでください');
+        return;
+      }
     }
     if (action === 'doctor') {
       if (target === O.playerName) {
@@ -5145,7 +5292,9 @@ function bindEvents() {
       }
     }
     if (action === 'doctor') O._myLastGuard = target; // 戦績: 護衛成功判定用
-    if (!wsSend({type:'night_action', action, target})) return;
+    const nightPayload = {type:'night_action', action, target};
+    if (action === 'brainwash') nightPayload.vote_target = voteTarget;
+    if (!wsSend(nightPayload)) return;
     if (mode === 'p2p') {
       O.nightActionPending = true;
       scheduleP2PActionAckWatchdog('night_action');
@@ -5244,6 +5393,7 @@ const SoloEngine = (() => {
       nightReport: null,
       humanNightDone: false, cpuNightDone: false,
       humanWolfChoice: null,
+      brainwash: null, brainwashApplied: false, brainwashDetail: null, brainwashHistory: [], lastBrainwashVoter: null,
       discMsgs: [], discOrder: [], discIdx: 0, discRound: 1,
       preVotes: {}, preVoteChanges: {},
       votes: {}, voteReasons: {}, humanVoted: false, tallyDone: false, resolveDone: false,
@@ -5309,7 +5459,7 @@ const SoloEngine = (() => {
   // ── 夜フェーズ ────────────────────────────────────────
   function startNight() {
     R.day++; R.phase = 'night';
-    R.wolfTarget = null; R.doctorTarget = null;
+    R.wolfTarget = null; R.doctorTarget = null; R.brainwash = null; R.brainwashApplied = false;
     R.humanNightDone = false; R.cpuNightDone = false;
     R.humanWolfChoice = null; R.resolveDone = false;
 
@@ -5338,6 +5488,10 @@ const SoloEngine = (() => {
         } else {
           R.humanNightDone = true;
         }
+      } else if (human.role==='MADMAN_ACTIVE') {
+        const brainwashTargets = others.filter(p=>p.name!==R.lastBrainwashVoter);
+        if (brainwashTargets.length >= 2) emit({ type:'action_needed', action:'brainwash', targets:brainwashTargets.map(p=>({name:p.name})), last_brainwashed:R.lastBrainwashVoter || null });
+        else R.humanNightDone = true;
       } else {
         R.humanNightDone = true;
       }
@@ -5367,6 +5521,13 @@ const SoloEngine = (() => {
     if (cpuWolves.length && vill.length) {
       const target = BRAIN.wolfNightTarget(R) || topAcc(vill) || rand(vill);
       if (target) R.wolfTarget = target.name;
+    }
+    // 能動型狂人CPU: 公開情報を基に一票を操作する
+    const cpuMadman = al.find(p=>p.isCpu && p.role==='MADMAN_ACTIVE');
+    if (cpuMadman) {
+      const brainwashPool = al.filter(p=>p.name!==cpuMadman.name && p.name!==R.lastBrainwashVoter);
+      const plan = BRAIN.chooseBrainwashTargets(R, cpuMadman, brainwashPool);
+      if (plan) { R.brainwash = { voter:plan.voter.name, target:plan.target.name, day:R.day, actor:cpuMadman.name }; R.lastBrainwashVoter = plan.voter.name; }
     }
     // 騎士CPU: 自衛・連続護衛を避け、役職COした情報源を優先して守る
     const cpuDoc = al.find(p=>p.isCpu && p.role==='DOCTOR');
@@ -5519,6 +5680,23 @@ const SoloEngine = (() => {
     return humanDone && aliveList.every(p => R.votes[p.name] !== undefined);
   }
 
+  function applySoloBrainwashVote(voterName, intendedTarget) {
+    const effect = R.brainwash;
+    const voter = byName(voterName);
+    const forcedTarget = effect ? byName(effect.target) : null;
+    if (!effect || effect.voter !== voterName || !voter?.alive || !forcedTarget?.alive || forcedTarget.name === voterName)
+      return { target:intendedTarget, forced:false };
+    R.brainwashApplied = true;
+    R.brainwashDetail = {
+      day: R.day,
+      actor: effect.actor || '',
+      voter: voterName,
+      intendedTarget,
+      forcedTarget: forcedTarget.name,
+      changed: intendedTarget !== forcedTarget.name,
+    };
+    return { target:forcedTarget.name, forced:true };
+  }
   function autoFillMissingCpuVotes() {
     const al = alive();
     al.filter(p => p.isCpu && R.votes[p.name] === undefined).forEach(cpu => {
@@ -5528,7 +5706,8 @@ const SoloEngine = (() => {
         tgt = others.length ? rand(others) : null;
       }
       if (tgt) {
-        R.votes[cpu.name] = tgt.name;
+        const applied = applySoloBrainwashVote(cpu.name, tgt.name);
+        R.votes[cpu.name] = applied.target;
         R.voteReasons[cpu.name] = BRAIN.voteReason(R, cpu, tgt);
       }
     });
@@ -5541,7 +5720,7 @@ const SoloEngine = (() => {
   }
 
   function startVote() {
-    R.phase = 'vote'; R.votes = {}; R.voteReasons = {}; R.humanVoted = false; R.tallyDone = false;
+    R.phase = 'vote'; R.votes = {}; R.voteReasons = {}; R.humanVoted = false; R.tallyDone = false; R.brainwashApplied = false; R.brainwashDetail = null;
     if (R._voteFallback) { clearTimeout(R._voteFallback); R._voteFallback = null; }
     if (R._discFallback) { clearTimeout(R._discFallback); R._discFallback = null; } // 議論フォールバックを確実に停止
     const al = alive();
@@ -5552,7 +5731,8 @@ const SoloEngine = (() => {
       later(1500 + i*1200, () => {
         const tgt = BRAIN.vote(R, cpu);
         if (tgt) {
-          R.votes[cpu.name] = tgt.name;
+          const applied = applySoloBrainwashVote(cpu.name, tgt.name);
+          R.votes[cpu.name] = applied.target;
           R.voteReasons[cpu.name] = BRAIN.voteReason(R, cpu, tgt);
         }
         const done = Object.keys(R.votes).length;
@@ -5589,6 +5769,7 @@ const SoloEngine = (() => {
     R.lastExecutedRole = execP?.role;
     if (!R.voteHistory) R.voteHistory = [];
     R.voteHistory.push({day:R.day, votes:{...R.votes}, preVotes:{...R.preVotes}, tally:{...count}, executed});
+    if (R.brainwashDetail) R.brainwashHistory.push({...R.brainwashDetail, tally:{...count}, executed});
     // 猫又ルール: 処刑時にランダムな生存者を道連れ
     let nekomataVictim = null;
     if (execP?.role === 'NEKOMATA') {
@@ -5609,6 +5790,8 @@ const SoloEngine = (() => {
       vote_reasons: R.voteReasons,
       votes: R.votes,
       pre_votes: R.preVotes,
+      brainwash_count: R.brainwashApplied ? 1 : 0,
+      brainwash_history: win ? R.brainwashHistory : null,
       winner: win,
       players: win ? R.players.map(p=>({name:p.name,role:p.role,alive:p.alive})) : null,
       log: win ? R.log : null,
@@ -5747,6 +5930,16 @@ const SoloEngine = (() => {
           }
           R.doctorTarget = data.target;
           emit({ type:'action_ack' });
+        } else if (human.role==='MADMAN_ACTIVE') {
+          const voter = byName(data.target);
+          const forcedTarget = byName(data.vote_target);
+          if (!voter || !forcedTarget || !voter.alive || !forcedTarget.alive || voter.name===human.name || forcedTarget.name===human.name || voter.name===forcedTarget.name || voter.name===R.lastBrainwashVoter) {
+            emit({ type:'error', msg:'洗脳する人と強制する投票先を別々に選んでください' });
+            break;
+          }
+          R.brainwash = { voter:voter.name, target:forcedTarget.name, day:R.day, actor:human.name };
+          R.lastBrainwashVoter = voter.name;
+          emit({ type:'action_ack', action:'brainwash' });
         }
         R.humanNightDone = true;
         if (R.cpuNightDone) later(700, resolveNight);
@@ -5808,8 +6001,16 @@ const SoloEngine = (() => {
       }
       case 'vote': {
         const al = alive();
-        R.votes[R.players[0].name] = data.target;
-        R.voteReasons[R.players[0].name] = (data.reason || '').trim() || `${data.target}さんの発言と投票の流れが気になりました。`;
+        const human = R.players[0];
+        const selected = byName(data.target);
+        if (!human?.alive || !selected?.alive || selected.name === human.name) {
+          emit({ type:'error', msg:'投票先を選び直してください' });
+          break;
+        }
+        const applied = applySoloBrainwashVote(human.name, selected.name);
+        R.votes[human.name] = applied.target;
+        R.voteReasons[human.name] = (data.reason || '').trim() || (selected.name + 'さんの発言と投票の流れが気になりました。');
+        if (applied.forced) emit({ type:'brainwashed_notice', forced_target:applied.target });
         R.humanVoted = true;
         const done = Object.keys(R.votes).length;
         emit({ type:'vote_progress', done, total:al.length });
@@ -6367,7 +6568,7 @@ const BRAIN = (function(){
     if (ownBlack.length) return pickByScore(ownBlack, player => (board.byName.get(player.name)?.score || 0) + 4 + tinyNoise());
 
     const isWolf = cpu.role === 'WEREWOLF';
-    const isMad = cpu.role === 'MADMAN';
+    const isMad = cpu.role === 'MADMAN' || cpu.role === 'MADMAN_ACTIVE';
     const wolfNames = isWolf ? new Set(alive(R).filter(player => player.role === 'WEREWOLF').map(player => player.name)) : new Set();
     const legal = pool.filter(player => !wolfNames.has(player.name));
     if (!legal.length) return null;
@@ -6425,7 +6626,7 @@ const BRAIN = (function(){
         };
       }
     }
-    if (cpu.role === 'MADMAN') {
+    if (cpu.role === 'MADMAN' || cpu.role === 'MADMAN_ACTIVE') {
       return {
         kind:'accuse', target:target.name, confidence,
         text:`今日は${target.name}さんを優先して見たいです。${evidence}。ここを残す場合の白要素を、誰か具体的に出してください。`
@@ -6653,7 +6854,7 @@ const BRAIN = (function(){
     let text = '';
 
     // ── 人狼・狂人ロジック ──
-    if (cpu.role==='WEREWOLF' || cpu.role==='MADMAN') {
+    if (isWolfSideRole(cpu.role)) {
       text = speakWolfSide(R, cpu, pers, round, wasAcc, ot);
     }
     // ── 占い師ロジック ──
@@ -6685,7 +6886,7 @@ const BRAIN = (function(){
 
   // === 人狼／狂人 ===
   function speakWolfSide(R, cpu, pers, round, wasAcc, ot){
-    const isMad = cpu.role==='MADMAN';
+    const isMad = cpu.role==='MADMAN' || cpu.role==='MADMAN_ACTIVE';
     const myTeam = isMad ? [cpu.name] : alive(R).filter(p=>p.role==='WEREWOLF').map(p=>p.name);
     const vill = ot.filter(p=>!myTeam.includes(p.name));
 
@@ -6698,6 +6899,10 @@ const BRAIN = (function(){
         return tplFill(rand(TPL.accuse), tgt.name);
       }
       return rand(TPL.defend);
+    }
+
+    if (cpu.role==='MADMAN_ACTIVE' && R.day >= 2 && Math.random() < 0.18) {
+      return '洗脳されたCOです。投票が自分の意思と違う先へ操作されました。誰にやられたかは分かりません。';
     }
 
     // 2) 騙り占い師として動く？
@@ -7062,7 +7267,7 @@ const BRAIN = (function(){
     if (!name) return '';
     const board = buildPublicBoard(R, cpu);
     const row = board.byName.get(name);
-    const isWolfSide = cpu.role === 'WEREWOLF' || cpu.role === 'MADMAN';
+    const isWolfSide = isWolfSideRole(cpu.role);
     const styled = reason => personagizeVoteReason(cpu, name, reason, true);
     const preliminary = R.preVotes?.[cpu.name];
     if (preliminary && preliminary !== name) {
@@ -7121,7 +7326,24 @@ const BRAIN = (function(){
     return target;
   }
 
-  return { initR, parseClaim, speak, vote, voteReason, wolfNightTarget, chooseSeerNightTarget, chooseDoctorGuardTarget, bumpSuspicion, bumpCover, buildPublicBoard, chooseStrategicVoteTarget };
+  function chooseBrainwashTargets(R, madman, al){
+    initR(R);
+    const pool = (al || alive(R)).filter(player => player && player.alive && player.name !== madman?.name);
+    if (pool.length < 2) return null;
+    const board = buildPublicBoard(R, madman);
+    const forcedTarget = pickByScore(pool, player => {
+      const row = board.byName.get(player.name);
+      return (row?.score || 0) * 0.72 + (board.tally[player.name] || 0) * 0.38 + (row?.claim ? 0.18 : 0) + tinyNoise();
+    });
+    if (!forcedTarget) return null;
+    const voters = pool.filter(player => player.name !== forcedTarget.name);
+    const voter = pickByScore(voters, player => {
+      const row = board.byName.get(player.name);
+      return Math.max(0, -(row?.score || 0)) * 0.7 + (R.speakCount?.[player.name] || 0) * 0.11 + tinyNoise();
+    });
+    return voter ? { voter, target:forcedTarget } : null;
+  }
+  return { initR, parseClaim, speak, vote, voteReason, wolfNightTarget, chooseSeerNightTarget, chooseDoctorGuardTarget, chooseBrainwashTargets, bumpSuspicion, bumpCover, buildPublicBoard, chooseStrategicVoteTarget };
 })();
 
 // ========== PROGRESSION & DETECTIVE SCORE（ソロの成長・中毒性レイヤー） ==========
@@ -7207,7 +7429,7 @@ const PROGRESS = (() => {
 
   function recordGame(ctx){
     const p = load();
-    const isWolfTeam = r => r==='WEREWOLF' || r==='MADMAN';
+    const isWolfTeam = r => isWolfSideRole(r);
     const me = (ctx.players||[]).find(x=>x.name===ctx.myName) || {};
     const survived = !!me.alive;
     const myTeam = (ROLES[ctx.myRole]||{}).team || 'village';
@@ -7442,6 +7664,7 @@ function renderSoloRecap(){
     ${achHtml}
     ${renderNotebookReview(g)}
     ${renderEndgameReplay(players)}
+    ${renderBrainwashRevelation(O.brainwashHistory)}
     <p class="sec-label">📋 全員の役職</p>
     ${rows}
     <hr class="div">
@@ -7722,6 +7945,10 @@ const P2PEngine = (() => {
       const docTargets = al.filter(x=>x.name!==player.name && x.name!==R.lastDoctorTarget);
       return docTargets.length ? {type:'action_needed',action:'doctor',targets:docTargets.map(x=>({name:x.name})),last_protected:R.lastDoctorTarget} : null;
     }
+    if (player.role==='MADMAN_ACTIVE') {
+      const brainwashTargets = others.filter(x=>x.name!==R.lastBrainwashVoter);
+      return brainwashTargets.length >= 2 ? {type:'action_needed',action:'brainwash',targets:brainwashTargets.map(x=>({name:x.name})),last_brainwashed:R.lastBrainwashVoter || null} : null;
+    }
     return null;
   }
   function resyncPayloadFor(playerName) {
@@ -7794,6 +8021,23 @@ const P2PEngine = (() => {
       try { old?.close?.(); } catch(e) {}
     });
   }
+  function applyP2PBrainwashVote(voterName, intendedTarget) {
+    const effect = R.brainwash;
+    const voter = byName(voterName);
+    const forcedTarget = effect ? byName(effect.target) : null;
+    if (!effect || effect.voter !== voterName || !voter?.alive || !forcedTarget?.alive || forcedTarget.name === voterName)
+      return { target:intendedTarget, forced:false };
+    R.brainwashApplied = true;
+    R.brainwashDetail = {
+      day: R.day,
+      actor: effect.actor || '',
+      voter: voterName,
+      intendedTarget,
+      forcedTarget: forcedTarget.name,
+      changed: intendedTarget !== forcedTarget.name,
+    };
+    return { target:forcedTarget.name, forced:true };
+  }
   function autoVoteForDisconnected(name) {
     const voter = byName(name);
     if (!voter || !voter.alive || voter.isCpu || R.phase !== 'vote') return;
@@ -7805,7 +8049,8 @@ const P2PEngine = (() => {
     if (!targets.length) return;
     if (!R.votes[name]) {
       const target = topAcc(targets) || rand(targets);
-      R.votes[name] = target.name;
+      const applied = applyP2PBrainwashVote(name, target.name);
+      R.votes[name] = applied.target;
       R.voteReasons[name] = '通信切断中のため、ゲーム停止防止の仮投票です。再接続すれば投票確定前に上書きできます。';
     }
     R.autoVotes.add(name);
@@ -8172,7 +8417,7 @@ const P2PEngine = (() => {
       ...R,
       players: allPlayers.map((p,i)=>({...p, role:roles[i], alive:true})),
       day:0, phase:'role',
-      wolfTarget:null, doctorTarget:null,
+      wolfTarget:null, doctorTarget:null, brainwash:null, brainwashApplied:false, brainwashDetail:null, brainwashHistory:[], lastBrainwashVoter:null,
       lastDoctorTarget:null, lastExecuted:null, lastExecutedRole:null,
       nightReport:null,
       humanActionDone:{}, cpuNightDone:false,
@@ -8231,7 +8476,7 @@ const P2PEngine = (() => {
 
   function startNight() {
     R.day++; R.phase='night';
-    R.wolfTarget=null; R.doctorTarget=null;
+    R.wolfTarget=null; R.doctorTarget=null; R.brainwash=null; R.brainwashApplied=false;
     R.humanActionDone={}; R.cpuNightDone=false;
     R.humanWolfChoice=null; R.resolveDone=false;
     const al = alive();
@@ -8259,6 +8504,10 @@ const P2PEngine = (() => {
         } else {
           R.humanActionDone[p.name] = true;
         }
+      } else if (p.role==='MADMAN_ACTIVE') {
+        const brainwashTargets = others.filter(x=>x.name!==R.lastBrainwashVoter);
+        if (brainwashTargets.length >= 2) sendTo(p.name,{type:'action_needed',action:'brainwash',targets:brainwashTargets.map(x=>({name:x.name})),last_brainwashed:R.lastBrainwashVoter || null});
+        else R.humanActionDone[p.name] = true;
       } else {
         R.humanActionDone[p.name] = true;
       }
@@ -8284,6 +8533,13 @@ const P2PEngine = (() => {
     if (cpuWolves.length && vill.length) {
       const tgt = BRAIN.wolfNightTarget(R) || topAcc(vill) || rand(vill);
       if (tgt) R.wolfTarget = tgt.name;
+    }
+    // 能動型狂人CPU: 公開情報を基に一票を操作する
+    const cpuMadman = al.find(p=>p.isCpu&&p.role==='MADMAN_ACTIVE');
+    if (cpuMadman) {
+      const brainwashPool = al.filter(p=>p.name!==cpuMadman.name && p.name!==R.lastBrainwashVoter);
+      const plan = BRAIN.chooseBrainwashTargets(R, cpuMadman, brainwashPool);
+      if (plan) { R.brainwash = { voter:plan.voter.name, target:plan.target.name, day:R.day, actor:cpuMadman.name }; R.lastBrainwashVoter = plan.voter.name; }
     }
     // 騎士CPU: 自衛・連続護衛を避け、役職COした情報源を優先して守る
     const cpuDoc = al.find(p=>p.isCpu&&p.role==='DOCTOR');
@@ -8345,6 +8601,18 @@ const P2PEngine = (() => {
       R.doctorTarget=data.target;
       sendTo(pname,{type:'action_ack'});
       pushP2PEvent('action_ack', `${pname}/doctor`);
+    } else if (player.role==='MADMAN_ACTIVE') {
+      const voter=byName(data.target);
+      const forcedTarget=byName(data.vote_target);
+      if (!voter || !forcedTarget || !voter.alive || !forcedTarget.alive || voter.name===player.name || forcedTarget.name===player.name || voter.name===forcedTarget.name || voter.name===R.lastBrainwashVoter) {
+        sendTo(pname,{type:'error',msg:'洗脳する人と強制する投票先を別々に選んでください'});
+        sendResyncTo(pname);
+        return;
+      }
+      R.brainwash={voter:voter.name,target:forcedTarget.name,day:R.day,actor:player.name};
+      R.lastBrainwashVoter=voter.name;
+      sendTo(pname,{type:'action_ack',action:'brainwash'});
+      pushP2PEvent('action_ack', `${pname}/brainwash`);
     }
     doneNames.forEach(n => { R.humanActionDone[n]=true; });
     checkNightDone();
@@ -8571,7 +8839,7 @@ const P2PEngine = (() => {
 
   // ── 投票 ─────────────────────────────────────────────
   function startVote() {
-    R.phase='vote'; R.votes={}; R.voteReasons={}; R.humanVotedSet=new Set(); R.autoVotes=new Set(); R.tallyDone=false;
+    R.phase='vote'; R.votes={}; R.voteReasons={}; R.humanVotedSet=new Set(); R.autoVotes=new Set(); R.tallyDone=false; R.brainwashApplied=false; R.brainwashDetail=null;
     if (R._discFallback) { clearTimeout(R._discFallback); R._discFallback = null; } // 議論フォールバックを停止
     const al=alive();
     al.filter(p=>!p.isCpu && p.disconnected).forEach(p=>autoVoteForDisconnected(p.name));
@@ -8581,7 +8849,8 @@ const P2PEngine = (() => {
     cpus.forEach((cpu,i)=>later(900+i*600,()=>{
       const tgt=BRAIN.vote(R, cpu);
       if (tgt) {
-        R.votes[cpu.name]=tgt.name;
+        const applied = applyP2PBrainwashVote(cpu.name, tgt.name);
+        R.votes[cpu.name]=applied.target;
         R.voteReasons[cpu.name]=BRAIN.voteReason(R, cpu, tgt);
       }
       const currentAlive = alive();
@@ -8611,11 +8880,13 @@ const P2PEngine = (() => {
       pushP2PEvent('vote_ack', `${pname} duplicate`);
       return;
     }
-    R.votes[pname]=target;
+    const applied = applyP2PBrainwashVote(pname, target);
+    R.votes[pname]=applied.target;
     R.voteReasons[pname]=(reason || '').trim() || `${target}さんへの疑いを確認する投票です。`;
     R.humanVotedSet.add(pname);
     if (R.autoVotes) R.autoVotes.delete(pname);
     sendTo(pname,{type:'vote_ack'});
+    if (applied.forced) sendTo(pname,{type:'brainwashed_notice',forced_target:applied.target});
     pushP2PEvent('vote_ack', pname);
     const al=alive();
     broadcast({type:'vote_progress',done:Object.keys(R.votes).length,total:al.length});
@@ -8625,7 +8896,7 @@ const P2PEngine = (() => {
   function cpuVoteTarget(cpu) {
     const al=alive(), others=al.filter(p=>p.name!==cpu.name);
     if (!others.length) return null;
-    if (cpu.role==='WEREWOLF'||cpu.role==='MADMAN') {
+    if (isWolfSideRole(cpu.role)) {
       const vill=others.filter(p=>p.role!=='WEREWOLF');
       return vill.length?(topAcc(vill)||rand(vill)):rand(others);
     }
@@ -8656,6 +8927,7 @@ const P2PEngine = (() => {
     R.lastExecuted=executed; R.lastExecutedRole=execP?.role;
     if (!R.voteHistory) R.voteHistory = [];
     R.voteHistory.push({day:R.day, votes:{...R.votes}, preVotes:{...R.preVotes}, tally:{...tally}, executed});
+    if (R.brainwashDetail) R.brainwashHistory.push({...R.brainwashDetail, tally:{...tally}, executed});
     // 猫又ルール: 処刑時にランダムな生存者を道連れ
     let nekomataVictim=null;
     if (execP?.role==='NEKOMATA') {
@@ -8673,6 +8945,8 @@ const P2PEngine = (() => {
       voteReasons:{...R.voteReasons},
       votes:{...R.votes},
       preVotes:{...R.preVotes},
+      brainwashCount:R.brainwashApplied ? 1 : 0,
+      brainwashHistory:win ? R.brainwashHistory : null,
     };
     broadcast({
       type:'vote_result', executed, executed_role:execP?.role, tally,
@@ -8680,6 +8954,8 @@ const P2PEngine = (() => {
       vote_reasons:R.voteReasons,
       votes:R.votes,
       pre_votes:R.preVotes,
+      brainwash_count:R.brainwashApplied ? 1 : 0,
+      brainwash_history:win ? R.brainwashHistory : null,
       winner:win,
       players:win?R.players.map(p=>({name:p.name,role:p.role,alive:p.alive,disconnected:!!p.disconnected,disconnectedAt:p.disconnectedAt||null,isCpu:!!p.isCpu,avatarIndex:p.avatarIndex,avatarLabel:p.avatarLabel})):null,
       log:win?R.log:null,
@@ -8716,7 +8992,7 @@ const P2PEngine = (() => {
     const pers = cpu.personality || 'balanced';
 
     // ── 人狼・狂人 ──
-    if (cpu.role==='WEREWOLF'||cpu.role==='MADMAN') {
+    if (isWolfSideRole(cpu.role)) {
       if (wasAcc) return rand(TPL.defend);
       const vill=others.filter(p=>p.role!=='WEREWOLF');
       if (pers==='wolf_smart') {
@@ -9074,7 +9350,7 @@ function initOnline() {
     phase: 'setup',
     day: 0, alive: [], eliminatedLastNight: null, nightReport: null,
     nightActionNeeded: null, nightActionDone: false, nightActionPending: false,
-    seerResult: null, wolfChosen: null,
+    seerResult: null, wolfChosen: null, brainwashNotice: null, brainwashHistory: [],
     // Wolf chat
     wolfChatMsgs: [], wolfChatReady: false, wolfChatReadyPending: false, wolfPartnerNames: [],
     // Discussion
@@ -9167,7 +9443,7 @@ function handleServer(data) {
       clearP2PActionAckWatchdog();
       O.phase = 'role';
       if (['solo','p2p','online'].includes(mode)) {
-        O.notebook = {}; O._scored = false; O.gameRecap = null;
+        O.notebook = {}; O._scored = false; O.gameRecap = null; O.brainwashNotice = null; O.brainwashHistory = [];
         O.myVotes = []; O.mySeerHits = 0; O.myGuardSuccess = 0; O._myLastGuard = null;
         O.intelMsgs = []; O.voteHistory = []; O.lastVoteResult = null;
         O.preVotes = {}; O.preVoteChanges = {}; O.preVotePending = false; O.preVoteTargetDraft = '';
@@ -9267,6 +9543,7 @@ function handleServer(data) {
             votes: vr.votes || {},
             preVotes: vr.preVotes || vr.pre_votes || {},
           };
+          if (Array.isArray(vr.brainwashHistory)) O.brainwashHistory = vr.brainwashHistory;
           O.lastVoteResult = O.voteResult;
         }
         O.winner = data.winner || null;
@@ -9431,13 +9708,17 @@ function handleServer(data) {
       O.voteTarget = '';
       O.voteReasonDraft = '';
       O.voteDone = 0; O.voteTotal = data.alive.length;
-      O.voteResult = null; O.phase = 'vote'; break;
+      O.voteResult = null; O.brainwashNotice = null; O.phase = 'vote'; break;
     case 'vote_progress':
       O.voteDone = data.done; O.voteTotal = data.total; break;
     case 'vote_ack':
       clearVoteAckWatchdog();
       pushP2PEvent('vote_ack', O.voteSentTarget || O.voteTarget || '');
       O.voteSubmitted = true; O.voteAckAt = Date.now(); O.voteAckWarningAt = 0; break;
+    case 'brainwashed_notice':
+      O.brainwashNotice = { forcedTarget: data.forced_target || '' };
+      alert('🌀 洗脳の影響：あなたの票は ' + (data.forced_target || '指定先') + ' さんへ操作されました。誰にやられたかは分かりません。');
+      break;
     case 'medium_reveal':
       // 霊媒師のみに届く: 処刑された人の役職を記録
       O.mediumReveal = { target: data.target, role: data.role };
@@ -9445,7 +9726,8 @@ function handleServer(data) {
     case 'vote_result':
       clearVoteAckWatchdog();
       clearP2PActionAckWatchdog();
-      O.voteResult = {executed: data.executed, role: data.executed_role, tally: data.tally, nekomataVictim: data.nekomata_victim, voteReasons: data.vote_reasons || {}, votes: data.votes || {}, preVotes: data.pre_votes || {}};
+      O.voteResult = {executed: data.executed, role: data.executed_role, tally: data.tally, nekomataVictim: data.nekomata_victim, voteReasons: data.vote_reasons || {}, votes: data.votes || {}, preVotes: data.pre_votes || {}, brainwashCount: data.brainwash_count || 0};
+      if (Array.isArray(data.brainwash_history)) O.brainwashHistory = data.brainwash_history;
       O.lastVoteResult = O.voteResult;
       O.voteHistory = O.voteHistory || [];
       O.voteHistory.push({day: O.day, executed: data.executed, tally: data.tally || {}, votes: data.votes || {}, preVotes: data.pre_votes || {}, reasons: data.vote_reasons || {}});
@@ -9800,7 +10082,7 @@ function renderTplPicker() {
     const isDoctor = O.myRole === 'DOCTOR';
     const isNeko   = O.myRole === 'NEKOMATA';
     const isShared = O.myRole === 'SHARED';
-    const isWolf   = O.myRole === 'WEREWOLF' || O.myRole === 'MADMAN';
+    const isWolf   = isWolfSideRole(O.myRole);
     const coBtn = isSeer
       ? `<div style="grid-column:span 2;"><button class="tpl-cat" id="tCatSeer" style="width:100%;">🔮 占い情報を公開（CO）▶</button><p style="color:#475569;font-size:.7rem;text-align:center;margin:.2rem 0 0;">占い師として名乗り出て占い結果を伝える</p></div>`
       : isMedium
@@ -10053,7 +10335,7 @@ function renderONight() {
         </div>`;
     } else if (O.mediumReveal && O.myRole === 'MEDIUM') {
       const mInfo = ROLES[O.mediumReveal.role] || {};
-      const mIsWolf = O.mediumReveal.role==='WEREWOLF'||O.mediumReveal.role==='MADMAN';
+      const mIsWolf = O.mediumReveal.role === 'WEREWOLF';
       const mC = mIsWolf?'#ef4444':'#22c55e';
       extra = `<div class="card-colored" style="text-align:center;border:2px solid ${mC};background:${mC}18;">
         <h3 style="color:#a78bfa;margin-bottom:.4rem;">👁️ 霊視結果</h3>
@@ -10116,6 +10398,25 @@ function renderONight() {
         ${lastNote}
         <label>守る相手</label>${tsel}
         <button class="btn btn-primary" id="oNightSend" data-action="doctor" ${disabled} style="margin-top:.6rem;">${actionPending ? '受理待ち...' : targets.length?'🛡️　護衛する':'護衛候補がいません'}</button>
+      </div>`;
+  }
+  if (action === 'brainwash') {
+    const voterSelect = mkSelect('oBrainwashVoter', targets);
+    const targetSelect = mkSelect('oBrainwashTarget', targets);
+    const previous = an.last_brainwashed ? `<p style="color:#f9a8d4;font-size:.75rem;">前夜の対象: ${esc(an.last_brainwashed)}（今夜は指定不可）</p>` : '';
+    return `
+      ${ph('🌀',`第 ${O.day} 夜`,'あなたは狂人（能動型）です','#ec4899')}
+      ${renderP2PStatusPanel()}
+      ${actionBlock}
+      ${pendingNotice}
+      <div class="card" style="border:1px solid #ec489966;background:rgba(236,72,153,.09);">
+        <h3 style="color:#f9a8d4;margin-bottom:.45rem;">🌀 洗脳</h3>
+        <p style="color:#cbd5e1;font-size:.82rem;line-height:1.65;">翌日の1人の投票先を強制します。投票結果には「操作票:1件」だけが公開されます。</p>
+        <label>票を操作する人</label>${voterSelect}
+        <label style="margin-top:.55rem;">強制する投票先</label>${targetSelect}
+        ${previous}
+        <p style="color:#94a3b8;font-size:.72rem;line-height:1.45;">※ 操作対象と強制先は別人。前夜と同じ操作対象は選べません。</p>
+        <button class="btn btn-primary" id="oNightSend" data-action="brainwash" ${(actionLocked || actionPending || targets.length < 2) ? 'disabled' : ''} style="margin-top:.6rem;background:linear-gradient(135deg,#be185d,#7e22ce);">${actionPending ? '受理待ち...' : '🌀　洗脳を確定する'}</button>
       </div>`;
   }
   if (action === 'wolf') {
@@ -10313,6 +10614,9 @@ function renderOVoteResult() {
     ? `<div style="margin-top:.8rem;padding:.6rem;background:rgba(251,146,60,.1);border:1px solid #fb923c44;border-radius:10px;color:#fb923c;font-size:.82rem;text-align:center;">
         🐱 猫又の道連れ: <strong>${esc(r.nekomataVictim)}</strong> も巻き込まれました！
        </div>` : '';
+  const brainwashHtml = r.brainwashCount
+    ? `<div style="margin-top:.55rem;padding:.58rem;background:rgba(236,72,153,.1);border:1px solid #ec489955;border-radius:8px;color:#f9a8d4;font-size:.82rem;text-align:center;font-weight:800;">🌀 操作票: 1件</div>`
+    : '';
   return `
     ${ph('⚖️',`第${O.day}日 処刑結果`,'村人会議の結論が出ました','#f87171')}
     ${renderP2PStatusPanel()}
@@ -10327,6 +10631,7 @@ function renderOVoteResult() {
       <div style="font-size:.88rem; color:#64748b; margin-bottom:.8rem;">役職は…ゲーム終了時に公開</div>
     </div>
     ${nekHtml}
+    ${brainwashHtml}
     ${renderCaseFile()}
     ${renderAiIntelPanel()}
     ${renderDiscussionHeatPanel()}
@@ -10364,6 +10669,7 @@ function renderOGameOver() {
       <p style="color:${color}; margin:0;">${isV?'村人チームの完全勝利！':'人狼の知略が勝りました...'}</p>
     </div>
     ${renderEndgameReplay(players)}
+    ${renderBrainwashRevelation(O.brainwashHistory)}
     <p class="sec-label">📋 全員の役職</p>
     ${rows}${logHtml}
     <hr class="div">
@@ -10406,7 +10712,7 @@ function renderHome() {
 
 // ========== 役職図鑑（いつでも閲覧できる初心者向けガイド） ==========
 function renderCodex() {
-  const order = ['WEREWOLF','MADMAN','VILLAGER','SEER','DOCTOR','SHARED','MEDIUM','NEKOMATA'];
+  const order = ['WEREWOLF','MADMAN_ACTIVE','VILLAGER','SEER','DOCTOR','SHARED','MEDIUM','NEKOMATA'];
   const cards = order.map(key => {
     const info = ROLES[key];
     if (!info) return '';
@@ -10426,7 +10732,7 @@ function renderCodex() {
       </div>`;
   }).join('');
   return `
-    ${ph('📖','役職図鑑','全8役職の能力と立ち回り・戦略ガイド','#818cf8')}
+    ${ph('📖','役職図鑑','全9役職の能力と立ち回り・戦略ガイド','#818cf8')}
     <div class="card" style="border:1px solid #4338ca44;">
       <p style="color:#cbd5e1;font-size:.86rem;line-height:1.7;margin:0;">
         🎯 <strong>ゲームの目的</strong><br>
@@ -10713,12 +11019,14 @@ function render() {
   const _hadChatFeeds = Object.keys(_feedScrolls).length > 0;
   const _pageScrollY = window.scrollY || window.pageYOffset || 0;
   const _activeEl = document.activeElement;
-  const _activeInputId = ['discFreeInput','wolfFreeInput'].includes(_activeEl?.id) ? _activeEl.id : '';
+  const _editableInputIds = ['discFreeInput','wolfFreeInput','coDraft','oVoteReason'];
+  const _activeInputId = _editableInputIds.includes(_activeEl?.id) ? _activeEl.id : '';
   const _activeSelStart = _activeInputId ? _activeEl.selectionStart : null;
   const _activeSelEnd = _activeInputId ? _activeEl.selectionEnd : null;
   // チャット入力中のテキストを保持（CPUターンで再描画されても消えないように）
   const _discVal  = document.getElementById('discFreeInput')?.value  || '';
   const _wolfVal  = document.getElementById('wolfFreeInput')?.value  || '';
+  const _coVal = document.getElementById('coDraft')?.value || '';
   const _voteTgt = document.getElementById('oVoteTgt')?.value || '';
   const _voteReason = document.getElementById('oVoteReason')?.value || '';
   if (O.phase === 'vote') {
@@ -10748,6 +11056,8 @@ function render() {
   if (discInput && _discVal) { discInput.value = _discVal; }
   const wolfInput = document.getElementById('wolfFreeInput');
   if (wolfInput && _wolfVal) { wolfInput.value = _wolfVal; }
+  const coInput = document.getElementById('coDraft');
+  if (coInput && _coVal) { coInput.value = _coVal; }
   const activeInput = _activeInputId ? document.getElementById(_activeInputId) : null;
   if (activeInput && !activeInput.disabled) {
     try {
@@ -10760,18 +11070,20 @@ function render() {
   const voteSelect = document.getElementById('oVoteTgt');
   if (voteSelect && O.voteTarget) voteSelect.value = O.voteTarget;
   const voteReason = document.getElementById('oVoteReason');
-  if (voteReason && O.voteReasonDraft) voteReason.value = O.voteReasonDraft;
+  if (voteReason) voteReason.value = _voteReason || O.voteReasonDraft || '';
 
   // 議論・チャット中は画面トップに飛ばさない（上下スクロール防止）
   const _isChatPhase = _chatPhases.includes(O.phase);
-  if (!_isChatPhase) window.scrollTo(0, 0);
+  const _isVotePhase = O.phase === 'vote' || (mode === 'local' && S.phase === 'vote');
+  const _preservePageScroll = _isChatPhase || _isVotePhase || !!_activeInputId;
+  if (!_preservePageScroll) window.scrollTo(0, 0);
   bindEvents();
   if (_isChatPhase) {
     const changed = chatLatestKey() !== _chatKeyBefore;
     if (changed || !_hadChatFeeds) scheduleChatLatestScroll(true);
     else restoreChatFeedScrolls(_feedScrolls);
-    if (_wasChatPhase && _hadChatFeeds) restorePageScrollLater(_pageScrollY);
   }
+  if (_preservePageScroll) restorePageScrollLater(_pageScrollY);
   QUALITY.lastRenderOkAt = Date.now();
   } catch (err) {
     pushQualityError('render', err);

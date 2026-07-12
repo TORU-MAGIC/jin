@@ -8,18 +8,18 @@ import asyncio, json, random, socket
 CONFIGS = {
     4:  ['WEREWOLF','SEER','VILLAGER','VILLAGER'],
     5:  ['WEREWOLF','SEER','DOCTOR','VILLAGER','VILLAGER'],
-    6:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','VILLAGER','VILLAGER'],
-    7:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN','VILLAGER','VILLAGER'],
-    8:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
-    9:  ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','MADMAN','VILLAGER','VILLAGER'],
-    10: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
-    11: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
-    12: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER'],
-    13: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
-    14: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
-    15: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
-    16: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
-    17: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+    6:  ['WEREWOLF','SEER','DOCTOR','MADMAN_ACTIVE','VILLAGER','VILLAGER'],
+    7:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN_ACTIVE','VILLAGER','VILLAGER'],
+    8:  ['WEREWOLF','WEREWOLF','SEER','DOCTOR','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER'],
+    9:  ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','MADMAN_ACTIVE','VILLAGER','VILLAGER'],
+    10: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER'],
+    11: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER'],
+    12: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER'],
+    13: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+    14: ['WEREWOLF','WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+    15: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+    16: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
+    17: ['WEREWOLF','WEREWOLF','WEREWOLF','SEER','DOCTOR','MEDIUM','SHARED','SHARED','NEKOMATA','MADMAN_ACTIVE','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER','VILLAGER'],
 }
 MAX_PLAYERS = 17
 CPU_NAMES = ['ボブ','井沢','工場長','狩野英孝','マリック','キングカズ','カズレーザー','リンゴちゃん','ドナルド','沢枝','イッコー','マツコ','アンジャッシュ渡部','ピコ太郎','ザコシショウ','出川','吉田沙保里','ラン']
@@ -116,7 +116,7 @@ def new_room(code):
         'phase': 'lobby', 'day': 0, 'cpu_pids': set(),
         'disc_msgs': [], 'disc_order': [], 'disc_step': 0, 'disc_round': 0,
         'wolf_chat': [], 'wolf_done': set(),
-        'night_actions': {}, 'night_pending': set(),
+        'night_actions': {}, 'night_pending': set(), 'brainwash_applied': False, 'brainwash_detail': None, 'brainwash_history': [], 'last_brainwash_voter': None,
         'last_doctor_target': None,
         'last_executed': None, 'last_executed_role': None,
         'votes': {}, 'vote_reasons': {}, 'vote_pending': set(), 'log': [],
@@ -236,7 +236,7 @@ def cpu_template(room, cpu_pid, ctx='discuss'):
             return random.choice(RAN_CPU_T['accuse']).replace('{t}', t)
         return random.choice(RAN_CPU_T['neutral'])
 
-    if role in ['WEREWOLF', 'MADMAN']:
+    if role in ['WEREWOLF', 'MADMAN', 'MADMAN_ACTIVE']:
         if was_accused:
             return random.choice(CPU_T['defend'])
         non_wolf_alive = [q for pid, q in alive_others if pid not in wolf_set]
@@ -292,6 +292,7 @@ async def start_night_actions(room):
     room['phase'] = 'night'
     room['night_actions'] = {}
     room['night_pending'] = set()
+    room['brainwash_applied'] = False
     await bcast(room, {'type': 'night_start', 'day': room['day']})
 
     if room.get('last_executed'):
@@ -319,6 +320,19 @@ async def start_night_actions(room):
                 if pid in room['cpu_pids']:
                     asyncio.create_task(_cpu_night(room, pid, 'doctor', tgts))
 
+    for bid, bp in room['players'].items():
+        if not bp['alive'] or bp['role'] != 'MADMAN_ACTIVE':
+            continue
+        targets = [{'name': q['name']} for qid, q in room['players'].items()
+                   if q['alive'] and qid != bid and q['name'] != room.get('last_brainwash_voter')]
+        if len(targets) >= 2:
+            await send1(room, bid, {'type': 'action_needed', 'action': 'brainwash',
+                                    'targets': targets,
+                                    'last_brainwashed': room.get('last_brainwash_voter')})
+            room['night_pending'].add(('brainwash', bid))
+            if bid in room['cpu_pids']:
+                asyncio.create_task(_cpu_night(room, bid, 'brainwash', targets))
+
     wlist = wolf_list(room)
     if wlist:
         tgts = [{'name': p['name']} for p in room['players'].values() if p['alive'] and p['role'] != 'WEREWOLF']
@@ -335,7 +349,14 @@ async def start_night_actions(room):
 async def _cpu_night(room, cpu_pid, action, tgts):
     await asyncio.sleep(random.uniform(0.5, 1.5))
     if not tgts: return
-    target = random.choice(tgts)['name']
+    if action == 'brainwash':
+        voter = random.choice(tgts)['name']
+        forced_choices = [item['name'] for item in tgts if item['name'] != voter]
+        if not forced_choices:
+            return
+        target = {'voter': voter, 'vote_target': random.choice(forced_choices)}
+    else:
+        target = random.choice(tgts)['name']
     await _apply_night_action(room, cpu_pid, action, target)
 
 async def _apply_night_action(room, pid, action, target):
@@ -368,6 +389,27 @@ async def _apply_night_action(room, pid, action, target):
         room['night_actions']['doctor_target'] = target
         room['night_pending'].discard(('doctor', pid))
         await send1(room, pid, {'type': 'action_ack', 'action': 'doctor'})
+    elif action == 'brainwash':
+        actor = room['players'].get(pid)
+        if ('brainwash', pid) not in room['night_pending']:
+            return
+        if not actor or not actor.get('alive') or actor.get('role') != 'MADMAN_ACTIVE':
+            await send1(room, pid, {'type': 'error', 'msg': '洗脳を使える役職ではありません'})
+            return
+        if not isinstance(target, dict):
+            return
+        voter_name = target.get('voter')
+        forced_name = target.get('vote_target')
+        voter = next((p for p in room['players'].values() if p['name'] == voter_name and p['alive']), None)
+        forced = next((p for p in room['players'].values() if p['name'] == forced_name and p['alive']), None)
+        if (not voter or not forced or voter_name == forced_name or voter_name == actor['name']
+                or forced_name == actor['name'] or voter_name == room.get('last_brainwash_voter')):
+            await send1(room, pid, {'type': 'error', 'msg': '同じ人を翌日の洗脳対象にはできません'})
+            return
+        room['night_actions']['brainwash'] = {'actor': actor['name'], 'voter': voter_name, 'target': forced_name}
+        room['last_brainwash_voter'] = voter_name
+        room['night_pending'].discard(('brainwash', pid))
+        await send1(room, pid, {'type': 'action_ack', 'action': 'brainwash'})
     elif action == 'wolf':
         actor = room['players'].get(pid)
         target_player = next((p for p in room['players'].values() if p['name'] == target and p['alive']), None)
@@ -499,7 +541,7 @@ def _cpu_pre_vote_target(room, cpu_pid):
         for _, q in alive_others:
             if q['name'] in m['text'] and any(w in m['text'] for w in ['怪しい', '疑', '投票', '処刑']):
                 accused[q['name']] = accused.get(q['name'], 0) + 1
-    if p['role'] in ['WEREWOLF', 'MADMAN']:
+    if p['role'] in ['WEREWOLF', 'MADMAN', 'MADMAN_ACTIVE']:
         candidates = [q for pid, q in alive_others if pid not in wolf_set]
         return (max(accused, key=accused.get) if accused else None) or (random.choice(candidates)['name'] if candidates else None)
     return (max(accused, key=accused.get) if accused else None) or random.choice(alive_others)[1]['name']
@@ -536,6 +578,7 @@ async def start_vote(room):
     room['phase'] = 'vote'
     room['votes'] = {}
     room['vote_reasons'] = {}
+    room['brainwash_detail'] = None
     room['vote_pending'] = {pid for pid, p in room['players'].items() if p['alive']}
     await bcast(room, {'type': 'vote_start',
                        'alive': [public_player(room, pid, p) for pid, p in room['players'].items() if p['alive']],
@@ -544,6 +587,27 @@ async def start_vote(room):
     for pid in list(room['vote_pending']):
         if pid in room['cpu_pids']:
             asyncio.create_task(_cpu_vote(room, pid))
+
+def apply_brainwash_vote(room, voter_name, intended_target):
+    effect = room.get('night_actions', {}).get('brainwash')
+    if not effect or effect.get('voter') != voter_name:
+        return intended_target, False
+    forced = next((p for p in room['players'].values()
+                   if p['name'] == effect.get('target') and p.get('alive')), None)
+    voter = next((p for p in room['players'].values()
+                  if p['name'] == voter_name and p.get('alive')), None)
+    if not forced or not voter or forced['name'] == voter_name:
+        return intended_target, False
+    room['brainwash_applied'] = True
+    room['brainwash_detail'] = {
+        'day': room.get('day'),
+        'actor': effect.get('actor', ''),
+        'voter': voter_name,
+        'intended_target': intended_target,
+        'forced_target': forced['name'],
+        'changed': intended_target != forced['name'],
+    }
+    return forced['name'], True
 
 async def _cpu_vote(room, cpu_pid):
     await asyncio.sleep(random.uniform(0.5, 2.0))
@@ -556,13 +620,18 @@ async def _cpu_vote(room, cpu_pid):
         for _, q in alive_others:
             if q['name'] in m['text'] and any(w in m['text'] for w in ['怪しい','疑','投票','処刑']):
                 accused[q['name']] = accused.get(q['name'], 0) + 1
-    if p['role'] in ['WEREWOLF', 'MADMAN']:
+    if p['role'] in ['WEREWOLF', 'MADMAN', 'MADMAN_ACTIVE']:
         candidates = [q for pid, q in alive_others if pid not in wolf_set]
         target = (max(accused, key=accused.get) if accused else None) or (random.choice(candidates)['name'] if candidates else None)
     else:
         target = (max(accused, key=accused.get) if accused else None) or (random.choice(alive_others)[1]['name'] if alive_others else None)
     if target:
-        room['votes'][p['name']] = target
+        final_target, forced = apply_brainwash_vote(room, p['name'], target)
+        room['votes'][p['name']] = final_target
+        if forced:
+            recipient = next((pid for pid, q in room['players'].items() if q['name'] == p['name']), None)
+            if recipient:
+                await send1(room, recipient, {'type': 'brainwashed_notice', 'forced_target': final_target})
         room['vote_reasons'][p['name']] = f"{target}さんの発言と投票の流れが気になりました。"
         room['vote_pending'].discard(cpu_pid)
         await bcast(room, {'type': 'vote_progress', 'done': len(room['votes']),
@@ -599,12 +668,19 @@ async def _tally_votes(room):
             nekomata_victim = victim['name']
             room['log'].append(f"第{room['day']}日: 猫又の道連れで {nekomata_victim} も倒れました")
     winner = check_win(room)
+    if room.get('brainwash_detail'):
+        detail = dict(room['brainwash_detail'])
+        detail['tally'] = dict(tally)
+        detail['executed'] = executed
+        room.setdefault('brainwash_history', []).append(detail)
     msg = {'type': 'vote_result', 'executed': executed, 'executed_role': erole,
            'tally': tally, 'winner': winner, 'nekomata_victim': nekomata_victim,
            'vote_reasons': room.get('vote_reasons', {}),
            'votes': dict(room.get('votes', {})),
-           'pre_votes': dict(room.get('pre_votes', {}))}
+           'pre_votes': dict(room.get('pre_votes', {})),
+           'brainwash_count': 1 if room.get('brainwash_applied') else 0}
     if winner:
+        msg['brainwash_history'] = list(room.get('brainwash_history', []))
         msg['players'] = [public_player(room, pid, p, include_role=True)
                           for pid, p in room['players'].items()]
         msg['log'] = room['log']
@@ -656,6 +732,10 @@ async def handle(ws, pid, room, data):
         room['votes'] = {}
         room['vote_reasons'] = {}
         room['vote_pending'] = set()
+        room['brainwash_applied'] = False
+        room['brainwash_detail'] = None
+        room['brainwash_history'] = []
+        room['last_brainwash_voter'] = None
         for ppid, p in room['players'].items():
             if ppid in room['cpu_pids']: continue
             wp = [q['name'] for qid, q in room['players'].items() if q['role'] == 'WEREWOLF' and qid != ppid] if p['role'] == 'WEREWOLF' else []
@@ -746,11 +826,13 @@ async def handle(ws, pid, room, data):
         if p and p.get('name') in valid_targets:
             valid_targets.discard(p['name'])
         if room['phase'] != 'vote' or not p or not p['alive'] or pid not in room['vote_pending'] or target not in valid_targets: return
-        data['target'] = target
-        room['votes'][p['name']] = data.get('target')
+        final_target, forced = apply_brainwash_vote(room, p['name'], target)
+        room['votes'][p['name']] = final_target
         room['vote_reasons'][p['name']] = str(data.get('reason') or f"{data.get('target')}さんの発言と投票の流れが気になりました。")[:160]
         room['vote_pending'].discard(pid)
         await send1(room, pid, {'type': 'vote_ack'})
+        if forced:
+            await send1(room, pid, {'type': 'brainwashed_notice', 'forced_target': final_target})
         await bcast(room, {'type': 'vote_progress', 'done': len(room['votes']),
                            'total': len(room['votes']) + len(room['vote_pending'])})
         if not room['vote_pending']:
